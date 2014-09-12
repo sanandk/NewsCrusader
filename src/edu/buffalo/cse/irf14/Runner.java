@@ -40,7 +40,7 @@ public class Runner {
 		
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		
+		long startTime=System.currentTimeMillis();
 		try {
 			for (String cat : catDirectories) {
 				dir = new File(ipDir+ File.separator+ cat);
@@ -53,6 +53,7 @@ public class Runner {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
 						writer.addDocument(d);
+						
 					} catch (ParserException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -61,8 +62,12 @@ public class Runner {
 				}
 				
 			}
-			
+//			System.out.println("No Place");
+//			writer.printA();
+//			System.out.println("No Date");
+//			writer.printB();
 			writer.close();
+			System.out.println(startTime+"\n"+System.currentTimeMillis());
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
