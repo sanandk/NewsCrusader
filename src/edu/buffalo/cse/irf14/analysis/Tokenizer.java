@@ -8,11 +8,14 @@ package edu.buffalo.cse.irf14.analysis;
  * Class that converts a given string into a {@link TokenStream} instance
  */
 public class Tokenizer {
+	
+	String delimiter;
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		delimiter=" ";
 	}
 	
 	/**
@@ -21,6 +24,7 @@ public class Tokenizer {
 	 */
 	public Tokenizer(String delim) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		delimiter=delim;
 	}
 	
 	/**
@@ -39,6 +43,8 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		TokenStream res=new TokenStream();
+		
 		return null;
 	}
 }
