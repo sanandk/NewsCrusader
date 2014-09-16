@@ -16,6 +16,11 @@ public class Token {
 	private String termText;
 	//The char array backing termText
 	private char[] termBuffer;
+	// Updated by anand on Sep 14th
+	Token(String str)
+	{
+		setTermText(str);
+	}
 	
 	/**
 	 * Method to set the termText to given text.
@@ -84,6 +89,6 @@ public class Token {
 	@Override
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		return termText;
 	}
 }

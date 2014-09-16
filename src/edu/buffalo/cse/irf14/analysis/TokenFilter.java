@@ -19,5 +19,7 @@ public abstract class TokenFilter implements Analyzer {
 	 */
 	public TokenFilter(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		
+		
 	}
 }

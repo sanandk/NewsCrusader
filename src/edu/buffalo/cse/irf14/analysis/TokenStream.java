@@ -3,7 +3,9 @@
  */
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author nikhillo
@@ -12,6 +14,15 @@ import java.util.Iterator;
  * behavior
  */
 public class TokenStream implements Iterator<Token>{
+	// Updated by anand on 14th Sep
+	
+	List<Token> my_stream;
+	int currentPointer;
+	TokenStream(ArrayList<Token> t_stream)
+	{
+		my_stream = t_stream;
+		currentPointer=0;
+	}
 	
 	/**
 	 * Method that checks if there is any Token left in the stream
@@ -22,7 +33,8 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		return false;
+		
+		return !(my_stream.size()==(currentPointer));
 	}
 
 	/**
@@ -34,8 +46,12 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public Token next() {
+//		System.out.println("Entered next now!"+currentPointer);
 		// TODO YOU MUST IMPLEMENT THIS
-		return null;
+		if(currentPointer<0 || currentPointer>=my_stream.size())
+			return null;
+		else
+		return my_stream.get(currentPointer++);
 	}
 	
 	/**
@@ -47,7 +63,7 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		
+		my_stream.remove(currentPointer);
 	}
 	
 	/**
@@ -57,6 +73,16 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
+		currentPointer=(my_stream.size()>0)?0:-1;
+	}
+	
+	/* Method to add token next to the current pointer */
+	public void add_next(Token t) {
+		my_stream.add(currentPointer++, t);
+	}
+	
+	public void replace(Token t){
+		my_stream.set(currentPointer, t);
 	}
 	
 	/**
@@ -70,6 +96,12 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
+		
+		while(stream.hasNext())
+		{
+			Token element = stream.next();
+			my_stream.add(element);
+		}
 	}
 	
 	/**
@@ -82,7 +114,10 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		return null;
+		if(currentPointer>=0 && currentPointer<my_stream.size())
+			return my_stream.get(currentPointer);
+		else 
+			return null;
 	}
 	
 }

@@ -9,6 +9,9 @@ import java.io.FileWriter;
 import java.util.List;
 import java.util.ArrayList;
 
+import edu.buffalo.cse.irf14.analysis.TokenStream;
+import edu.buffalo.cse.irf14.analysis.Tokenizer;
+import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
 
@@ -43,6 +46,24 @@ public class IndexWriter {
 
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
+		// Updated by anand on Sep 14
+		TokenStream t_stream = null;
+		Tokenizer t=new Tokenizer();
+		try {
+			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
+			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
+		} catch (TokenizerException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Exception!");
+			e.printStackTrace();
+		}
+		
+		while (t_stream.hasNext()) {
+            System.out.println("Item is: " + t_stream.next());
+        }
+
+		System.exit(0);
+		
 		// Code added by Karthik-J on Sept 9, 2014 - Starts
 //		printDoc(d);
 //		System.out.println("File Parsed " + i++ + "==> "
