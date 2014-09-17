@@ -22,7 +22,7 @@ public class SymbolFilter extends TokenFilter {
 		// TODO Auto-generated method stub
 		
 		 char[] punctuations={'.',',',':',';','?','!','-','\''};
-		Token current_token=t_stream.getCurrent();
+		Token current_token=t_stream.next();
 		
 		if(current_token==null)
 			return false;
@@ -135,10 +135,7 @@ public class SymbolFilter extends TokenFilter {
 		
 		
 		if(t_stream.hasNext())
-		{
-			t_stream.next();
 			return true;
-		}
 		else
 			return false;
 	}
