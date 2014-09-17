@@ -16,14 +16,13 @@ public class TFRuleBaseTest {
 		TokenStream tstream = tkizer.consume(str);
 		TokenFilterFactory factory = TokenFilterFactory.getInstance();
 		TokenFilter filter = factory.getFilterByType(type, tstream);
-		System.out.println(str);
+		
 		while (filter.increment()) {
 			//Do nothing :/
 		}
 		
 		tstream = filter.getStream();
 		tstream.reset();
-	
 		
 		ArrayList<String> list = new ArrayList<String>();
 		String s;
@@ -31,7 +30,7 @@ public class TFRuleBaseTest {
 
 		while (tstream.hasNext()) {
 			t = tstream.next();
-			System.out.println(t.toString());
+
 			if (t != null) {
 				s = t.toString();
 				

@@ -21,7 +21,7 @@ public class TokenStream implements Iterator<Token>{
 	TokenStream(ArrayList<Token> t_stream)
 	{
 		my_stream = t_stream;
-		currentPointer=0;
+		currentPointer=-1;
 	}
 	
 	/**
@@ -33,8 +33,16 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		
-		return !(my_stream.size()==(currentPointer));
+		if((currentPointer+1)<my_stream.size())
+		{
+			if(currentPointer+1>=0 && my_stream.get(currentPointer+1)==null)
+			{
+				my_stream.remove(currentPointer+1);
+			}
+			if((currentPointer+1)<my_stream.size())
+				return true;
+		}
+			return false;
 	}
 
 	/**
@@ -48,10 +56,11 @@ public class TokenStream implements Iterator<Token>{
 	public Token next() {
 //		System.out.println("Entered next now!"+currentPointer);
 		// TODO YOU MUST IMPLEMENT THIS
-		if(currentPointer<0 || currentPointer>=my_stream.size())
+		if(currentPointer+1>=my_stream.size())
 			return null;
-		else
-		return my_stream.get(currentPointer++);
+		if(currentPointer>=0 && my_stream.get(currentPointer)==null)
+			return my_stream.remove(currentPointer);
+		return my_stream.get(++currentPointer);
 	}
 	
 	/**
@@ -63,7 +72,9 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public void remove() {
 		// TODO YOU MUST IMPLEMENT THIS
-		my_stream.remove(currentPointer);
+		if(currentPointer>=0 && currentPointer<my_stream.size() )
+			//my_stream.remove(currentPointer--);
+			my_stream.set(currentPointer,null);
 	}
 	
 	/**
@@ -73,12 +84,13 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public void reset() {
 		//TODO : YOU MUST IMPLEMENT THIS
-		currentPointer=(my_stream.size()>0)?0:-1;
+	//	currentPointer=(my_stream.size()>0)?0:-1;
+		currentPointer=-1;
 	}
 	
 	/* Method to add token next to the current pointer */
 	public void add_next(Token t) {
-		my_stream.add(currentPointer++, t);
+		my_stream.add(++currentPointer, t);
 	}
 	
 	public void replace(Token t){
@@ -97,11 +109,17 @@ public class TokenStream implements Iterator<Token>{
 	public void append(TokenStream stream) {
 		//TODO : YOU MUST IMPLEMENT THIS
 		
+		if(stream==null)
+			return;
+		Token element;
+
+		stream.reset();
 		while(stream.hasNext())
 		{
-			Token element = stream.next();
+			element = stream.next();
 			my_stream.add(element);
 		}
+
 	}
 	
 	/**

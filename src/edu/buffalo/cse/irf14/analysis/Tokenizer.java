@@ -46,11 +46,13 @@ public class Tokenizer {
 	 */
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
-		
+		if(str==null || str.length()<1)
+			throw new TokenizerException();
 		String[] t_strings = str.split(delimiter);
 		ArrayList<Token> t_list=new ArrayList<Token>();
 		for(String text:t_strings)
 			t_list.add(new Token(text));
 		return new TokenStream(t_list);
+		
 	}
 }

@@ -28,13 +28,14 @@ public class Parser {
 		// Code edited by Karthik-j on Sept 9, 2014- Starts
 		Document doc = new Document();
 		try {
-			if (null != filename) {
+		
 				String[] dirList = filename
 						.split(Pattern.quote(File.separator));
 				int dirLen = dirList.length;
 				if (dirLen > 0) { // if less then zero try throwing an error
 									// saying invalid file name
 					File inputFile = new File(filename);
+					
 					FileReader inputFileReader = new FileReader(inputFile);
 					BufferedReader inputBR = new BufferedReader(inputFileReader);
 
@@ -99,17 +100,17 @@ public class Parser {
 							}
 							doc.setField(FieldNames.CONTENT, content);
 						}
+						
 					} catch (IOException ioe) {
-
+						
 					}
-
 				}
-			}
 		} catch (FileNotFoundException fe) {
-
+			throw new ParserException();
 		} catch (NullPointerException npe) {
-
+			throw new ParserException();
 		}
+		
 		return doc;
 		// Code edited by Karthik-j on Sept 9, 2014- Ends
 	}
