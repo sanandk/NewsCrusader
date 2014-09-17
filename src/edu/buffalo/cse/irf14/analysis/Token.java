@@ -72,6 +72,11 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		if(tokens!=null)
+		for(Token t:tokens)
+		{
+			termText+=" "+t.getTermText();
+		}
 	}
 	
 	/**
