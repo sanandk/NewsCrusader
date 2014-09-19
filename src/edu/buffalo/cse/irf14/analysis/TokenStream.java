@@ -63,6 +63,12 @@ public class TokenStream implements Iterator<Token>{
 			return my_stream.get(currentPointer);
 	}
 	
+	public Token prev(){
+		if(currentPointer>0)
+			return my_stream.get(currentPointer-1);
+		return null;
+	}
+	
 	/**
 	 * Method to remove the current Token from the stream.
 	 * Note that "current" token refers to the Token just returned
