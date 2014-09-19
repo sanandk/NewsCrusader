@@ -54,8 +54,8 @@ public class Tokenizer {
 		Token tk;
 		for(String text:t_strings){
 			tk=new Token(text);
-			endChar=str.charAt(str.length()-1);
-			tk.lineEnd=(".?!".indexOf(endChar)>0);
+			endChar=text.charAt(text.length()-1);
+			tk.lineEnd=(".?!".indexOf(endChar)!=-1);
 			t_list.add(tk);
 		}
 		return new TokenStream(t_list);
