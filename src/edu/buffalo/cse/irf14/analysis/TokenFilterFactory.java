@@ -52,12 +52,8 @@ public class TokenFilterFactory {
 	
 		if(type==TokenFilterType.SYMBOL){
 			return new SymbolFilter(stream);
-		}else if(type==TokenFilterType.CAPITALIZATION){
-			return new CapitalizationFilter(stream);
-		}else if(type==TokenFilterType.STOPWORD){
-			return new StopwordFilter(stream);
-		}else if(type==TokenFilterType.STEMMER){
-			return new StemmerFilter(stream);
+		}else if(type==TokenFilterType.DATE){
+			return new DateFilter(stream);
 		}
 		return null;
 	}

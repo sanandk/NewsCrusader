@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class SymbolFilter extends TokenFilter {
 	// Updated by anand on Sep 15
+	// Fixed after changes made on 17th Sep
 	
 	TokenStream t_stream;
 	public SymbolFilter(TokenStream stream) {
@@ -22,7 +23,10 @@ public class SymbolFilter extends TokenFilter {
 		// TODO Auto-generated method stub
 		
 		 char[] punctuations={'.',',',':',';','?','!','-','\''};
-		Token current_token=t_stream.next();
+		 Token current_token;
+	
+		 current_token=t_stream.next();
+		
 		
 		if(current_token==null)
 			return false;
