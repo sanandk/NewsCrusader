@@ -40,6 +40,11 @@ public class TokenStream implements Iterator<Token>{
 		}
 		return ((currentPointer+1)<my_stream.size());
 	}
+	
+	public boolean hasPrevious() {
+		// TODO YOU MUST IMPLEMENT THIS
+		return ((currentPointer-1)>-1);
+	}
 
 	/**
 	 * Method to return the next Token in the stream. If a previous
@@ -63,10 +68,15 @@ public class TokenStream implements Iterator<Token>{
 			return my_stream.get(currentPointer);
 	}
 	
-	public Token prev(){
-		if(currentPointer>0)
-			return my_stream.get(currentPointer-1);
-		return null;
+
+	 public Token previous() {
+
+		// TODO YOU MUST IMPLEMENT THIS
+		
+		if(--currentPointer>-1)
+			return my_stream.get(currentPointer);
+		else
+			return null;
 	}
 	
 	/**

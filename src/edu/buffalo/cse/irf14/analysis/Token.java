@@ -16,10 +16,12 @@ public class Token {
 	private String termText;
 	//The char array backing termText
 	private char[] termBuffer;
+	boolean lineEnd;
 	// Updated by anand on Sep 14th
 	Token(String str)
 	{
 		setTermText(str);
+		lineEnd=false;
 	}
 	
 	/**

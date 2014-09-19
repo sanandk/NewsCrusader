@@ -50,8 +50,14 @@ public class Tokenizer {
 			throw new TokenizerException();
 		String[] t_strings = str.split(delimiter);
 		ArrayList<Token> t_list=new ArrayList<Token>();
-		for(String text:t_strings)
-			t_list.add(new Token(text));
+		char endChar;
+		Token tk;
+		for(String text:t_strings){
+			tk=new Token(text);
+			endChar=str.charAt(str.length()-1);
+			tk.lineEnd=(".?!".indexOf(endChar)>0);
+			t_list.add(tk);
+		}
 		return new TokenStream(t_list);
 		
 	}
