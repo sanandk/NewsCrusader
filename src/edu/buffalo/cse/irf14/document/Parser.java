@@ -67,12 +67,12 @@ public class Parser {
 												.split(",");
 										if (inputLine.contains(",")) {
 											doc.setField(FieldNames.AUTHOR,
-													authorData[0]);
+													authorData[0].trim());
 											doc.setField(FieldNames.AUTHORORG,
-													authorData[1]);
+													authorData[1].trim());
 										} else {
 											doc.setField(FieldNames.AUTHOR,
-													authorData[0]);
+													authorData[0].trim());
 										}
 									} else {
 										// PLACE, NEWSDATE, CONTENT
@@ -87,7 +87,7 @@ public class Parser {
 												doc.setField(FieldNames.PLACE,placeInfo.substring(0, placeInfo.lastIndexOf(",")).trim());
 												doc.setField(FieldNames.NEWSDATE,placeInfo.substring(placeInfo.lastIndexOf(",")+1).trim());
 											} else {
-												doc.setField(FieldNames.PLACE,placeInfo);
+												doc.setField(FieldNames.PLACE,placeInfo.trim());
 											}
 										} else {
 											content+=" "+inputLine;
@@ -102,9 +102,12 @@ public class Parser {
 						}
 						
 					} catch (IOException ioe) {
-						
+							throw new ParserException();
 					}
 				}
+			
+			else
+				throw new ParserException();
 		} catch (FileNotFoundException fe) {
 			throw new ParserException();
 		} catch (NullPointerException npe) {
@@ -116,3 +119,4 @@ public class Parser {
 	}
 
 }
+
