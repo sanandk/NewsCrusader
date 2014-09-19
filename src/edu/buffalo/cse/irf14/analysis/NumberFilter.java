@@ -42,7 +42,7 @@ public class NumberFilter extends TokenFilter {
 					str+=temp;
 				}
 				str=str.replaceAll("\\.|,","");
-				System.out.println(str);
+				//System.out.println(str);
 				if("".equals(str))
 					t_stream.remove();
 				else

@@ -285,7 +285,7 @@ public class DateFilter  extends TokenFilter {
 				}
 				date+=ch_time;
 			}
-			System.out.println(date);
+			
 			if(!date.equals(""))
 			t_stream.replace(new Token(date));
 			while(cnt>0)

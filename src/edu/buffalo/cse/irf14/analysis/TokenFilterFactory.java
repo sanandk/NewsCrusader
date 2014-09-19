@@ -58,9 +58,17 @@ public class TokenFilterFactory {
 		else if(type==TokenFilterType.ACCENT){
 			return new AccentFilter(stream);
 		}
+		else if(type==TokenFilterType.NUMERIC){
+			return new NumberFilter(stream);
+		}
 		else if(type==TokenFilterType.SPECIALCHARS){
-			
 			return new SpecialCharFilter(stream);
+		}
+		else if(type==TokenFilterType.CAPITALIZATION){
+			return new CapitalizationFilter(stream);
+		}
+		else if(type==TokenFilterType.STOPWORD){
+			return new StopwordFilter(stream);
 		}
 		return null;
 	}

@@ -51,9 +51,7 @@ public class AccentFilter  extends TokenFilter {
 			{
 				str=str.replaceAll(a, accents_val[i++]);
 			}
-			   String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
-		    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-		    
+		   
 		    str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 			t_stream.replace(new Token(str));
 			
