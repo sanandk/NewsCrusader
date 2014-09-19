@@ -55,6 +55,13 @@ public class TokenFilterFactory {
 		}else if(type==TokenFilterType.DATE){
 			return new DateFilter(stream);
 		}
+		else if(type==TokenFilterType.ACCENT){
+			return new AccentFilter(stream);
+		}
+		else if(type==TokenFilterType.SPECIALCHARS){
+			
+			return new SpecialCharFilter(stream);
+		}
 		return null;
 	}
 }

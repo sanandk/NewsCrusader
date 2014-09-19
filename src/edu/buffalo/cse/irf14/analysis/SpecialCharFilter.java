@@ -1,6 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
 import java.text.Normalizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SpecialCharFilter  extends TokenFilter {
@@ -12,16 +13,18 @@ public class SpecialCharFilter  extends TokenFilter {
 		// TODO Auto-generated constructor stub
 		t_stream=stream;
 	}
-
+	String intregex = "(.)*(\\d)(.)*";      
+    Pattern intpattern = Pattern.compile(intregex);
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		
-		 char[] punctuations={'.',',','?','!','-','\''};
+		 char[] punctuations={'.',',','?','!','\''};
 		 String ps=new String(punctuations);
 		 StringBuffer res = new StringBuffer();
 		 int flag=0;
 			Token current_token=t_stream.next();
+			String str=current_token.getTermText();
 			if(current_token==null)
 				return false;
 			char [] buf=current_token.getTermBuffer();
@@ -30,11 +33,14 @@ public class SpecialCharFilter  extends TokenFilter {
 			{
 				if(Character.isLetterOrDigit(a) || ps.indexOf(a)>=0)
 					res.append(a);
-				else if(a=='@')
+				else if(a=='-')
 				{
-					t_stream.replace(new Token(res.toString()));
-					res.delete(0, res.capacity());
-					flag=1;
+					 Matcher matcher = intpattern.matcher(str);
+			         boolean isMatched = matcher.matches();
+			        
+			        if(isMatched)
+			        	 res=res.append(a);
+					
 				}
 			}
 			if(flag==1)

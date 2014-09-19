@@ -1,5 +1,7 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
@@ -35,16 +37,24 @@ public class AccentFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.toString();
-			
-			 //  String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
-			//    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-			    
-			 //   str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", ""); 
+			String encoded="";
+			try {
+				str = new String(str.getBytes(), Charset.forName("UTF-8"));
+				//encoded = new String(str.getBytes("utf-8"), "iso8859-1");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+ 
 			int i=0;
 			for(String a:accents)
 			{
-				str.replaceAll(a, accents_val[i++]);
+				str=str.replaceAll(a, accents_val[i++]);
 			}
+			   String nfdNormalizedString = Normalizer.normalize(str, Normalizer.Form.NFD); 
+		    Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+		    
+		    str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 			t_stream.replace(new Token(str));
 			
 			if(t_stream.hasNext())
