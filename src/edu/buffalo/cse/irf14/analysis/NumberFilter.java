@@ -46,14 +46,21 @@ public class NumberFilter extends TokenFilter {
 				if("".equals(str))
 					t_stream.remove();
 				else
-					t_stream.replace(new Token(str));
+                {
+                    current_token.setTermText(str);
+                    t_stream.replace(current_token);
+                }
+
 			}else if(numberMatcher.matches()){
 //				System.out.println(numberMatcher.group());
 				str=str.replaceAll(numberRegex, "");
 				if("".equals(str))
 					t_stream.remove();
-				else
-					t_stream.replace(new Token(str));
+                else{
+                    current_token.setTermText(str);
+                    t_stream.replace(current_token);
+                }
+
 			}
 			if (t_stream.hasNext()) {
 			return true;
