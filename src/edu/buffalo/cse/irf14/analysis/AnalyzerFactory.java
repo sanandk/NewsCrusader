@@ -43,62 +43,65 @@ public class AnalyzerFactory {
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		ArrayList<Analyzer> list=new ArrayList<Analyzer>();
+		TokenFilterFactory factory = TokenFilterFactory.getInstance();
+		TokenFilter filter;
+		TokenFilter AccentFilterObject = factory.getFilterByType(TokenFilterType.ACCENT, stream);
+		TokenFilter SymbolFilterObject = factory.getFilterByType(TokenFilterType.SYMBOL, stream);
+		TokenFilter CapitalizationFilterObject = factory.getFilterByType(TokenFilterType.CAPITALIZATION, stream);
+		TokenFilter StopwordFilterObject = factory.getFilterByType(TokenFilterType.STOPWORD, stream);
+		TokenFilter StemmerFilterObject = factory.getFilterByType(TokenFilterType.STEMMER, stream);
+		TokenFilter DateFilterObject = factory.getFilterByType(TokenFilterType.DATE, stream);
+		TokenFilter SpecialCharFilterObject = factory.getFilterByType(TokenFilterType.SPECIALCHARS, stream);
+		TokenFilter NumberFilterObject = factory.getFilterByType(TokenFilterType.NUMERIC, stream);
+		
 		if(name==FieldNames.CONTENT){
-			/*symbol
-stop words
-stemmer
-caps
-dates
-spl
-number
-accent
-*/			list.add(new AccentFilter(stream));
-			list.add(new SymbolFilter(stream));
-			list.add(new CapitalizationFilter(stream));
-			list.add(new StopwordFilter(stream));
-			list.add(new StemmerFilter(stream));
-			list.add(new DateFilter(stream));
-			list.add(new SpecialCharFilter(stream));
-			list.add(new NumberFilter(stream));
+			list.add(AccentFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(CapitalizationFilterObject);
+			list.add(StopwordFilterObject);
+			list.add(StemmerFilterObject);
+			list.add(DateFilterObject);
+			list.add(SpecialCharFilterObject);
+			list.add(NumberFilterObject);
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)
 		{
-			list.add(new CapitalizationFilter(stream));
-			list.add(new StopwordFilter(stream));
-			list.add(new AccentFilter(stream));
-			list.add(new SymbolFilter(stream));
-			list.add(new SpecialCharFilter(stream));
+			list.add(CapitalizationFilterObject);
+			list.add(StopwordFilterObject);
+			list.add(AccentFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
 			
 		}
 		else if(name==FieldNames.CATEGORY)
 		{
-			list.add(new CapitalizationFilter(stream));
-			list.add(new StopwordFilter(stream));
-			list.add(new AccentFilter(stream));
-			list.add(new SymbolFilter(stream));
-			list.add(new SpecialCharFilter(stream));
+			list.add(CapitalizationFilterObject);
+			list.add(StopwordFilterObject);
+			list.add(AccentFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
 		}
 		else if(name==FieldNames.NEWSDATE)
 		{
-			list.add(new SymbolFilter(stream));
-			list.add(new DateFilter(stream));
-			list.add(new SpecialCharFilter(stream));
+			list.add(SymbolFilterObject);
+			list.add(DateFilterObject);
+			list.add(SpecialCharFilterObject);
 		}
 		else if(name==FieldNames.PLACE)
 		{
-			list.add(new CapitalizationFilter(stream));
-			list.add(new StopwordFilter(stream));
-			list.add(new StemmerFilter(stream));
-			list.add(new AccentFilter(stream));
-			list.add(new SymbolFilter(stream));
-			list.add(new SpecialCharFilter(stream));
+			list.add(CapitalizationFilterObject);
+			list.add(StopwordFilterObject);
+			list.add(StemmerFilterObject);
+			list.add(AccentFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
 		}
 		else if(name==FieldNames.TITLE)
 		{
-			list.add(new CapitalizationFilter(stream));
-			list.add(new AccentFilter(stream));
-			list.add(new SymbolFilter(stream));
-			list.add(new SpecialCharFilter(stream));
+			list.add(CapitalizationFilterObject);
+			list.add(AccentFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
 		}
 		ChainFilters cf=new ChainFilters(list, stream);
 		return cf;
