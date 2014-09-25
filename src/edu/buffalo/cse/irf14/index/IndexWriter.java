@@ -9,6 +9,8 @@ import java.io.FileWriter;
 import java.util.List;
 import java.util.ArrayList;
 
+import edu.buffalo.cse.irf14.analysis.Analyzer;
+import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -49,21 +51,31 @@ public class IndexWriter {
 		// Updated by anand on Sep 14
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
+		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
-			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
-			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
+		//	System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
+			t_stream=t.consume(d.getField(FieldNames.AUTHOR)[0]);
+			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.AUTHOR, t_stream);
+			
+		//	t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
+		//	Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
+			
+			while (analyzer.increment()) {
+				
+			}
+			
+			t_stream.reset();
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception!");
 			e.printStackTrace();
 		}
 		
-		while (t_stream.hasNext()) {
-            System.out.println("Item is: " + t_stream.next());
-        }
+//		while (t_stream.hasNext()) {
+//            System.out.println("Item is: " + t_stream.next());
+//        }
 
-		System.exit(0);
-		
+	
 		// Code added by Karthik-J on Sept 9, 2014 - Starts
 //		printDoc(d);
 //		System.out.println("File Parsed " + i++ + "==> "
