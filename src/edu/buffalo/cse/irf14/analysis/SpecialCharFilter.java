@@ -24,9 +24,9 @@ public class SpecialCharFilter  extends TokenFilter {
 		 StringBuffer res = new StringBuffer();
 		 int flag=0;
 			Token current_token=t_stream.next();
-			String str=current_token.getTermText();
 			if(current_token==null)
 				return false;
+			String str=current_token.getTermText();
 			char [] buf=current_token.getTermBuffer();
 			
 			for(char a:buf)

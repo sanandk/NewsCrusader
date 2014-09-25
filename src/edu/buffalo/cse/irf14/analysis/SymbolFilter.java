@@ -31,6 +31,9 @@ public class SymbolFilter extends TokenFilter {
 		if(current_token==null)
 			return false;
 		String str=current_token.toString();
+		if(str.length()>0)
+		{
+			
 		char f=str.charAt(0);
 		char l=str.charAt(str.length()-1);
 		String ps=new String(punctuations);
@@ -137,11 +140,12 @@ public class SymbolFilter extends TokenFilter {
 		else
 			t_stream.remove();
 		
-		
+		}
 		if(t_stream.hasNext())
 			return true;
 		else
 			return false;
+		
 	}
 
 	@Override

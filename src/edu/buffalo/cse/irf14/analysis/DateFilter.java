@@ -37,7 +37,7 @@ public class DateFilter  extends TokenFilter {
 	public String month(String str)
 	{
 		int i=1;
-		if(str!=null)
+		if(str!=null && !str.equals(""))
 		for(String s:months)
 		{
 			if(s.contains(str) && s.charAt(0)==str.charAt(0))
@@ -128,8 +128,13 @@ public class DateFilter  extends TokenFilter {
 				int range=0,i=0;
 				for(String s:yr)
 				{
-						if(s.length()<4)
+					try{
+						if(i>0 && s.length()<4){
 							s=yr[i-1].substring(0,2)+s;
+						}
+					}catch(Exception e){
+//						System.out.println("Datefilter error"+yr[i-1]);
+					}
 							
 						t1=year_or_date(s);
 						if(i!=0 && t1!=""){
