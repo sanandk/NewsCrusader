@@ -70,6 +70,9 @@ public class TokenFilterFactory {
 		else if(type==TokenFilterType.STOPWORD){
 			return new StopwordFilter(stream);
 		}
+		else if(type==TokenFilterType.STEMMER){
+			return new StemmerFilter(stream);
+		}
 		return null;
 	}
 }

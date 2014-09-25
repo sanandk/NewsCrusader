@@ -37,7 +37,7 @@ public class StemmerFilter extends TokenFilter {
 		Token current_token;
 
 		Matcher consonantVowelMatcher;
-		if (t_stream.hasNext()) {
+//		if (t_stream.hasNext()) {
 			t_stream.next();
 			current_token = t_stream.getCurrent();
 			if (null == current_token)
@@ -522,6 +522,7 @@ public class StemmerFilter extends TokenFilter {
 			
 			
 			t_stream.replace(current_token);
+			if (t_stream.hasNext()) {	
 			return true;
 		} else {
 			return false;

@@ -28,7 +28,7 @@ public class NumberFilter extends TokenFilter {
 //		skfdjks7==>skfdjks
 		Token current_token;
 		
-		if(t_stream.hasNext()){
+//		if(t_stream.hasNext()){
 			current_token=t_stream.next();
 			if(current_token==null)
 				return false;
@@ -55,7 +55,7 @@ public class NumberFilter extends TokenFilter {
 				else
 					t_stream.replace(new Token(str));
 			}
-			
+			if (t_stream.hasNext()) {
 			return true;
 			
 		}
