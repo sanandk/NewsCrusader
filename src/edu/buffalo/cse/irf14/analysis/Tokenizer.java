@@ -53,13 +53,15 @@ public class Tokenizer {
 		char endChar;
 		Token tk;
 		for(String text:t_strings){
-			tk=new Token(text);
+			text=text.trim();
 			if(text.length()>1)
 			{
+				tk=new Token(text);
 				endChar=text.charAt(text.length()-1);
 				tk.lineEnd=(".?!".indexOf(endChar)!=-1);
+				t_list.add(tk);
 			}
-			t_list.add(tk);
+			
 		}
 		return new TokenStream(t_list);
 		
