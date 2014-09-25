@@ -16,7 +16,7 @@ import java.util.List;
 public class TokenStream implements Iterator<Token>{
 	// Updated by anand on 14th Sep
 	
-	List<Token> my_stream;
+	public List<Token> my_stream;
 	int currentPointer;
 	TokenStream(ArrayList<Token> t_stream)
 	{

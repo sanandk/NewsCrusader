@@ -15,11 +15,15 @@ public class ChainFilters implements Analyzer{
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
+		
 		boolean next=false;
 		for(Analyzer a:chain)
 		{
 			next=a.increment();
+			stream.previous();
 		}
+		if(next!=false)
+			stream.next();
 		return next;
 	}
 

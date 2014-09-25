@@ -67,7 +67,7 @@ public class Runner {
 //			System.out.println("No Date");
 //			writer.printB();
 			writer.close();
-			System.out.println(startTime+"\n"+System.currentTimeMillis());
+			System.out.println(startTime+"\n"+System.currentTimeMillis()+"\nTotal Number of tokenss"+IndexWriter.tokenSize);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

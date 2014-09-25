@@ -45,7 +45,7 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
-
+	public static int tokenSize =0;
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
@@ -54,8 +54,8 @@ public class IndexWriter {
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
 		//	System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
-			t_stream=t.consume(d.getField(FieldNames.AUTHOR)[0]);
-			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.AUTHOR, t_stream);
+			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
+			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
 			
 		//	t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
 		//	Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
@@ -63,7 +63,7 @@ public class IndexWriter {
 			while (analyzer.increment()) {
 				
 			}
-			
+			tokenSize+=t_stream.my_stream.size();
 			t_stream.reset();
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block
