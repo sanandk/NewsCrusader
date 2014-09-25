@@ -37,14 +37,14 @@ public class AccentFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.toString();
-			String encoded="";
-			try {
-				str = new String(str.getBytes(), Charset.forName("UTF-8"));
-				//encoded = new String(str.getBytes("utf-8"), "iso8859-1");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			String encoded="";
+//			try {
+//				str = new String(str.getBytes(), Charset.forName("UTF-8"));
+//				//encoded = new String(str.getBytes("utf-8"), "iso8859-1");
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
  
 			int i=0;
 			for(String a:accents)
