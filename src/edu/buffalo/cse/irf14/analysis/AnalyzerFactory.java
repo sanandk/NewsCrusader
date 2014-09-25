@@ -44,7 +44,6 @@ public class AnalyzerFactory {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		ArrayList<Analyzer> list=new ArrayList<Analyzer>();
 		TokenFilterFactory factory = TokenFilterFactory.getInstance();
-		TokenFilter filter;
 		TokenFilter AccentFilterObject = factory.getFilterByType(TokenFilterType.ACCENT, stream);
 		TokenFilter SymbolFilterObject = factory.getFilterByType(TokenFilterType.SYMBOL, stream);
 		TokenFilter CapitalizationFilterObject = factory.getFilterByType(TokenFilterType.CAPITALIZATION, stream);
@@ -57,11 +56,11 @@ public class AnalyzerFactory {
 		if(name==FieldNames.CONTENT){
 			list.add(AccentFilterObject);
 			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
 			list.add(CapitalizationFilterObject);
 			list.add(StopwordFilterObject);
 			list.add(StemmerFilterObject);
 			list.add(DateFilterObject);
-			list.add(SpecialCharFilterObject);
 			list.add(NumberFilterObject);
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)

@@ -62,6 +62,11 @@ public class TokenStream implements Iterator<Token>{
 			my_stream.remove(currentPointer);
 		else
 			++currentPointer;
+		
+		while(currentPointer<my_stream.size() && my_stream.get(currentPointer)==null)
+		{
+			my_stream.remove(currentPointer);
+		}
 		if(currentPointer>=my_stream.size())
 			return null;
 		else

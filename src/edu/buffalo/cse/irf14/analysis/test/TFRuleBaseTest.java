@@ -27,7 +27,7 @@ public class TFRuleBaseTest {
 		ArrayList<String> list = new ArrayList<String>();
 		String s;
 		Token t;
-
+System.out.println("\n");
 		while (tstream.hasNext()) {
 			t = tstream.next();
 
@@ -35,7 +35,8 @@ public class TFRuleBaseTest {
 				s = t.toString();
 				
 				if (s!= null && !s.isEmpty())
-					list.add(s);	
+					list.add(s);
+					System.out.print(s+"|");
 			}
 		}
 		

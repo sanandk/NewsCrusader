@@ -38,8 +38,8 @@ public class StemmerFilter extends TokenFilter {
 
 		Matcher consonantVowelMatcher;
 //		if (t_stream.hasNext()) {
-			t_stream.next();
-			current_token = t_stream.getCurrent();
+			
+			current_token = t_stream.next();
 			if (null == current_token)
 				return false;
 			String str = current_token.toString();

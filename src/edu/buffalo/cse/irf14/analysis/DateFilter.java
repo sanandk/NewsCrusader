@@ -192,7 +192,8 @@ public class DateFilter  extends TokenFilter {
 							ap=1;
 							cnt++;
 						}
-						if(!Character.isDigit(y.charAt(y.length()-1)))
+
+						if(y.length()>1 && !Character.isDigit(y.charAt(y.length()-1)))
 							ch_time=y.charAt(y.length()-1)+"";
 				    	
 				    	
@@ -224,11 +225,10 @@ public class DateFilter  extends TokenFilter {
 				t2=month(str);
 				if(!t2.equals(""))
 				{
-					if(!t_stream.hasNext())
-						return false;
+					if(t_stream.hasNext()){
 					next=t_stream.next();
 					t1=year_or_date(next.toString());
-					
+					}
 					if(!t1.equals("") && t_stream.hasNext())
 					{
 						next=t_stream.next();

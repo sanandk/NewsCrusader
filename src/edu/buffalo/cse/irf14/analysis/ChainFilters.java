@@ -16,6 +16,7 @@ public class ChainFilters implements Analyzer{
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		
+		
 		boolean next=false;
 		for(Analyzer a:chain)
 		{

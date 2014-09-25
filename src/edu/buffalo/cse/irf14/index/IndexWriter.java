@@ -11,16 +11,21 @@ import java.util.ArrayList;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
+import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
+import edu.buffalo.cse.irf14.index.FileUtilities.DictType;
 
 /**
  * @author nikhillo Class responsible for writing indexes to disk
  */
 public class IndexWriter {
+	
+	String outputDir;
+	
 	/**
 	 * Default constructor
 	 * 
@@ -29,6 +34,17 @@ public class IndexWriter {
 	 */
 	public IndexWriter(String indexDir) {
 		// TODO : YOU MUST IMPLEMENT THIS
+		outputDir=indexDir;
+		File theDir = new File(outputDir);
+		 
+		  // if the directory does not exist, create it
+		  if (!theDir.exists())
+		  {
+		    System.out.println("creating directory: " + outputDir);
+		    theDir.mkdir();
+		  }
+		  FileUtilities.setOutputDir(indexDir);
+		  FileUtilities.openDict();
 	}
 
 	/**
@@ -49,22 +65,34 @@ public class IndexWriter {
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
+		
+		FileUtilities.writeToDic(d.getField(FieldNames.FILEID)[0], DictType.DOC);
+
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
-		//	System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
+			
 			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
 			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
 			
-		//	t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
-		//	Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
+	//		t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
+	//		Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
 			
 			while (analyzer.increment()) {
 				
 			}
 			tokenSize+=t_stream.my_stream.size();
+			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
 			t_stream.reset();
+			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
+			System.out.print("Content is ");
+			while(t_stream.hasNext())
+			{
+				Token tp=t_stream.next();
+				if(tp!=null)
+				System.out.print(tp.toString()+"|");
+			}
 		} catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception!");

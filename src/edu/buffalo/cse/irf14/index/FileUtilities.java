@@ -20,7 +20,7 @@ public class FileUtilities {
 	public static String docDict = "DocDictionary";
 	public static String termDict = "TermDictionary";
 	public static String authorDict = "AutDictionary";
-	public String delim="~";
+	public static String delim="~";
 	// public static String fileName;
 	public static BufferedWriter docBW;
 	public static BufferedWriter termBW;
@@ -43,7 +43,7 @@ public class FileUtilities {
 	// FileUtilities.fileName = fileName;
 	// }
 
-	public void openDict() {
+	public static void openDict() {
 		try {
 			File docDicFile = new File(outputDir + File.separator + docDict);
 			FileWriter docFW = new FileWriter(docDicFile, true);
@@ -53,13 +53,13 @@ public class FileUtilities {
 		}
 	}
 
-	public void writeToDic(Object data, DictType type) {
+	public static void writeToDic(Object data, DictType type) {
 		try {
 			switch (type) {
 			case DOC:
 				if (null != docBW) {
-					String fileName = (String) data;
-					docBW.write(fileName + delim + docId++);
+					String fileName = data.toString();
+					docBW.write(fileName + delim + docId+++"\n");
 				}
 			}
 		} catch (IOException e) {
