@@ -20,6 +20,8 @@ public class StemmerFilter extends TokenFilter {
 	Pattern consonantPattern = Pattern.compile(consonantRegex);
 	Pattern vowelPattern = Pattern.compile(vowelRegex);
 	Matcher matcher;
+	
+	Stemmer stemmer=new Stemmer();
 
 	public StemmerFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
@@ -41,7 +43,25 @@ public class StemmerFilter extends TokenFilter {
 			if (null == current_token)
 				return false;
 			String str = current_token.toString();
-			String stem;
+			if (str.matches("[a-zA-Z]+")) {
+			char[] w= str.toCharArray();
+			
+//			stemmer.stem();
+			int j= w.length;
+			for (int c = 0; c < j; c++) stemmer.add(w[c]);
+
+            /* or, to test add(char[] w, int j) */
+            /* s.add(w, j); */
+
+			stemmer.stem();
+			
+			current_token.setTermText(stemmer.toString());
+			}else{
+				current_token.setTermText(str);
+			}
+			
+			//Code for STemming by KarthikJ Commented as alternate Porters algorithm code is being used.
+			/*String stem;
 			int m = 0;
 			if (str.matches("[a-zA-Z]+")) {
 
@@ -495,8 +515,12 @@ public class StemmerFilter extends TokenFilter {
 						str = str.substring(0, str.lastIndexOf("e"));
 					}
 				}
-			}
-			current_token.setTermText(str);
+			}*/
+			//Code for STemming by KarthikJ Commented as alternate Porters algorithm code is being used.- Ends
+			
+			
+			
+			
 			t_stream.replace(current_token);
 			return true;
 		} else {
