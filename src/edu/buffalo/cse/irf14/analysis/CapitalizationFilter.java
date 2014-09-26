@@ -10,7 +10,8 @@ public class CapitalizationFilter extends TokenFilter {
 		// TODO Auto-generated constructor stub
 		super(stream);
 		t_stream = stream;
-		f_type=TokenFilterType.CAPITALIZATION;
+        f_type=TokenFilterType.CAPITALIZATION;
+		// lineStart=0;
 	}
 
 	@Override
@@ -25,27 +26,30 @@ public class CapitalizationFilter extends TokenFilter {
 		current_token = t_stream.getCurrent();
 		if (null == current_token)
 			return false;
-		
-        if (current_token.getTermText().matches(camelCaseRegex)) {
+		if (current_token.getTermText().matches(camelCaseRegex)) {
 
 			if (previous_token == null || previous_token.lineEnd) {
-				// loop to check if not begining of line and captilization
-				// conditions
+				// loop to check if not begining of line and captilization conditions
                 current_token.setTermText(current_token.getTermText().toLowerCase());
-
-    		    ChainFilters.change=true;
 				t_stream.replace(current_token);
 			} else if (t_stream.hasNext()) {
-				current_token = t_stream.next();
-                if (current_token.getTermText().matches(camelCaseRegex)) {
+				
+				do{
+					current_token = t_stream.next();
+					camelCaseRegex = "([a-z]*[A-Z]+[a-z]*[ ]*)+";
+//					String tempStr=current_token.getTermText(); 
+//					tempStr=tempStr.replace(" ","");
+                if (null!=current_token && current_token.getTermText().matches(camelCaseRegex)) {
 					t_stream.remove();
 					previous_token = t_stream.previous();
                     current_token.setTermText(previous_token.getTermText()+" "+current_token.getTermText());
-                    ChainFilters.change=true;
 					t_stream.replace(current_token);
+					
 				} else {
 					t_stream.previous();
+					break;
 				}
+				}while(true);
 			}
 		}
 
