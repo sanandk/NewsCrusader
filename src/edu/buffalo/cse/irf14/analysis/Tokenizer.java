@@ -51,16 +51,19 @@ public class Tokenizer {
 		String[] t_strings = str.split(delimiter);
 		ArrayList<Token> t_list=new ArrayList<Token>();
 		char endChar;
-		Token tk;
+		int len;
+		
 		for(String text:t_strings){
 			text=text.trim();
-			if(text.length()>1)
+			Token tk=new Token(text);
+			len=text.length();
+			if(len>1)
 			{
-				tk=new Token(text);
 				endChar=text.charAt(text.length()-1);
 				tk.lineEnd=(".?!".indexOf(endChar)!=-1);
-				t_list.add(tk);
 			}
+			if(len>0)
+				t_list.add(tk);
 			
 		}
 		return new TokenStream(t_list);

@@ -12,7 +12,7 @@ public class SymbolFilter extends TokenFilter {
 	public SymbolFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
-		
+		f_type=TokenFilterType.SYMBOL;
 		t_stream=stream;
 	}
 	String intregex = "(.)*(\\d)(.)*";      
@@ -31,6 +31,7 @@ public class SymbolFilter extends TokenFilter {
 		if(current_token==null)
 			return false;
 		String str=current_token.toString();
+		String old=str;
 		if(str.length()>0)
 		{
 			
@@ -57,8 +58,13 @@ public class SymbolFilter extends TokenFilter {
 				//if(l=='\'' && str.contains("s\'"))
 					//str=str.replaceAll("s\'", "s");	
 				//else
-				str=str.substring(0,str.length()-1);
-				l=str.charAt(str.length()-1);
+				if(str.length()>0)
+					str=str.substring(0,str.length()-1);
+				if(str.length()>0)
+					l=str.charAt(str.length()-1);
+				
+				else
+					break;
 			}
 			if(str.contains("\'")) // Handling apostrophe
 			{
@@ -125,7 +131,7 @@ public class SymbolFilter extends TokenFilter {
 		            if((char_flag-h_flag)>1)
 		            {	
 		            	str=str.replaceAll("-", " ");
-		            	t_stream.replace(new Token(str));
+		            	//t_stream.replace(new Token(str));
 		            }
 		            else
 		            {
@@ -135,12 +141,20 @@ public class SymbolFilter extends TokenFilter {
 		            }
 		         }
 			}
-			t_stream.replace(new Token(str));
+			
 		} 
-		else
-			t_stream.remove();
 		
 		}
+		if(str.length()<1){
+			t_stream.remove();
+			ChainFilters.change=true;
+		}
+		if(!str.equals(old))
+		{
+			t_stream.replace(new Token(str));
+			ChainFilters.change=true;
+		}
+			
 		if(t_stream.hasNext())
 			return true;
 		else

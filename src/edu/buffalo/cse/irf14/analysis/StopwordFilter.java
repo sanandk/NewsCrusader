@@ -29,6 +29,7 @@ public class StopwordFilter extends TokenFilter {
 	public StopwordFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		super(stream);
+		f_type=TokenFilterType.STOPWORD;
 		t_stream = stream;
 	}
 
@@ -39,8 +40,10 @@ public class StopwordFilter extends TokenFilter {
 		current_token = t_stream.getCurrent();
 		if (null == current_token)
 			return false;
-		if (stopwordList.contains(current_token.toString()))
+		if (stopwordList.contains(current_token.toString())){
 			t_stream.remove();
+			ChainFilters.change=true;
+		}
 
 		if (t_stream.hasNext()) {
 			return true;

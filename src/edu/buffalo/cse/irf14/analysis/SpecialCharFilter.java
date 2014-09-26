@@ -12,6 +12,7 @@ public class SpecialCharFilter  extends TokenFilter {
 		super(stream);
 		// TODO Auto-generated constructor stub
 		t_stream=stream;
+		f_type=TokenFilterType.SPECIALCHARS;
 	}
 	String intregex = "(.)*(\\d)(.)*";      
     Pattern intpattern = Pattern.compile(intregex);
@@ -22,7 +23,7 @@ public class SpecialCharFilter  extends TokenFilter {
 		 char[] punctuations={'.',',','?','!','\''};
 		 String ps=new String(punctuations);
 		 StringBuffer res = new StringBuffer();
-		 int flag=0;
+
 			Token current_token=t_stream.next();
 			if(current_token==null)
 				return false;
@@ -43,11 +44,12 @@ public class SpecialCharFilter  extends TokenFilter {
 					
 				}
 			}
-			if(flag==1)
-			t_stream.add_next(new Token(res.toString()));
-			else
-				t_stream.replace(new Token(res.toString()));
 			
+			if(!(str.equals(res.toString())))
+			{
+				t_stream.replace(new Token(res.toString()));
+				ChainFilters.change=true;
+			}
 			if(t_stream.hasNext())
 				return true;
 			else

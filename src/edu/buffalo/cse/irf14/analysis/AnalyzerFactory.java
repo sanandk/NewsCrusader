@@ -54,14 +54,15 @@ public class AnalyzerFactory {
 		TokenFilter NumberFilterObject = factory.getFilterByType(TokenFilterType.NUMERIC, stream);
 		
 		if(name==FieldNames.CONTENT){
-			list.add(AccentFilterObject);
-			list.add(SymbolFilterObject);
-			list.add(SpecialCharFilterObject);
 			list.add(CapitalizationFilterObject);
-			list.add(StopwordFilterObject);
-			list.add(StemmerFilterObject);
+			list.add(AccentFilterObject);
 			list.add(DateFilterObject);
 			list.add(NumberFilterObject);
+			list.add(SymbolFilterObject);
+			list.add(SpecialCharFilterObject);
+			list.add(StopwordFilterObject);
+			list.add(StemmerFilterObject);
+			
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)
 		{

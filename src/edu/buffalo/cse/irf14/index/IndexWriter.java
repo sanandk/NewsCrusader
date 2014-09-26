@@ -189,5 +189,6 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		// TODO
+		FileUtilities.openDict();
 	}
 }

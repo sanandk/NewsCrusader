@@ -15,6 +15,7 @@ public class NumberFilter extends TokenFilter {
 		// TODO Auto-generated constructor stub
 		super(stream);
 		t_stream=stream;
+		f_type=TokenFilterType.NUMERIC;
 	}
 	
 	@Override
@@ -50,7 +51,7 @@ public class NumberFilter extends TokenFilter {
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-
+				ChainFilters.change=true;
 			}else if(numberMatcher.matches()){
 //				System.out.println(numberMatcher.group());
 				str=str.replaceAll(numberRegex, "");
@@ -60,7 +61,7 @@ public class NumberFilter extends TokenFilter {
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-
+				ChainFilters.change=true;
 			}
 			if (t_stream.hasNext()) {
 			return true;

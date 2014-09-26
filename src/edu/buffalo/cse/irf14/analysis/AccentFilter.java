@@ -13,6 +13,7 @@ public class AccentFilter  extends TokenFilter {
 		super(stream);
 		// TODO Auto-generated constructor stub
 		t_stream=stream;
+		f_type=TokenFilterType.ACCENT;
 	}
 
 	@Override
@@ -37,15 +38,7 @@ public class AccentFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.toString();
-//			String encoded="";
-//			try {
-//				str = new String(str.getBytes(), Charset.forName("UTF-8"));
-//				//encoded = new String(str.getBytes("utf-8"), "iso8859-1");
-//			} catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
- 
+			String old=str;
 			int i=0;
 			for(String a:accents)
 			{
@@ -53,8 +46,11 @@ public class AccentFilter  extends TokenFilter {
 			}
 		   
 		    str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-			t_stream.replace(new Token(str));
-			
+			if(!(str.equals(old)))
+			{
+		    t_stream.replace(new Token(str));
+		    ChainFilters.change=true;
+			}
 			if(t_stream.hasNext())
 				return true;
 			else

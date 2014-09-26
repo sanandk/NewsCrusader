@@ -10,7 +10,7 @@ public class CapitalizationFilter extends TokenFilter {
 		// TODO Auto-generated constructor stub
 		super(stream);
 		t_stream = stream;
-		// lineStart=0;
+		f_type=TokenFilterType.CAPITALIZATION;
 	}
 
 	@Override
@@ -32,6 +32,8 @@ public class CapitalizationFilter extends TokenFilter {
 				// loop to check if not begining of line and captilization
 				// conditions
                 current_token.setTermText(current_token.getTermText().toLowerCase());
+
+    		    ChainFilters.change=true;
 				t_stream.replace(current_token);
 			} else if (t_stream.hasNext()) {
 				current_token = t_stream.next();
@@ -39,7 +41,7 @@ public class CapitalizationFilter extends TokenFilter {
 					t_stream.remove();
 					previous_token = t_stream.previous();
                     current_token.setTermText(previous_token.getTermText()+" "+current_token.getTermText());
-
+                    ChainFilters.change=true;
 					t_stream.replace(current_token);
 				} else {
 					t_stream.previous();

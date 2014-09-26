@@ -5,6 +5,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateFilter  extends TokenFilter {
@@ -15,9 +16,11 @@ public class DateFilter  extends TokenFilter {
 		super(stream);
 		// TODO Auto-generated constructor stub
 		t_stream=stream;
+		f_type=TokenFilterType.DATE;
 	}
-
-	public static String Number(String string) {
+	String intregex = "[012]?[0-9]:[0-5][0-9](:[0-5][0-9])?([a-zA-z.]{3})?";      
+    Pattern intpattern = Pattern.compile(intregex);
+	public static String Number(String string,boolean suffix) {
 		int i; String ch="";
 	    try {
 	    	if(!Character.isDigit(string.charAt(string.length()-1)))
@@ -27,7 +30,14 @@ public class DateFilter  extends TokenFilter {
 	    	}
 	    	i=Integer.parseInt(string);
 	    	String delim=(ch=="")?"":"^";
-	        return (i>31)?"~"+String.format("%04d", i)+delim+ch:String.format("%02d", i);
+	    	if(!suffix && i>1800 && i<2100)
+	    		return "~"+String.format("%04d", i)+delim+ch;
+	    	if(i<32)
+	    		return String.format("%02d", i);
+	    	if(suffix)
+	    		return "~"+String.format("%04d", i)+delim+ch;
+	    	
+	    	 return "";
 	    } catch (Exception e) {
 	       return "";
 	        
@@ -50,11 +60,11 @@ public class DateFilter  extends TokenFilter {
 	public String year_or_date(String str)
 	{
 		if(str.contains("BC"))
-			return "-"+Number(str.replaceAll("BC", ""));
+			return "-"+Number(str.replaceAll("BC", ""),true);
 		else if(str.contains("AD"))
-			return Number(str.replaceAll("AD", ""));
+			return Number(str.replaceAll("AD", ""),true);
 		else
-			return Number(str);
+			return Number(str,false);
 	}
 	
 	
@@ -71,17 +81,25 @@ public class DateFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.getTermText();
-			String t1=year_or_date(str),t2 = "",t3="";
+			Matcher matcher = intpattern.matcher(str);
+	        boolean onlyNo = matcher.matches();
+	        
+	         
+			
 			if(t_stream.hasNext())
 			{
 				String y=t_stream.next().getTermText();
 				if(y.contains("BC")){
-					t1="-"+t1;
+					str=str+"BC";
+					cnt++;
+				}
+				else if(str.contains("AD")){
+					str=str+"BC";
 					cnt++;
 				}
 				t_stream.previous();
 			}
-			
+			String t1=year_or_date(str),t2 = "",t3="";
 			
 			if(!t1.equals("")) // DD MM YY
 			{
@@ -100,8 +118,10 @@ public class DateFilter  extends TokenFilter {
 					}
 					t_stream.previous();
 				}
-				
-				t2=(t2.equals(""))?"01":t2;
+				if(t2.equals("") && t3.equals("") && !t1.contains("~"))
+					date="~0000";
+				if(t2.equals(""))
+					t2="01";				
 				if(t3.contains("~")) //t3=year
 				{
 					t1=(t1.equals(""))?"01":t1;
@@ -111,8 +131,10 @@ public class DateFilter  extends TokenFilter {
 				else if(t1.contains("~")) //t1=year
 				{
 					t3=(t3.equals(""))?"01":t3;
-					date=t1.replaceAll("~", "")+t2+t3;
-					//cnt++;
+					if(t1.startsWith("~00"))
+						date="";
+					else
+						date=t1.replaceAll("~", "")+t2+t3;
 				}
 				else
 				{
@@ -148,10 +170,9 @@ public class DateFilter  extends TokenFilter {
 					i++;
 				}
 				
-			}
-			else if(str.contains(":"))
+			}		
+			else if(onlyNo && str.contains(":") && str.length()>1)
 			{
-				
 				int ap=-1;
 				if(str.contains("PM")){
 					ap=2;
@@ -228,7 +249,7 @@ public class DateFilter  extends TokenFilter {
 					if(t_stream.hasNext()){
 					next=t_stream.next();
 					t1=year_or_date(next.toString());
-					}
+					
 					if(!t1.equals("") && t_stream.hasNext())
 					{
 						next=t_stream.next();
@@ -238,7 +259,7 @@ public class DateFilter  extends TokenFilter {
 					}
 					t_stream.previous();
 					
-										
+					}					
 					if(t3.contains("~"))
 					{
 						t1=(t1.equals(""))?"01":t1;
@@ -292,7 +313,10 @@ public class DateFilter  extends TokenFilter {
 			}
 			
 			if(!date.equals(""))
+			{
+			ChainFilters.change=true;
 			t_stream.replace(new Token(date));
+			}
 			while(cnt>0)
 			{
 				t_stream.next();

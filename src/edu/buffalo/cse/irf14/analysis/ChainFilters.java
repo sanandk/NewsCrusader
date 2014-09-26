@@ -12,16 +12,44 @@ public class ChainFilters implements Analyzer{
 		stream=s;
 	}
 	
+	public static boolean change=false;
+	int j=-1;
+	
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		
 		
 		boolean next=false;
-		for(Analyzer a:chain)
+		int i=0;
+		while(i<chain.size())
 		{
-			next=a.increment();
-			stream.previous();
+			if(i==0)
+				change=false;
+			TokenFilter a=(TokenFilter) chain.get(i);
+			
+				if(j>0)
+				{
+					if(a.f_type!=TokenFilterType.ACCENT && a.f_type!=TokenFilterType.CAPITALIZATION)
+					{
+						next=a.increment();
+						stream.previous();		
+					}
+				}
+				else
+				{
+					next=a.increment();
+					stream.previous();
+				}
+			
+			i++;
+			if(change)
+			{
+				j=i;
+				i=0;
+			}
+			if(i==j)
+				j=-1;
 		}
 		if(next!=false)
 			stream.next();

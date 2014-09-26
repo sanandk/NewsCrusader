@@ -26,6 +26,7 @@ public class StemmerFilter extends TokenFilter {
 	public StemmerFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		super(stream);
+		f_type=TokenFilterType.STEMMER;
 		t_stream = stream;
 	}
 
@@ -55,10 +56,18 @@ public class StemmerFilter extends TokenFilter {
 
 			stemmer.stem();
 			
+			
+			if(!str.equals(stemmer.toString()))
+			{
 			current_token.setTermText(stemmer.toString());
-			}else{
-				current_token.setTermText(str);
+			t_stream.replace(current_token);
+			ChainFilters.change=true;
 			}
+			
+			}
+			//else{
+			//	current_token.setTermText(str);
+		//	}
 			
 			//Code for STemming by KarthikJ Commented as alternate Porters algorithm code is being used.
 			/*String stem;
@@ -521,7 +530,7 @@ public class StemmerFilter extends TokenFilter {
 			
 			
 			
-			t_stream.replace(current_token);
+			
 			if (t_stream.hasNext()) {	
 			return true;
 		} else {
