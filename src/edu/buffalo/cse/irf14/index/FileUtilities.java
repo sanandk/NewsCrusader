@@ -46,6 +46,9 @@ public class FileUtilities {
 	public static void openDict() {
 		try {
 			File docDicFile = new File(outputDir + File.separator + docDict);
+			if(docDicFile.exists()){
+				docDicFile.delete();
+			}
 			FileWriter docFW = new FileWriter(docDicFile, true);
 			docBW = new BufferedWriter(docFW);
 		} catch (IOException e) {

@@ -5,9 +5,13 @@ package edu.buffalo.cse.irf14.index;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -62,17 +66,19 @@ public class IndexWriter {
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
 	public static int tokenSize =0;
+	public static ConcurrentHashMap<String, StringBuilder> termIndex = new ConcurrentHashMap<String, StringBuilder>();
+	
+	
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
 		
 		FileUtilities.writeToDic(d.getField(FieldNames.FILEID)[0], DictType.DOC);
-
+		
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		try {
-			
 			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
 			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
 			
@@ -85,15 +91,31 @@ public class IndexWriter {
 			tokenSize+=t_stream.my_stream.size();
 			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
 			t_stream.reset();
-			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
-			System.out.print("Content is ");
+//			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
+//			System.out.print("Content is ");
+			Token tp;
+			StringBuilder termPosting ;
 			while(t_stream.hasNext())
 			{
-				Token tp=t_stream.next();
-				if(tp!=null)
-				System.out.print(tp.toString()+"|");
+				tp=t_stream.next();
+				termPosting= new StringBuilder();
+				if(tp!=null){
+					String termValue=tp.toString();
+					if(termIndex.containsKey(termValue)){
+						termPosting=termIndex.get(termValue);
+						
+					}
+//					else{
+						termPosting.append(","+FileUtilities.docId);
+						
+						termIndex.put(termValue,termPosting );
+//					}
+				}
+//				System.out.print(tp.toString()+"|");
 			}
-		} catch (TokenizerException e) {
+//			System.out.print(termIndex.size());
+		}
+		catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception!");
 			e.printStackTrace();

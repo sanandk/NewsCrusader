@@ -3,7 +3,10 @@
  */
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import edu.buffalo.cse.irf14.document.Document;
 import edu.buffalo.cse.irf14.document.FieldNames;
@@ -65,6 +68,30 @@ public class Runner {
 				}
 				
 			}
+			
+			try{
+			String indexTest="IndexTestFile";
+			File indexTestFile= new File(indexDir+File.separator+indexTest);
+			if(indexTestFile.exists()){
+				indexTestFile.delete();
+			}
+			FileWriter indexTestFw;
+			BufferedWriter indexTestBw;
+			indexTestFw= new FileWriter(indexTestFile);
+			indexTestBw= new BufferedWriter(indexTestFw);
+			System.out.println(IndexWriter.termIndex.size());
+			for (String key : IndexWriter.termIndex.keySet()) {
+				indexTestBw.write("\n"+key + " " + IndexWriter.termIndex.get(key));
+		    }
+			indexTestBw.close();
+			}catch(IOException e){
+				
+			}
+			
+//			    
+			
+			
+//			System.out.println("==============*******=============\n"+termValue+"===>"+termPosting+"\n==============*******=============");
 //			System.out.println("No Place");
 //			writer.printA();
 //			System.out.println("No Date");
