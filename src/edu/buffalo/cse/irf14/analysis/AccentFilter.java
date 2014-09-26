@@ -48,7 +48,8 @@ public class AccentFilter  extends TokenFilter {
 		    str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 			if(!(str.equals(old)))
 			{
-		    t_stream.replace(new Token(str));
+			current_token.setTermText(str);
+		    t_stream.replace(current_token);
 		    ChainFilters.change=true;
 			}
 			if(t_stream.hasNext())

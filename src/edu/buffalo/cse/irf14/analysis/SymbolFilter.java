@@ -151,7 +151,8 @@ public class SymbolFilter extends TokenFilter {
 		}
 		if(!str.equals(old))
 		{
-			t_stream.replace(new Token(str));
+			current_token.setTermText(str);
+			t_stream.replace(current_token);
 			ChainFilters.change=true;
 		}
 			

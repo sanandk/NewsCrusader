@@ -27,32 +27,29 @@ public class ChainFilters implements Analyzer{
 			if(i==0)
 				change=false;
 			TokenFilter a=(TokenFilter) chain.get(i);
-			
-				if(j>0)
-				{
-					if(a.f_type!=TokenFilterType.ACCENT && a.f_type!=TokenFilterType.CAPITALIZATION)
-					{
-						next=a.increment();
-						stream.previous();		
-					}
-				}
-				else
-				{
+			while(a.increment())
+			{
+				
+			}
+			if(i<chain.size()-1)
+			stream.reset();
+			i++;
+			/*
 					next=a.increment();
 					stream.previous();
-				}
+					
 			
-			i++;
+			
 			if(change)
 			{
 				j=i;
 				i=0;
 			}
 			if(i==j)
-				j=-1;
+				j=-1;*/
 		}
-		if(next!=false)
-			stream.next();
+	//	if(next!=false)
+	//		stream.next();
 		return next;
 	}
 

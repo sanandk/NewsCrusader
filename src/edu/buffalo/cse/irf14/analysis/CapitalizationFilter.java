@@ -28,7 +28,7 @@ public class CapitalizationFilter extends TokenFilter {
 			return false;
 		if (current_token.getTermText().matches(camelCaseRegex)) {
 
-			if (previous_token == null || previous_token.lineEnd) {
+			if (t_stream.currentPointer == 0 || (previous_token!=null && previous_token.lineEnd)) {
 				// loop to check if not begining of line and captilization conditions
                 current_token.setTermText(current_token.getTermText().toLowerCase());
 				t_stream.replace(current_token);
@@ -44,7 +44,6 @@ public class CapitalizationFilter extends TokenFilter {
 					previous_token = t_stream.previous();
                     current_token.setTermText(previous_token.getTermText()+" "+current_token.getTermText());
 					t_stream.replace(current_token);
-					
 				} else {
 					t_stream.previous();
 					break;

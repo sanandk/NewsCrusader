@@ -52,7 +52,7 @@ public class NumberFilter extends TokenFilter {
                     t_stream.replace(current_token);
                 }
 				ChainFilters.change=true;
-			}else if(numberMatcher.matches()){
+			}else if(numberMatcher.matches() && str.length()!=8){
 //				System.out.println(numberMatcher.group());
 				str=str.replaceAll(numberRegex, "");
 				if("".equals(str))

@@ -20,7 +20,7 @@ public class SpecialCharFilter  extends TokenFilter {
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		
-		 char[] punctuations={'.',',','?','!','\''};
+		 char[] punctuations={'.'};
 		 String ps=new String(punctuations);
 		 StringBuffer res = new StringBuffer();
 
@@ -47,7 +47,8 @@ public class SpecialCharFilter  extends TokenFilter {
 			
 			if(!(str.equals(res.toString())))
 			{
-				t_stream.replace(new Token(res.toString()));
+				current_token.setTermText(res.toString());
+				t_stream.replace(current_token);
 				ChainFilters.change=true;
 			}
 			if(t_stream.hasNext())

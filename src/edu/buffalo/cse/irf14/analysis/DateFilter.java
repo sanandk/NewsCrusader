@@ -4,7 +4,11 @@ import java.sql.Time;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +19,33 @@ public class DateFilter  extends TokenFilter {
 	public DateFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
+		
+		monthList.put("january",1);
+		monthList.put( "february",2 );
+		monthList.put("march", 3);
+		monthList.put("april",4);
+		monthList.put( "may", 5);
+		monthList.put("june",6);
+		monthList.put( "july",7);
+		monthList.put( "august",8 );
+		monthList.put("september",9 );
+		monthList.put("october", 10);
+		monthList.put("november", 11);
+		monthList.put("december",12);
+		monthList.put("jan",1);
+		monthList.put("feb",2);
+		monthList.put("mar",3);
+		monthList.put("apr",4);
+		monthList.put("jun",6);
+		monthList.put("jul",7);
+		monthList.put("aug",8);
+		monthList.put("sep",9);
+		monthList.put("oct",10);
+		monthList.put("nov",11);
+		monthList.put("dec",12);
+		
+		
+		
 		t_stream=stream;
 		f_type=TokenFilterType.DATE;
 	}
@@ -46,15 +77,12 @@ public class DateFilter  extends TokenFilter {
 	
 	public String month(String str)
 	{
-		int i=1;
-		if(str!=null && !str.equals(""))
-		for(String s:months)
-		{
-			if(s.contains(str) && s.charAt(0)==str.charAt(0))
-				return (i<10)?"0"+i:i+"";
-			i++;
+		if(str!=null && !str.equals(""))	{
+			Integer i=monthList.get(str.toLowerCase());
+			return (i==null)?"":String.format("%02d", i);
 		}
-		return "";
+		else
+			return "";
 	}
 	
 	public String year_or_date(String str)
@@ -67,8 +95,8 @@ public class DateFilter  extends TokenFilter {
 			return Number(str,false);
 	}
 	
+	final static HashMap<String,Integer> monthList = new HashMap<String,Integer>();
 	
-	static String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
@@ -83,10 +111,8 @@ public class DateFilter  extends TokenFilter {
 			String str=current_token.getTermText();
 			Matcher matcher = intpattern.matcher(str);
 	        boolean onlyNo = matcher.matches();
-	        
-	         
-			
-			if(t_stream.hasNext())
+
+	        if(t_stream.hasNext())
 			{
 				String y=t_stream.next().getTermText();
 				if(y.contains("BC")){
@@ -120,6 +146,7 @@ public class DateFilter  extends TokenFilter {
 				}
 				if(t2.equals("") && t3.equals("") && !t1.contains("~"))
 					date="~0000";
+				else
 				if(t2.equals(""))
 					t2="01";				
 				if(t3.contains("~")) //t3=year
@@ -143,11 +170,10 @@ public class DateFilter  extends TokenFilter {
 				}
 				
 			}
-			else if(str.contains("-")) // for 2011-12
+			else if(str.matches("(\\d{4})(-)(\\d{2}|\\d{4})(.|,|!|\\?|:|;)*")) // for 2011-12.
 			{
 				String[] yr=str.split("-");
-				String re;
-				int range=0,i=0;
+				int i=0;
 				for(String s:yr)
 				{
 					try{
@@ -315,7 +341,8 @@ public class DateFilter  extends TokenFilter {
 			if(!date.equals(""))
 			{
 			ChainFilters.change=true;
-			t_stream.replace(new Token(date));
+			current_token.setTermText(date);
+			t_stream.replace(current_token);
 			}
 			while(cnt>0)
 			{

@@ -33,11 +33,9 @@ public class TokenStream implements Iterator<Token>{
 	@Override
 	public boolean hasNext() {
 		// TODO YOU MUST IMPLEMENT THIS
-		if((currentPointer+1)<my_stream.size() && my_stream.get(currentPointer+1)==null)
-		{
-			my_stream.remove(currentPointer+1);
-			
-		}
+		
+		while(currentPointer+1<my_stream.size() && my_stream.get(currentPointer+1)==null)
+			currentPointer++;
 		return ((currentPointer+1)<my_stream.size());
 	}
 	
@@ -55,18 +53,11 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	@Override
 	public Token next() {
-//		System.out.println("Entered next now!"+currentPointer);
 		// TODO YOU MUST IMPLEMENT THIS
-		
-		if(currentPointer>-1 && currentPointer<my_stream.size() && my_stream.get(currentPointer)==null)
-			my_stream.remove(currentPointer);
-		else
-			++currentPointer;
+		++currentPointer;
 		
 		while(currentPointer<my_stream.size() && my_stream.get(currentPointer)==null)
-		{
-			my_stream.remove(currentPointer);
-		}
+			currentPointer++;
 		if(currentPointer>=my_stream.size())
 			return null;
 		else
@@ -77,8 +68,11 @@ public class TokenStream implements Iterator<Token>{
 	 public Token previous() {
 
 		// TODO YOU MUST IMPLEMENT THIS
-		
-		if(--currentPointer>-1)
+		 --currentPointer;
+		 while(currentPointer>-1 && my_stream.get(currentPointer)==null)
+				currentPointer--;
+			
+		if(currentPointer>-1)
 			return my_stream.get(currentPointer);
 		else
 			return null;
@@ -153,10 +147,13 @@ public class TokenStream implements Iterator<Token>{
 	 */
 	public Token getCurrent() {
 		//TODO: YOU MUST IMPLEMENT THIS
-		if(currentPointer>=0 && currentPointer<my_stream.size())
-			return my_stream.get(currentPointer);
-		else 
-			return null;
+		Token t=null;
+	
+			if(currentPointer>=0 && currentPointer<my_stream.size())
+	
+				t=my_stream.get(currentPointer);
+		
+			return t;
 	}
 	
 }
