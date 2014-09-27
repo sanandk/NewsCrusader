@@ -29,7 +29,7 @@ public class NumberFilter extends TokenFilter {
 //		skfdjks7==>skfdjks
 		Token current_token;
 		
-//		if(t_stream.hasNext()){
+
 			current_token=t_stream.next();
 			if(current_token==null)
 				return false;
@@ -38,12 +38,14 @@ public class NumberFilter extends TokenFilter {
 			
 			String[] strArr= str.split("\\d");
 			if(strArr.length>1){
-				str="";
+				StringBuilder res=new StringBuilder();
 				for(String temp: strArr){
-					str+=temp;
+					//str+=temp;
+				
+					res.append(temp);
 				}
-				str=str.replaceAll("\\.|,","");
-				//System.out.println(str);
+				str=res.toString();
+				str=str.replaceAll("\\.|,", "");
 				if("".equals(str))
 					t_stream.remove();
 				else
@@ -51,9 +53,9 @@ public class NumberFilter extends TokenFilter {
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-				ChainFilters.change=true;
+				
 			}else if(numberMatcher.matches() && str.length()!=8){
-//				System.out.println(numberMatcher.group());
+
 				str=str.replaceAll(numberRegex, "");
 				if("".equals(str))
 					t_stream.remove();
@@ -61,7 +63,7 @@ public class NumberFilter extends TokenFilter {
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-				ChainFilters.change=true;
+			
 			}
 			if (t_stream.hasNext()) {
 			return true;

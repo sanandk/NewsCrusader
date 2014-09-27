@@ -44,8 +44,6 @@ public class DateFilter  extends TokenFilter {
 		monthList.put("nov",11);
 		monthList.put("dec",12);
 		
-		
-		
 		t_stream=stream;
 		f_type=TokenFilterType.DATE;
 	}
@@ -104,7 +102,8 @@ public class DateFilter  extends TokenFilter {
 		 ArrayList<String> time = null;
 		 String ch_time = "";
 		 int cnt=0;
-		 String date="";
+		
+		  StringBuilder date_builder = new StringBuilder();
 			current_token=t_stream.next();
 			if(current_token==null)
 				return false;
@@ -145,28 +144,36 @@ public class DateFilter  extends TokenFilter {
 					t_stream.previous();
 				}
 				if(t2.equals("") && t3.equals("") && !t1.contains("~"))
-					date="~0000";
+					date_builder.append("~0000");
 				else
 				if(t2.equals(""))
 					t2="01";				
 				if(t3.contains("~")) //t3=year
 				{
 					t1=(t1.equals(""))?"01":t1;
-					date=t3.replaceAll("~", "")+t2+t1;
+					date_builder.append(t3.replaceAll("~", ""));
+					date_builder.append(t2);
+					date_builder.append(t1);
 					cnt++;
 				}
 				else if(t1.contains("~")) //t1=year
 				{
 					t3=(t3.equals(""))?"01":t3;
 					if(t1.startsWith("~00"))
-						date="";
-					else
-						date=t1.replaceAll("~", "")+t2+t3;
+						date_builder.setLength(0);
+					else{
+					
+						date_builder.append(t1.replaceAll("~", ""));
+						date_builder.append(t2);
+						date_builder.append(t3);
+					}
 				}
 				else
 				{
 					t3=(t3.equals(""))?"1900":t3;	
-					date=t3+t2+t1;
+					date_builder.append(t3);
+					date_builder.append(t2);
+					date_builder.append(t1);
 				}
 				
 			}
@@ -186,11 +193,15 @@ public class DateFilter  extends TokenFilter {
 							
 						t1=year_or_date(s);
 						if(i!=0 && t1!=""){
-							date+="-"+t1.replaceAll("~", "")+"01"+"01";
+							date_builder.append("-");
+							date_builder.append(t1.replaceAll("~", ""));
+							date_builder.append("0101");
 							cnt++;
 						}
-						else if(t1!="")
-							date+=t1.replaceAll("~", "")+"01"+"01";
+						else if(t1!=""){
+							date_builder.append(t1.replaceAll("~", ""));
+							date_builder.append("0101");
+						}
 						
 				
 					i++;
@@ -289,7 +300,9 @@ public class DateFilter  extends TokenFilter {
 					if(t3.contains("~"))
 					{
 						t1=(t1.equals(""))?"01":t1;
-						date=t3.replaceAll("~", "")+t2+t1;
+						date_builder.append(t3.replaceAll("~", ""));
+						date_builder.append(t2);
+						date_builder.append(t1);
 						cnt++;
 					}
 					else if(t1.contains("~"))
@@ -298,50 +311,56 @@ public class DateFilter  extends TokenFilter {
 							t3="01";
 						else
 							cnt++;
-						date=t1.replaceAll("~", "")+t2+t3;
+						date_builder.append(t1.replaceAll("~", ""));
+						date_builder.append(t2);
+						date_builder.append(t3);
 					}
 					else
 					{
 						t3=(t3.equals(""))?"1900":t3;	
 						t1=(t1.equals(""))?"01":t1;
-						date=t3+t2+t1;
+						date_builder.append(t3);
+						date_builder.append(t2);
+						date_builder.append(t1);
 					}
 					
 				}
 				
 			}
 			String delim="^";
-			int di=date.indexOf(delim);
+			int di=date_builder.indexOf(delim);
 			String ch="";
 			while(di>0)
 			{
-				ch=date.charAt(di+1)+"";
-				date=date.substring(0, di)+date.substring(di+2, date.length());
-				
-				di=date.indexOf(delim);
+				ch=date_builder.charAt(di+1)+"";
+				date_builder.deleteCharAt(di);
+				date_builder.deleteCharAt(di);
+				//date=date.substring(0, di)+date.substring(di+2, date.length());
+				di=date_builder.indexOf(delim);
 			}
-			date+=ch;
+			date_builder.append(ch);
 			int i=0;
 			if(time!=null)
 			{
 				for(String s:time)
 				{
-					date+=s+":";
+					date_builder.append(s);
+					date_builder.append(":");
 					i++;
 				}
 				while(i>0 && i<3)
 				{
-					date+="00";
+					date_builder.append("00");
+				
 					if(++i<3)
-						date+=":";
+						date_builder.append(":");
 				}
-				date+=ch_time;
+				date_builder.append(ch_time);
 			}
 			
-			if(!date.equals(""))
+			if(!date_builder.toString().equals(""))
 			{
-			ChainFilters.change=true;
-			current_token.setTermText(date);
+			current_token.setTermText(date_builder.toString());
 			t_stream.replace(current_token);
 			}
 			while(cnt>0)

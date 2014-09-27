@@ -61,7 +61,7 @@ public class StemmerFilter extends TokenFilter {
 			{
 			current_token.setTermText(stemmer.toString());
 			t_stream.replace(current_token);
-			ChainFilters.change=true;
+			
 			}
 			
 			}

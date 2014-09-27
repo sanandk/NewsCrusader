@@ -63,7 +63,7 @@ public class AnalyzerFactory {
 		
 			list.add(CapitalizationFilterObject);
 			list.add(StopwordFilterObject);
-			list.add(StemmerFilterObject);
+		//	list.add(StemmerFilterObject);
 			
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)

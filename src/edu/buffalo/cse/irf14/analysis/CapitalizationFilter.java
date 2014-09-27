@@ -11,7 +11,6 @@ public class CapitalizationFilter extends TokenFilter {
 		super(stream);
 		t_stream = stream;
         f_type=TokenFilterType.CAPITALIZATION;
-		// lineStart=0;
 	}
 
 	@Override
@@ -19,8 +18,6 @@ public class CapitalizationFilter extends TokenFilter {
 		Token current_token;
 		Token previous_token;
 
-		// if(t_stream.hasNext())
-		// {
 		previous_token = t_stream.getCurrent();
 		t_stream.next();
 		current_token = t_stream.getCurrent();

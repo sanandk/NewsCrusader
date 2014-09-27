@@ -42,7 +42,7 @@ public class StopwordFilter extends TokenFilter {
 			return false;
 		if (stopwordList.contains(current_token.toString())){
 			t_stream.remove();
-			ChainFilters.change=true;
+			
 		}
 
 		if (t_stream.hasNext()) {

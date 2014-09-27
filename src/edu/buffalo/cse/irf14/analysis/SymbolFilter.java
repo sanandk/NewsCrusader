@@ -62,38 +62,23 @@ public class SymbolFilter extends TokenFilter {
 					str=str.substring(0,str.length()-1);
 				if(str.length()>0)
 					l=str.charAt(str.length()-1);
-				
 				else
 					break;
 			}
 			if(str.contains("\'")) // Handling apostrophe
 			{
-				if(str.contains("let\'s"))
 					str=str.replaceAll("let\'s", "let us");
-				if(str.contains("\'s"))
 					str=str.replaceAll("\'s", "");
-				if(str.contains("\'ve"))
 					str=str.replaceAll("\'ve", " have");
-				if(str.contains("\'d"))
 					str=str.replaceAll("\'d", " would");
-				if(str.contains("\'ll"))
 					str=str.replaceAll("\'ll", " will");
-				if(str.contains("won\'t"))
 					str=str.replaceAll("won\'t", "will not");
-				if(str.contains("ain\'t"))
 					str=str.replaceAll("ai\'t", "am not");
-				if(str.contains("shan\'t"))
 					str=str.replaceAll("shan\'t", "shall not");
-				if(str.contains("\'re"))
 					str=str.replaceAll("\'re", " are");
-				if(str.contains("\'m"))
 					str=str.replaceAll("\'m", " am");
-				if(str.contains("\'em"))
 					str=str.replaceAll("\'em", "them");
-				
-				if(str.contains("n\'t"))
 					str=str.replaceAll("n\'t", " not");
-				if(str.contains("o\' clock"))
 					str=str.replaceAll("\'ve", " of the clock");
 			}
 	
@@ -129,10 +114,7 @@ public class SymbolFilter extends TokenFilter {
 		        			h_flag++;
 		        	}
 		            if((char_flag-h_flag)>1)
-		            {	
 		            	str=str.replaceAll("-", " ");
-		            	//t_stream.replace(new Token(str));
-		            }
 		            else
 		            {
 		            	while(str.contains("-"))
@@ -147,13 +129,13 @@ public class SymbolFilter extends TokenFilter {
 		}
 		if(str.length()<1){
 			t_stream.remove();
-			ChainFilters.change=true;
+			
 		}
 		if(!str.equals(old))
 		{
 			current_token.setTermText(str);
 			t_stream.replace(current_token);
-			ChainFilters.change=true;
+		
 		}
 			
 		if(t_stream.hasNext())

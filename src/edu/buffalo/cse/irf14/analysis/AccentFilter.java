@@ -50,7 +50,7 @@ public class AccentFilter  extends TokenFilter {
 			{
 			current_token.setTermText(str);
 		    t_stream.replace(current_token);
-		    ChainFilters.change=true;
+		   
 			}
 			if(t_stream.hasNext())
 				return true;

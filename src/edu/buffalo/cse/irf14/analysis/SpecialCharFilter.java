@@ -49,7 +49,7 @@ public class SpecialCharFilter  extends TokenFilter {
 			{
 				current_token.setTermText(res.toString());
 				t_stream.replace(current_token);
-				ChainFilters.change=true;
+				
 			}
 			if(t_stream.hasNext())
 				return true;

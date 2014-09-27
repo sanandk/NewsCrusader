@@ -87,7 +87,7 @@ public class Parser {
 												doc.setField(FieldNames.PLACE,placeInfo.substring(0, placeInfo.lastIndexOf(",")).trim());
 												doc.setField(FieldNames.NEWSDATE,placeInfo.substring(placeInfo.lastIndexOf(",")+1).trim());
 											} else {
-												doc.setField(FieldNames.PLACE,placeInfo.trim());
+												doc.setField(FieldNames.PLACE,placeInfo.trim()); // NOPMD by SAnanda on 26/9/14 6:27 PM
 											}
 										} else {
 											content+=" "+inputLine;
