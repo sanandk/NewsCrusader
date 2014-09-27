@@ -6,8 +6,10 @@ package edu.buffalo.cse.irf14.index;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -45,7 +47,7 @@ public class IndexWriter {
 		    theDir.mkdir();
 		  }
 		  FileUtilities.setOutputDir(indexDir);
-		  FileUtilities.openDict();
+		  
 	}
 
 	/**
@@ -62,21 +64,22 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
+//	public static int tokenSize =0;
 
-	public static List<String> docList= new ArrayList<String>();
-	public static TreeMap<String, StringBuilder> termIndexAC = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexDG = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexHK = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexLP = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexQS = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexTZ = new TreeMap<String, StringBuilder>();
-	public static TreeMap<String, StringBuilder> termIndexMisc = new TreeMap<String, StringBuilder>();
+	public static TreeMap<String,LinkedList<String>> docList= new TreeMap<String,LinkedList<String>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexAC = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexDG = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexHK = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexLP = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexQS = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexTZ = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<String, HashMap<Integer, Integer>> termIndexMisc = new TreeMap<String, HashMap<Integer, Integer>>();
 	
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
 		
-		FileUtilities.writeToDic(d.getField(FieldNames.CATEGORY)[0]+File.separator+d.getField(FieldNames.FILEID)[0]  , DictType.DOC);
+//		FileUtilities.writeToDic(d.getField(FieldNames.CATEGORY)[0]+File.separator+d.getField(FieldNames.FILEID)[0]  , DictType.DOC);
 		
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
@@ -98,11 +101,12 @@ public class IndexWriter {
 //			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
 //			System.out.print("Content is ");
 			Token tp;
-			StringBuilder termPosting ;
+			HashMap<Integer,Integer> termPosting ;
+			Integer frequency=0;
 			while(t_stream.hasNext())
 			{
 				tp=t_stream.next();
-				termPosting= new StringBuilder();
+				termPosting= new HashMap<Integer,Integer>();
 				String termValue;
 				if(tp!=null && (termValue=tp.toString()).length()>0){
 					
@@ -111,59 +115,98 @@ public class IndexWriter {
 						case 'a': case 'b': case 'c':
 							if(termIndexAC.containsKey(termValue)){
 								termPosting=termIndexAC.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexAC.put(termValue,termPosting );
 							break;
 						case 'd': case 'e': case 'f': case 'g':
 							if(termIndexDG.containsKey(termValue)){
 								termPosting=termIndexDG.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexDG.put(termValue,termPosting );
 							break;
 						case 'h': case 'i': case 'j': case 'k':
 							if(termIndexHK.containsKey(termValue)){
 								termPosting=termIndexHK.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexHK.put(termValue,termPosting );
 							break;
 						case 'l': case 'm': case 'n': case 'o': case 'p':
 							if(termIndexLP.containsKey(termValue)){
 								termPosting=termIndexLP.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexLP.put(termValue,termPosting );
 							break;
 						case 'q': case 'r': case 's':
 							if(termIndexQS.containsKey(termValue)){
 								termPosting=termIndexQS.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexQS.put(termValue,termPosting );
 							break;
 						case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
 							if(termIndexTZ.containsKey(termValue)){
 								termPosting=termIndexTZ.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexTZ.put(termValue,termPosting );
 							break;
 						default :
 							if(termIndexMisc.containsKey(termValue)){
+//								termPosting=termIndexMisc.get(termValue);
+//								
+//							}
+//							termPosting.append(","+FileUtilities.docId);
+//							termIndexMisc.put(termValue,termPosting );
 								termPosting=termIndexMisc.get(termValue);
-								
-							}
-							termPosting.append(","+FileUtilities.docId);
+								frequency=termPosting.get(FileUtilities.docId);
+								if(frequency==null){
+									termPosting.put(FileUtilities.docId, 1);
+								}else{
+									termPosting.put(FileUtilities.docId, ++frequency);
+								}
+							}else
+								termPosting.put(FileUtilities.docId, 1);
 							termIndexMisc.put(termValue,termPosting );
-					 
 					}
 					
 					
@@ -270,7 +313,7 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		// TODO
-		
+		FileUtilities.writeToDic(docList, DictType.DOC);
 		FileUtilities.writeIndexFile(termIndexAC,FileUtilities.indexAC);
 		FileUtilities.writeIndexFile(termIndexDG,FileUtilities.indexDG);
 		FileUtilities.writeIndexFile(termIndexHK,FileUtilities.indexHK);
@@ -279,5 +322,15 @@ public class IndexWriter {
 		FileUtilities.writeIndexFile(termIndexTZ,FileUtilities.indexTZ);
 		FileUtilities.writeIndexFile(termIndexMisc,FileUtilities.indexMisc);
 		FileUtilities.closeDict();
+	}
+	
+	public void read() {
+		FileUtilities.readIndexFile(FileUtilities.indexAC);
+		FileUtilities.readIndexFile(FileUtilities.indexDG);
+		FileUtilities.readIndexFile(FileUtilities.indexHK);
+		FileUtilities.readIndexFile(FileUtilities.indexLP);
+		FileUtilities.readIndexFile(FileUtilities.indexQS);
+		FileUtilities.readIndexFile(FileUtilities.indexTZ);
+		FileUtilities.readIndexFile(FileUtilities.indexMisc);
 	}
 }
