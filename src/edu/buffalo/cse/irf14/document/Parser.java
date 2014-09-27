@@ -8,8 +8,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.regex.Pattern;
 
+import edu.buffalo.cse.irf14.index.FileUtilities;
 import edu.buffalo.cse.irf14.index.IndexWriter;
 
 /**
@@ -25,22 +27,27 @@ public class Parser {
 	 * @throws ParserException
 	 *             In case any error occurs during parsing
 	 */
-	static Pattern f=Pattern.compile(Pattern.quote(File.separator));
 	public static int skippedCount=0;
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		// Code edited by Karthik-j on Sept 9, 2014- Starts
 		Document doc = new Document();
+		LinkedList<String> docCatList; 
 		try {
 				
-			String[] dirList = f.split(filename);
+			String[] dirList = filename
+					.split(Pattern.quote(File.separator));
 			int dirLen = dirList.length;
 			if (dirLen > 0) {// if less then zero try throwing an error
 				// saying invalid file name
 				doc.setField(FieldNames.FILEID, dirList[dirLen - 1]);
 				doc.setField(FieldNames.CATEGORY, dirList[dirLen - 2]);
-			if(!IndexWriter.docList.contains(dirList[dirLen - 1])){
-				IndexWriter.docList.add(dirList[dirLen - 1]);
+			if(!IndexWriter.docList.containsKey(dirList[dirLen - 1])){
+				docCatList=new LinkedList<String>();
+				docCatList.add(String.valueOf(++FileUtilities.docId));
+				docCatList.add(dirList[dirLen - 2]);
+				IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
+//				IndexWriter.docList.put(dirList[dirLen - 1],Fi);
 				 	File inputFile = new File(filename);
 					
 					FileReader inputFileReader = new FileReader(inputFile);
@@ -110,6 +117,9 @@ public class Parser {
 							throw new ParserException();
 					}
 				}else{
+					docCatList=IndexWriter.docList.get(dirList[dirLen - 1]);
+					docCatList.add(dirList[dirLen - 2]);
+					IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
 					skippedCount++;
 				}
 			

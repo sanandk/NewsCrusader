@@ -69,35 +69,8 @@ public class Runner {
 				
 			}
 			
-//			try{
-//			String indexTest="IndexTestFile";
-//			File indexTestFile= new File(indexDir+File.separator+indexTest);
-//			if(indexTestFile.exists()){
-//				indexTestFile.delete();
-//			}
-//			FileWriter indexTestFw;
-//			BufferedWriter indexTestBw;
-//			indexTestFw= new FileWriter(indexTestFile);
-//			indexTestBw= new BufferedWriter(indexTestFw);
-//			System.out.println(IndexWriter.termIndex.size());
-//			for (String key : IndexWriter.termIndex.keySet()) {
-//				indexTestBw.write("\n"+key + " " + IndexWriter.termIndex.get(key));
-//		    }
-//			indexTestBw.close();
-//			}catch(IOException e){
-//				
-//			}
-			
-//			    
-			
-			
-//			System.out.println("==============*******=============\n"+termValue+"===>"+termPosting+"\n==============*******=============");
-//			System.out.println("No Place");
-//			writer.printA();
-//			System.out.println("No Date");
-//			writer.printB();
 			writer.close();
-			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
+			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)/1000+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
