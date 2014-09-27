@@ -66,7 +66,7 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
-	public static int tokenSize =0;
+//	public static int tokenSize =0;
 
 	public static List<String> docList= new ArrayList<String>();
 	public static TreeMap<String, StringBuilder> termIndexAC = new TreeMap<String, StringBuilder>();
@@ -97,8 +97,8 @@ public class IndexWriter {
 			while (analyzer.increment()) {
 				
 			}
-			tokenSize+=t_stream.my_stream.size();
-			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
+//			tokenSize+=t_stream.my_stream.size();
+//			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
 			t_stream.reset();
 //			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
 //			System.out.print("Content is ");

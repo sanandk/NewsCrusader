@@ -57,7 +57,7 @@ public class Runner {
 				for (String f : files) {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
+//						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
 						writer.addDocument(d);
 						
 					} catch (ParserException e) {
@@ -97,7 +97,7 @@ public class Runner {
 //			System.out.println("No Date");
 //			writer.printB();
 			writer.close();
-			System.out.println(startTime+"\n"+System.currentTimeMillis()+"\nParser Skipped File:"+Parser.skippedCount);
+			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)/1000+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
