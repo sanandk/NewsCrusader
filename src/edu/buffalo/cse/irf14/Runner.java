@@ -57,7 +57,7 @@ public class Runner {
 				for (String f : files) {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-					
+						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
 						writer.addDocument(d);
 						
 					} catch (ParserException e) {
@@ -69,26 +69,24 @@ public class Runner {
 				
 			}
 			
-			try{
-			String indexTest="IndexTestFile";
-			File indexTestFile= new File(indexDir+File.separator+indexTest);
-			if(indexTestFile.exists()){
-				indexTestFile.delete();
-			}
-			FileWriter indexTestFw;
-			BufferedWriter indexTestBw;
-			indexTestFw= new FileWriter(indexTestFile);
-			indexTestBw= new BufferedWriter(indexTestFw);
-			System.out.println(IndexWriter.termIndex.size());
-			for (String key : IndexWriter.termIndex.keySet()) {
-				 int y=IndexWriter.freq.get(key);
-				 if(y>100)
-				indexTestBw.write("\n"+key + "=" + y + " " + IndexWriter.termIndex.get(key));
-		    }
-			indexTestBw.close();
-			}catch(IOException e){
-				
-			}
+//			try{
+//			String indexTest="IndexTestFile";
+//			File indexTestFile= new File(indexDir+File.separator+indexTest);
+//			if(indexTestFile.exists()){
+//				indexTestFile.delete();
+//			}
+//			FileWriter indexTestFw;
+//			BufferedWriter indexTestBw;
+//			indexTestFw= new FileWriter(indexTestFile);
+//			indexTestBw= new BufferedWriter(indexTestFw);
+//			System.out.println(IndexWriter.termIndex.size());
+//			for (String key : IndexWriter.termIndex.keySet()) {
+//				indexTestBw.write("\n"+key + " " + IndexWriter.termIndex.get(key));
+//		    }
+//			indexTestBw.close();
+//			}catch(IOException e){
+//				
+//			}
 			
 //			    
 			
@@ -99,8 +97,7 @@ public class Runner {
 //			System.out.println("No Date");
 //			writer.printB();
 			writer.close();
-			startTime=(System.currentTimeMillis()-startTime)/1000;
-			System.out.println("Time taken="+startTime+" seconds\nTotal Number of tokenss"+IndexWriter.tokenSize);
+			System.out.println(startTime+"\n"+System.currentTimeMillis()+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
