@@ -5,6 +5,7 @@ package edu.buffalo.cse.irf14.analysis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * @author nikhillo
@@ -49,7 +50,7 @@ public class Tokenizer {
 		if(str==null || str.length()<1)
 			throw new TokenizerException();
 		String[] t_strings = str.split(delimiter);
-		ArrayList<Token> t_list=new ArrayList<Token>();
+		LinkedList<Token> t_list=new LinkedList<Token>();
 		char endChar;
 		int len;
 		

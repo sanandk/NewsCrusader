@@ -57,7 +57,7 @@ public class Runner {
 				for (String f : files) {
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
+					
 						writer.addDocument(d);
 						
 					} catch (ParserException e) {
@@ -81,7 +81,9 @@ public class Runner {
 			indexTestBw= new BufferedWriter(indexTestFw);
 			System.out.println(IndexWriter.termIndex.size());
 			for (String key : IndexWriter.termIndex.keySet()) {
-				indexTestBw.write("\n"+key + " " + IndexWriter.termIndex.get(key));
+				 int y=IndexWriter.freq.get(key);
+				 if(y>100)
+				indexTestBw.write("\n"+key + "=" + y + " " + IndexWriter.termIndex.get(key));
 		    }
 			indexTestBw.close();
 			}catch(IOException e){
@@ -97,7 +99,8 @@ public class Runner {
 //			System.out.println("No Date");
 //			writer.printB();
 			writer.close();
-			System.out.println(startTime+"\n"+System.currentTimeMillis()+"\nTotal Number of tokenss"+IndexWriter.tokenSize);
+			startTime=(System.currentTimeMillis()-startTime)/1000;
+			System.out.println("Time taken="+startTime+" seconds\nTotal Number of tokenss"+IndexWriter.tokenSize);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

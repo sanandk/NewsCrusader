@@ -25,7 +25,7 @@ public class FileUtilities {
 	public static BufferedWriter docBW;
 	public static BufferedWriter termBW;
 	public static BufferedWriter autBW;
-	static int docId = 1;
+	static int docId = 0;
 
 	public static String getOutputDir() {
 		return outputDir;
@@ -62,7 +62,7 @@ public class FileUtilities {
 			case DOC:
 				if (null != docBW) {
 					String fileName = data.toString();
-					docBW.write(fileName + delim + docId+++"\n");
+					docBW.write(fileName + delim + ++docId +"\n");
 				}
 			}
 		} catch (IOException e) {
@@ -70,7 +70,7 @@ public class FileUtilities {
 		}
 	}
 
-	public void closeDict() {
+	public static void closeDict() {
 		try {
 			if (null != docBW) {
 				docBW.close();

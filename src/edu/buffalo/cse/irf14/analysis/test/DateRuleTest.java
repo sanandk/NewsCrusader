@@ -22,10 +22,10 @@ public class DateRuleTest extends TFRuleBaseTest {
 		try{
 				assertArrayEquals(
 						new String[] { "Vidya", "Balan", "born",
-								"19780101", "is", "an", "Indian",
+								"19780101", "is", "an", "15",
 								"actress." },
 						runTest(TokenFilterType.DATE, "Vidya Balan born 1 January "
-								+ "1978 is an Indian actress."));
+								+ "1978 is an 15 actress."));
 				assertArrayEquals(
 						new String[] { "President", "Franklin", "D.",
 								"Roosevelt", "to", "proclaim", "19411207,",

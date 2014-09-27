@@ -40,7 +40,7 @@ public class StopwordFilter extends TokenFilter {
 		current_token = t_stream.getCurrent();
 		if (null == current_token)
 			return false;
-		if (stopwordList.contains(current_token.toString())){
+		if (stopwordList.contains(current_token.toString().toLowerCase())){
 			t_stream.remove();
 			
 		}

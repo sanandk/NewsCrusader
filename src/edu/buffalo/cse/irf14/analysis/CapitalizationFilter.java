@@ -1,11 +1,17 @@
 package edu.buffalo.cse.irf14.analysis;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class CapitalizationFilter extends TokenFilter {
 
 	TokenStream t_stream;
 	// int lineStart;
 	String camelCaseRegex = "([a-z]*[A-Z]+[a-z]*)+";
-
+	String camelCaseRegex2 = "([a-z]*[A-Z]+[a-z]*[ ]*)+";
+	Pattern p = Pattern.compile(camelCaseRegex);
+	Pattern p2 = Pattern.compile(camelCaseRegex2);
+	 Matcher m1=null,m2=null;
 	public CapitalizationFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		super(stream);
@@ -23,7 +29,11 @@ public class CapitalizationFilter extends TokenFilter {
 		current_token = t_stream.getCurrent();
 		if (null == current_token)
 			return false;
-		if (current_token.getTermText().matches(camelCaseRegex)) {
+		if(m1==null)
+			m1 = p.matcher(current_token.getTermText());
+		else
+			m1.reset(current_token.getTermText());
+		if (m1.matches()) {
 
 			if (t_stream.currentPointer == 0 || (previous_token!=null && previous_token.lineEnd)) {
 				// loop to check if not begining of line and captilization conditions
@@ -33,15 +43,22 @@ public class CapitalizationFilter extends TokenFilter {
 				
 				do{
 					current_token = t_stream.next();
-					camelCaseRegex = "([a-z]*[A-Z]+[a-z]*[ ]*)+";
+					if(null!=current_token)
+						if(m2==null)
+							m2=p2.matcher(current_token.getTermText());
+						else
+							m2.reset(current_token.getTermText());
+					else
+						m2=null;
 //					String tempStr=current_token.getTermText(); 
 //					tempStr=tempStr.replace(" ","");
-                if (null!=current_token && current_token.getTermText().matches(camelCaseRegex)) {
+                if (null!=m2 && m2.matches()) {
 					t_stream.remove();
 					previous_token = t_stream.previous();
                     current_token.setTermText(previous_token.getTermText()+" "+current_token.getTermText());
 					t_stream.replace(current_token);
-				} else {
+				} 
+					else {
 					t_stream.previous();
 					break;
 				}

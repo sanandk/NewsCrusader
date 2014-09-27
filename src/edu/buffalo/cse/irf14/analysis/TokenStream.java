@@ -5,6 +5,7 @@ package edu.buffalo.cse.irf14.analysis;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class TokenStream implements Iterator<Token>{
 	
 	public List<Token> my_stream;
 	int currentPointer;
-	TokenStream(ArrayList<Token> t_stream)
+	TokenStream(LinkedList<Token> t_stream)
 	{
 		my_stream = t_stream;
 		currentPointer=-1;

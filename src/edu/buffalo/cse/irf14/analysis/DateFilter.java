@@ -1,20 +1,18 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.sql.Time;
-import java.text.Normalizer;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DateFilter  extends TokenFilter {
 	// Update on 17th Sep by anand
 	
+	String dateRegex = "(\\d{4})(-)(\\d{2}|\\d{4})(.|,|!|\\?|:|;)*";
+	Pattern p = Pattern.compile(dateRegex);
+	Matcher m1=null;
+	 
 	TokenStream t_stream;
 	public DateFilter(TokenStream stream) {
 		super(stream);
@@ -75,9 +73,15 @@ public class DateFilter  extends TokenFilter {
 	
 	public String month(String str)
 	{
+		String ch="";
 		if(str!=null && !str.equals(""))	{
+			if(!Character.isAlphabetic(str.charAt(str.length()-1)))
+	    	{
+	    		ch=str.charAt(str.length()-1)+"";
+	    		str=str.substring(0,str.length()-1);
+	    	}
 			Integer i=monthList.get(str.toLowerCase());
-			return (i==null)?"":String.format("%02d", i);
+			return (i==null)?"":String.format("%02d", i)+ch;
 		}
 		else
 			return "";
@@ -144,8 +148,9 @@ public class DateFilter  extends TokenFilter {
 					t_stream.previous();
 				}
 				if(t2.equals("") && t3.equals("") && !t1.contains("~"))
-					date_builder.append("~0000");
+					date_builder.setLength(0);
 				else
+				{
 				if(t2.equals(""))
 					t2="01";				
 				if(t3.contains("~")) //t3=year
@@ -175,9 +180,9 @@ public class DateFilter  extends TokenFilter {
 					date_builder.append(t2);
 					date_builder.append(t1);
 				}
-				
+				}
 			}
-			else if(str.matches("(\\d{4})(-)(\\d{2}|\\d{4})(.|,|!|\\?|:|;)*")) // for 2011-12.
+			else if((m1!=null && m1.reset(str).matches()) || (m1=p.matcher(str)).matches()) // for 2011-12.
 			{
 				String[] yr=str.split("-");
 				int i=0;

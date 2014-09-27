@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -66,15 +67,16 @@ public class IndexWriter {
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
 	public static int tokenSize =0;
-	public static ConcurrentHashMap<String, StringBuilder> termIndex = new ConcurrentHashMap<String, StringBuilder>();
-	
+	public static TreeMap<String, StringBuilder> termIndex = new TreeMap<String, StringBuilder>();
+	public static TreeMap<String, Integer> freq = new TreeMap<String, Integer>();
 	
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
 		
 		FileUtilities.writeToDic(d.getField(FieldNames.FILEID)[0], DictType.DOC);
-		
+		int f;
+		String termValue;
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
@@ -89,7 +91,7 @@ public class IndexWriter {
 				
 			}
 			tokenSize+=t_stream.my_stream.size();
-			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
+		//	System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
 			t_stream.reset();
 //			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
 //			System.out.print("Content is ");
@@ -98,33 +100,26 @@ public class IndexWriter {
 			while(t_stream.hasNext())
 			{
 				tp=t_stream.next();
+				
 				termPosting= new StringBuilder();
-				if(tp!=null){
-					String termValue=tp.toString();
+				if(tp!=null && (termValue=tp.toString()).length()>0){
+					f=0;
 					if(termIndex.containsKey(termValue)){
 						termPosting=termIndex.get(termValue);
-						
+						f=freq.get(termValue).intValue();
 					}
-//					else{
-						termPosting.append(","+FileUtilities.docId);
-						
+
+						termPosting.append(","+(FileUtilities.docId));
+						freq.put(termValue,f+1);
 						termIndex.put(termValue,termPosting );
-//					}
 				}
-//				System.out.print(tp.toString()+"|");
 			}
-//			System.out.print(termIndex.size());
 		}
 		catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception!");
 			e.printStackTrace();
 		}
-		
-//		while (t_stream.hasNext()) {
-//            System.out.println("Item is: " + t_stream.next());
-//        }
-
 	
 		// Code added by Karthik-J on Sept 9, 2014 - Starts
 //		printDoc(d);
@@ -211,6 +206,6 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		// TODO
-		FileUtilities.openDict();
+		FileUtilities.closeDict();
 	}
 }

@@ -96,6 +96,10 @@ public class Token {
 	@Override
 	public String toString() {
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
+		
+		termText.trim();
+		if(termText.length()==1 && ".,:;?!-\'".indexOf(termBuffer[0])>-1)
+			setTermText("");
 		return termText;
 	}
 }

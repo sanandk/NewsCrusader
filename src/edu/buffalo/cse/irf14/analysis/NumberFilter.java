@@ -8,7 +8,7 @@ public class NumberFilter extends TokenFilter {
 
 	
 	TokenStream t_stream;
-	String numberRegex="([\\.]*(\\d)+[\\.]*[,]*(\\d)*)";
+	String numberRegex="([\\.]*[-]*(\\d)+[\\.]*[,]*[-]*(\\d)*)";
 	Pattern numberRegexPattern= Pattern.compile(numberRegex);
 	Matcher numberMatcher;
 	public NumberFilter(TokenStream stream) {
@@ -17,7 +17,7 @@ public class NumberFilter extends TokenFilter {
 		t_stream=stream;
 		f_type=TokenFilterType.NUMERIC;
 	}
-	
+	int len=0;
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
@@ -29,7 +29,7 @@ public class NumberFilter extends TokenFilter {
 //		skfdjks7==>skfdjks
 		Token current_token;
 		
-
+			
 			current_token=t_stream.next();
 			if(current_token==null)
 				return false;
@@ -38,14 +38,13 @@ public class NumberFilter extends TokenFilter {
 			
 			String[] strArr= str.split("\\d");
 			if(strArr.length>1){
-				StringBuilder res=new StringBuilder();
+				str="";
 				for(String temp: strArr){
-					//str+=temp;
+					str+=temp;
 				
-					res.append(temp);
 				}
-				str=res.toString();
-				str=str.replaceAll("\\.|,", "");
+				
+				str=str.replaceAll("\\.|-|,", "");
 				if("".equals(str))
 					t_stream.remove();
 				else
@@ -53,17 +52,23 @@ public class NumberFilter extends TokenFilter {
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-				
-			}else if(numberMatcher.matches() && str.length()!=8){
-
+			
+			}else if(numberMatcher.matches() ){
+				len=str.length();
+				if(len==8 && Integer.valueOf(str)>21001231){
+					t_stream.remove();
+				}
+				else if(len!=8)
+				{
 				str=str.replaceAll(numberRegex, "");
+				
 				if("".equals(str))
 					t_stream.remove();
                 else{
                     current_token.setTermText(str);
                     t_stream.replace(current_token);
                 }
-			
+				}
 			}
 			if (t_stream.hasNext()) {
 			return true;

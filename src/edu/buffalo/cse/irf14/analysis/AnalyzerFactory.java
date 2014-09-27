@@ -56,14 +56,17 @@ public class AnalyzerFactory {
 		if(name==FieldNames.CONTENT){
 			
 			list.add(AccentFilterObject);
-			list.add(DateFilterObject);
+		
+			list.add(DateFilterObject); //5 seconds
+			
 			list.add(SymbolFilterObject);
 			list.add(SpecialCharFilterObject);
 			list.add(NumberFilterObject);
-		
-			list.add(CapitalizationFilterObject);
+			list.add(CapitalizationFilterObject); 
+			
 			list.add(StopwordFilterObject);
-		//	list.add(StemmerFilterObject);
+			list.add(StemmerFilterObject);
+			
 			
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)

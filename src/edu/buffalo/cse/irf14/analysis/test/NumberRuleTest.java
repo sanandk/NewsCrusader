@@ -21,10 +21,10 @@ public class NumberRuleTest extends TFRuleBaseTest {
 			try {
 					assertArrayEquals(
 							new String[] { "The", "App", "Store", "offered", "more", "than", "apps", "by", "Apple", "and", "third", "parties." },
-							runTest(TokenFilterType.NUMERIC, "The App Store offered more than 775,000 apps by Apple and third parties."));
+							runTest(TokenFilterType.NUMERIC, "The App Store offered more than 27755000 apps by Apple and third parties."));
 					assertArrayEquals(
-							new String[] { "The", "game", "received", "average", "review", "scores", "of", "%", "and", "/", "for", "the", "Xbox", "version" },
-							runTest(TokenFilterType.NUMERIC, "The game received average review scores of 96.92% and 98/100 for the Xbox 360 version"));
+							new String[] { "The", "game", "received", "20130202", "review", "scores", "of", "%", "and", "/", "for", "the", "Xbox", "version" },
+							runTest(TokenFilterType.NUMERIC, "The game received 20130202 review scores of 96.92% and 98/100 for the Xbox 360 version"));
 					assertArrayEquals(
 							new String[] { "The", "number", "is", "the", "sixth", "prime", "number" },
 							runTest(TokenFilterType.NUMERIC, "The number 13 is the sixth prime number"));
