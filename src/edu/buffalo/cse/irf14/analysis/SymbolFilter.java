@@ -1,6 +1,5 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.lang.reflect.Array;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,35 +14,38 @@ public class SymbolFilter extends TokenFilter {
 		f_type=TokenFilterType.SYMBOL;
 		t_stream=stream;
 	}
-	String intregex = "(.)*(\\d)(.)*";      
-    Pattern intpattern = Pattern.compile(intregex);
-    
+	
+    final Pattern intpattern = Pattern.compile("(.)*(\\d)(.)*");
+//	final Pattern p = Pattern.compile("\'|-|.|,|:|;|\\?|!");
+//	Matcher m;
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
-		
-		 char[] punctuations={'.',',',':',';','?','!','-','\''};
-		 Token current_token;
 	
+	//	 char[] punctuations={'.',',',':',';','?','!','-','\''};
+		 Token current_token;
+		 String ps=".,:;?!-\'";
 		 current_token=t_stream.next();
 		
 		
 		if(current_token==null)
 			return false;
 		String str=current_token.toString();
+		int len=str.length();
+//		m=p.matcher(str);
 		String old=str;
-		if(str.length()>0)
+		if(len>0)
 		{
 			
 		char f=str.charAt(0);
 		char l=str.charAt(str.length()-1);
-		String ps=new String(punctuations);
 		
-		if(str.length()>=1)
+		
+		if(len>=1)
 		{
-			while(f==l && ps.indexOf(l)>=0)
+			while(f==l && (l=='\'' || l=='\"' || l=='-'))
 			{
-				if(str.length()<=2)
+				if(len<=2)
 				{	
 					str="";
 					l=0;
@@ -52,6 +54,7 @@ public class SymbolFilter extends TokenFilter {
 					str=str.substring(1,str.length()-1);
 					f=str.charAt(0);
 					l=str.charAt(str.length()-1);
+				len=str.length();
 			}
 			while(ps.indexOf(l)>=0)
 			{

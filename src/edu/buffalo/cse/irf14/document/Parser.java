@@ -25,6 +25,7 @@ public class Parser {
 	 * @throws ParserException
 	 *             In case any error occurs during parsing
 	 */
+	static Pattern f=Pattern.compile(Pattern.quote(File.separator));
 	public static int skippedCount=0;
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
@@ -32,8 +33,7 @@ public class Parser {
 		Document doc = new Document();
 		try {
 				
-			String[] dirList = filename
-					.split(Pattern.quote(File.separator));
+			String[] dirList = f.split(filename);
 			int dirLen = dirList.length;
 			if (dirLen > 0) {// if less then zero try throwing an error
 				// saying invalid file name

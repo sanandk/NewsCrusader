@@ -6,6 +6,7 @@ package edu.buffalo.cse.irf14.analysis;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 /**
  * @author nikhillo
@@ -14,12 +15,14 @@ import java.util.LinkedList;
 public class Tokenizer {
 	// Updated by anand on Sep 14th
 	String delimiter;
+	Pattern del;
 	/**
 	 * Default constructor. Assumes tokens are whitespace delimited
 	 */
 	public Tokenizer() {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		delimiter=" ";
+		del=Pattern.compile(delimiter);
 	}
 	
 	/**
@@ -45,11 +48,12 @@ public class Tokenizer {
 	 * @throws TokenizerException : In case any exception occurs during
 	 * tokenization
 	 */
+	
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		if(str==null || str.length()<1)
 			throw new TokenizerException();
-		String[] t_strings = str.split(delimiter);
+		String[] t_strings = del.split(str);
 		LinkedList<Token> t_list=new LinkedList<Token>();
 		char endChar;
 		int len;

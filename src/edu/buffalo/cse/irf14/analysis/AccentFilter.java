@@ -38,19 +38,22 @@ public class AccentFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.toString();
-			String old=str;
-			int i=0;
-//			for(String a:accents)
-//			{
-//				str=str.replaceAll(a, accents_val[i++]);
-//			}
-		   
-			str=Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+			String old=str;	   
+	
+			char c;
+			char[] out = new char[str.length()];
+		    str = Normalizer.normalize(str, Normalizer.Form.NFD);
+		    int j = 0;
+		    for (int i = 0, n = str.length(); i < n; ++i) {
+		         c= str.charAt(i);
+		        if (c <= '\u007F') out[j++] = c;
+		    }
+		    str= new String(out);
+		    
 			if(!(str.equals(old)))
 			{
 			current_token.setTermText(str);
 		    t_stream.replace(current_token);
-		   
 			}
 			if(t_stream.hasNext())
 				return true;

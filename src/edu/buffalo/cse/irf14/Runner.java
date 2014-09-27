@@ -97,7 +97,7 @@ public class Runner {
 //			System.out.println("No Date");
 //			writer.printB();
 			writer.close();
-			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)/1000+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
+			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

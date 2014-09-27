@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Writer;
 import java.util.TreeMap;
+import java.util.zip.GZIPOutputStream;
 
 public class FileUtilities {
 
@@ -76,11 +77,12 @@ public class FileUtilities {
 	}
 
 	public static void writeToDic(Object data, DictType type) {
+		String fileName;
 		try {
 			switch (type) {
 			case DOC:
 				if (null != docBW) {
-					String fileName = data.toString();
+					fileName = data.toString();
 					docBW.write(fileName + delim + ++docId + "\n");
 				}
 			}
@@ -102,8 +104,23 @@ public class FileUtilities {
 	public static void writeIndexFile(TreeMap<String, StringBuilder> indexMap,String fileName) {
 		FileOutputStream f_out = null;
 		ObjectOutputStream obj_out = null;
-		File indexFile= new File(outputDir+File.separator+fileName);
-		BufferedWriter indexBW= null;
+		//File indexFile= new File(outputDir+File.separator+fileName);
+		 try {
+		 FileOutputStream fos = new FileOutputStream(outputDir+File.separator+fileName);
+		  GZIPOutputStream gz = new GZIPOutputStream(fos);
+		  
+		   ObjectOutputStream oos = new ObjectOutputStream(gz);
+		 
+			oos.writeObject(indexMap);
+			  oos.close();
+			  fos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		  
+
+		/*BufferedWriter indexBW= null;
 		FileWriter indexFW= null;
 		
 		try {
@@ -123,14 +140,13 @@ public class FileUtilities {
 			
 		} catch (Exception e) {
 
-		}
 		if (null != indexBW) {
 			try {
 				indexBW.close();
 			} catch (IOException e) {
 
 			}
-		}
+		}*/
 //	 	if (null != obj_out) {
 //			try {
 //				obj_out.close();

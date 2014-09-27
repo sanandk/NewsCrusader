@@ -5,14 +5,10 @@ package edu.buffalo.cse.irf14.index;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -66,7 +62,6 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
-//	public static int tokenSize =0;
 
 	public static List<String> docList= new ArrayList<String>();
 	public static TreeMap<String, StringBuilder> termIndexAC = new TreeMap<String, StringBuilder>();

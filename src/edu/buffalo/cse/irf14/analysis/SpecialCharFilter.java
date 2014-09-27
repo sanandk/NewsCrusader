@@ -14,14 +14,13 @@ public class SpecialCharFilter  extends TokenFilter {
 		t_stream=stream;
 		f_type=TokenFilterType.SPECIALCHARS;
 	}
-	String intregex = "(.)*(\\d)(.)*";      
-    Pattern intpattern = Pattern.compile(intregex);
+	final String intregex = "(.)*(\\d)(.)*";      
+	final Pattern intpattern = Pattern.compile(intregex);
+    Matcher matcher = null;
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 		
-		 char[] punctuations={'.'};
-		 String ps=new String(punctuations);
 		 StringBuffer res = new StringBuffer();
 
 			Token current_token=t_stream.next();
@@ -32,16 +31,18 @@ public class SpecialCharFilter  extends TokenFilter {
 			
 			for(char a:buf)
 			{
-				if(Character.isLetterOrDigit(a) || ps.indexOf(a)>=0)
+				if(Character.isLetterOrDigit(a) || a=='.')
 					res.append(a);
 				else if(a=='-')
 				{
-					 Matcher matcher = intpattern.matcher(str);
+					if(matcher==null)
+						matcher = intpattern.matcher(str);
+					else
+						matcher.reset(str);
 			         boolean isMatched = matcher.matches();
 			        
 			        if(isMatched)
 			        	 res=res.append(a);
-					
 				}
 			}
 			

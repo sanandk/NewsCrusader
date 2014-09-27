@@ -24,7 +24,8 @@ public class StopwordFilter extends TokenFilter {
 					"this", "tis", "to", "too", "twas", "us", "wants", "was",
 					"we", "were", "what", "when", "where", "which", "while",
 					"who", "whom", "why", "will", "with", "would", "yet",
-					"you", "your"));
+					"you", "your"
+					,"above"));
 
 	public StopwordFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
