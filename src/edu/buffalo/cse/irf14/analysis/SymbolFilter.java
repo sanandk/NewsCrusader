@@ -16,23 +16,21 @@ public class SymbolFilter extends TokenFilter {
 	
     final Pattern intpattern = Pattern.compile("(.)*(\\d)(.)*");
     final Pattern alphap=Pattern.compile("[a-zA-Z]+");
-//	final Pattern p = Pattern.compile("\'|-|.|,|:|;|\\?|!");
+    final String ps=".,-\'?!:;";
 	Matcher m,matcher;
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
 	
-	//	 char[] punctuations={'.',',',':',';','?','!','-','\''};
-		 Token current_token;
-		 String ps=".,:;?!-\'";
-		 current_token=t_stream.next();
-		
+		Token current_token;
+		 
+		current_token=t_stream.next();
 		
 		if(current_token==null)
 			return false;
 		String str=current_token.toString();
 		int len=str.length();
-//		m=p.matcher(str);
+
 		final String old=str;
 		if(len>0)
 		{
@@ -58,9 +56,7 @@ public class SymbolFilter extends TokenFilter {
 			}
 			while(ps.indexOf(l)>=0)
 			{
-				//if(l=='\'' && str.contains("s\'"))
-					//str=str.replaceAll("s\'", "s");	
-				//else
+				
 				if(str.length()>0)
 					str=str.substring(0,str.length()-1);
 				if(str.length()>0)

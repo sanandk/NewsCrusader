@@ -30,23 +30,25 @@ public class Parser {
 	 *             In case any error occurs during parsing
 	 */
 	public static int skippedCount=0;	   
-
+	static FileReader inputFileReader;
+	static BufferedReader inputBR;
 	final static Pattern byp=Pattern.compile("By|by|BY");
+	static String fileid,category,place;
 	static Matcher m;
+	static String inputLine;
+	static int dirLen;
+	String content;
+	static StringBuilder content_b;
     public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		// Code edited by Karthik-j on Sept 9, 2014- Starts
 		Document doc = new Document();
-//		LinkedList<String> catList; 
-//		int tempFileId;
-		FileReader inputFileReader;
-		BufferedReader inputBR;
-		String place=null;
+	
 		try {
 				
 			String[] dirList = filename.split(Pattern.quote(File.separator));
-			int dirLen = dirList.length;
-			String fileid,category;
+			dirLen = dirList.length;
+			
 			if (dirLen > 2) {// if less then zero try throwing an error saying invalid file name
 				fileid=dirList[dirLen - 1];
 				category=dirList[dirLen - 2];
@@ -58,8 +60,8 @@ public class Parser {
 				inputFileReader = new FileReader(filename);
 				inputBR = new BufferedReader(inputFileReader);
 				
-				String inputLine;
-				String content="";
+				content_b=new StringBuilder();
+				
 				boolean titleFlag = true;
 				boolean placeFlag = true; 
 				try {
@@ -89,7 +91,7 @@ public class Parser {
 										placeFlag=false;
 										int h=inputLine.indexOf("-");
 											String placeInfo = inputLine.substring(0, h);
-											content=inputLine.substring(h+1);
+											content_b.append(inputLine.substring((h+1)));
 											if (placeInfo.contains(",")) {
 												h=placeInfo.lastIndexOf(",");
 												place=placeInfo.substring(0, h).trim();
@@ -100,13 +102,14 @@ public class Parser {
 												doc.setField(FieldNames.PLACE,place);
 											}
 									} else {
-										content+=" "+inputLine;
+										content_b.append(' ');
+										content_b.append(inputLine);
 										
 									}
 								}
 							}
 						}
-						doc.setField(FieldNames.CONTENT, content);
+						doc.setField(FieldNames.CONTENT, content_b.toString());
 						
 					}
 					if(null!=inputBR){
@@ -117,15 +120,6 @@ public class Parser {
 				}
 				
 				}else{
-                  /*docCatList=IndexWriter.docList.get(fileid);
-					docCatList.add(category);
-	                IndexWriter.docList.put(fileid,docCatList);
-					catList=IndexWriter.CatIndex.get(category);
-					if(catList==null)
-						catList=new ArrayList<Integer>();
-					catList.add(FileUtilities.docId);
-					IndexWriter.CatIndex.put(dirList[dirLen - 2], catList);
-					*/
 					skippedCount++;
 				}
 			}
@@ -133,8 +127,7 @@ public class Parser {
 				throw new ParserException();
 		} catch (FileNotFoundException fe) {
 			throw new ParserException();
-//		}catch (IOException ioe) {
-//			throw new ParserException();
+	
 		} catch (NullPointerException npe) {
 			throw new ParserException();
 		}

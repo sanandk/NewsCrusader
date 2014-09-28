@@ -4,7 +4,6 @@
 package edu.buffalo.cse.irf14.index;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ public class IndexReader {
 		FileUtilities.setOutputDir(indexDir);
 		readIndex(type);
 		
-
 	}
 
 	/**
@@ -94,7 +92,6 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		// TODO: YOU MUST IMPLEMENT THIS
-//		int totalValueTerms=0;
 		HashSet<Integer> uniquePostingList= new HashSet<Integer>();
 		switch (type) { 
 			case TERM:
@@ -193,8 +190,7 @@ public class IndexReader {
 		Map<String, Integer> postingsMap=null;
 		HashMap<Integer, Integer> postingList;
 		ArrayList<Integer> postingArray;
-		LinkedList<String[]> docList;
-		String fileId;
+		
 		switch(type){
 			case TERM:
 				if(null!=term && !term.isEmpty()){

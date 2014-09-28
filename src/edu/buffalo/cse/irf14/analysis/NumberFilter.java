@@ -6,8 +6,6 @@ import java.util.regex.Pattern;
 
 public class NumberFilter extends TokenFilter {
 
-	
-	
 	final Pattern numberRegexPattern= Pattern.compile("([\\.]*[-]*(\\d)+[\\.]*[,]*[-]*(\\d)*)");
 	final Pattern repPattern= Pattern.compile("\\.|-|,");
 	final Pattern remove_no=Pattern.compile("\\d");
@@ -45,8 +43,10 @@ public class NumberFilter extends TokenFilter {
 				for(String temp: strArr){
 					str+=temp;
 				}
-				if(repMatcher==null)
-					str=(repMatcher=repPattern.matcher(str)).replaceAll("");
+				if(repMatcher==null){
+					repMatcher=repPattern.matcher(str);
+					str=repMatcher.replaceAll("");
+				}
 				else
 					str=repMatcher.reset(str).replaceAll("");
 			
@@ -66,7 +66,6 @@ public class NumberFilter extends TokenFilter {
 				else if(len!=8)
 				{
 					str=numberMatcher.replaceAll("");
-				//str=str.replaceAll(numberRegex, "");
 				
 				if("".equals(str))
 					t_stream.remove();

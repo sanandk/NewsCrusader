@@ -43,38 +43,37 @@ public class DateFilter  extends TokenFilter {
 		
 		t_stream=stream;
 		f_type=TokenFilterType.DATE;
-	}
-	final String intregex = "[012]?[0-9]:[0-5][0-9](:[0-5][0-9])?([a-zA-z.]{3})?";      
-	final Pattern intpattern = Pattern.compile(intregex);
+	}	
+	final Pattern intpattern = Pattern.compile("[012]?[0-9]:[0-5][0-9](:[0-5][0-9])?([a-zA-z.]{3})?");
     
 	public static String Number(String string,boolean suffix){
-		String ch="";
+		char ch=' ';
 		StringBuilder sb=new StringBuilder();
 		int i;
 	    try {
 	    	if(!Character.isDigit(string.charAt(string.length()-1)))
 	    	{
-	    		ch=string.charAt(string.length()-1)+"";
+	    		ch=string.charAt(string.length()-1);
 	    		string=string.substring(0,string.length()-1);
 	    	}
 	    	i=Integer.parseInt(string);
-	    	String delim=(ch=="")?"":"^";
-	    	if(!suffix && i>1800 && i<2100)
+	    	
+	    	if((suffix) || i>1800 && i<2100)
 	    	{		sb.append('~');
 	    	sb.append(String.format("%04d", i));
-	    	sb.append(delim);
-	    	sb.append(ch);
+
+	    	if(ch!=' '){
+	    		sb.append('^');
+	    		sb.append(ch);
+	    	}
 	    }
-	    		//return "~"+String.format("%04d", i)+delim+ch;
+	    		
 	    	else if(i<32)
 	    	{
 	    		sb.append(String.format("%02d", i));	
 	    	}
 	    		//return String.format("%02d", i);
-	    	else if(suffix){
-	    		sb.append('~');
-	    		sb.append(String.format("%02d", i));
-	    	}
+	    	
 	    	
 	    	 return sb.toString();
 	    } catch (Exception e) {
@@ -85,15 +84,24 @@ public class DateFilter  extends TokenFilter {
 	
 	public String month(String str)
 	{
-		String ch="";
+		char ch=' ';
 		if(str!=null && !str.equals(""))	{
 			if(!Character.isLetter(str.charAt(str.length()-1)))
 	    	{
-	    		ch=str.charAt(str.length()-1)+"";
+	    		ch=str.charAt(str.length()-1);
 	    		str=str.substring(0,str.length()-1);
 	    	}
 			Integer i=monthList.get(str.toLowerCase());
-			return (i==null)?"":String.format("%02d", i)+ch;
+			if(i==null)
+				return "";
+			else
+			{
+				if(ch==' ')
+					return String.format("%02d", i);
+				else
+					return String.format("%02d", i)+ch;
+			}
+			
 		}
 		else
 			return "";
@@ -202,11 +210,11 @@ public class DateFilter  extends TokenFilter {
 				String l=str.toLowerCase();
 				if(l.contains("pm")){
 					ap=2;
-					str=str.replaceAll("pm", "");
+					str=l.replaceAll("pm", "");
 				}
 				else if(l.contains("am")){
 					ap=1;
-					str=str.replaceAll("am", "");
+					str=l.replaceAll("am", "");
 				}
 				else
 				{

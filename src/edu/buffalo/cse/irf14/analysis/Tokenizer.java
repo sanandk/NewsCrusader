@@ -50,6 +50,7 @@ public class Tokenizer {
 	
 	public TokenStream consume(String str) throws TokenizerException {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+		
 		if(str==null || str.length()<1)
 			throw new TokenizerException();
 		String[] t_strings = del.split(str);

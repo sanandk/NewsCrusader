@@ -25,7 +25,7 @@ public class StopwordFilter extends TokenFilter {
 					"who", "whom", "why", "will", "with", "would", "yet",
 					"you", "your"
 					,"above","told"));
-
+	
 	public StopwordFilter(TokenStream stream) {
 		// TODO Auto-generated constructor stub
 		super(stream);
@@ -42,7 +42,6 @@ public class StopwordFilter extends TokenFilter {
 			return false;
 		if (stopwordList.contains(current_token.toString().toLowerCase())){
 			t_stream.remove();
-			
 		}
 
 		if (t_stream.hasNext()) {

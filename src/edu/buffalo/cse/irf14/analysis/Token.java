@@ -74,10 +74,17 @@ public class Token {
 	 */
 	protected void merge(Token...tokens) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
+
 		if(tokens!=null)
+		{
+		StringBuilder b=new StringBuilder();	
+		b.append(termText);
 		for(Token t:tokens)
 		{
-			termText+=" "+t.getTermText();
+			b.append(' ');
+			b.append(t.getTermText());
+		}
+		termText=b.toString();
 		}
 	}
 	

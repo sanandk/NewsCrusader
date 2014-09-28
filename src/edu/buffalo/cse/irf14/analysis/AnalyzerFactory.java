@@ -13,6 +13,7 @@ import edu.buffalo.cse.irf14.document.FieldNames;
  */
 public class AnalyzerFactory {
 	static AnalyzerFactory ins=new AnalyzerFactory();
+	final TokenFilterFactory factory = TokenFilterFactory.getInstance();
 	/**
 	 * Static method to return an instance of the factory class.
 	 * Usually factory classes are defined as singletons, i.e. 
@@ -43,7 +44,7 @@ public class AnalyzerFactory {
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		ArrayList<Analyzer> list=new ArrayList<Analyzer>();
-		final TokenFilterFactory factory = TokenFilterFactory.getInstance();
+		
 		final TokenFilter AccentFilterObject = factory.getFilterByType(TokenFilterType.ACCENT, stream);
 		final TokenFilter SymbolFilterObject = factory.getFilterByType(TokenFilterType.SYMBOL, stream);
 		final TokenFilter CapitalizationFilterObject = factory.getFilterByType(TokenFilterType.CAPITALIZATION, stream);
@@ -69,7 +70,6 @@ public class AnalyzerFactory {
 
 			list.add(StemmerFilterObject); //1.702 sec
 		
-			
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)
 		{

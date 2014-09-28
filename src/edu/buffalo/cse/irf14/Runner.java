@@ -3,15 +3,14 @@
  */
 package edu.buffalo.cse.irf14;
 
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import edu.buffalo.cse.irf14.document.Document;
-import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.document.Parser;
 import edu.buffalo.cse.irf14.document.ParserException;
+import edu.buffalo.cse.irf14.index.IndexReader;
+import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.IndexWriter;
 import edu.buffalo.cse.irf14.index.IndexerException;
 
@@ -44,8 +43,8 @@ public class Runner {
 		
 		Document d = null;
 		IndexWriter writer = new IndexWriter(indexDir);
-		System.out.println(indexDir);
-		long startTime=System.currentTimeMillis();
+	
+	//	long startTime=System.currentTimeMillis();
 		try {
 			for (String cat : catDirectories) {
 				
@@ -57,12 +56,12 @@ public class Runner {
 				for (String f : files) { // NOPMD by SAnanda on 28/9/14 2:41 AM
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
-//						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
+
 						writer.addDocument(d);
 						
 					} catch (ParserException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("ParserException: "+e.getMessage());
 					} 
 					
 				}
@@ -70,10 +69,11 @@ public class Runner {
 			}
 			
 			writer.close();
-			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
+			
+		//	System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("IndexerException: "+e.getMessage());
 		}
 	}
 

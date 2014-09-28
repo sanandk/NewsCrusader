@@ -13,8 +13,8 @@ public class SpecialCharFilter  extends TokenFilter {
 		t_stream=stream;
 		f_type=TokenFilterType.SPECIALCHARS;
 	}
-	final String intregex = "(.)*(\\d)(.)*";      
-	final Pattern intpattern = Pattern.compile(intregex);
+	
+	final Pattern intpattern = Pattern.compile("(.)*(\\d)(.)*");
     Matcher matcher = null;
 	@Override
 	public boolean increment() throws TokenizerException {
