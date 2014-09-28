@@ -4,6 +4,8 @@
 package edu.buffalo.cse.irf14.index;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ public class IndexReader {
 		FileUtilities.setOutputDir(indexDir);
 		readIndex(type);
 		
+
 	}
 
 	/**
@@ -92,54 +95,11 @@ public class IndexReader {
 	 */
 	public int getTotalValueTerms() {
 		// TODO: YOU MUST IMPLEMENT THIS
+//		int totalValueTerms=0;
 		HashSet<Integer> uniquePostingList= new HashSet<Integer>();
 		switch (type) { 
 			case TERM:
 				return (null!=IndexWriter.docList)?IndexWriter.docList.size():0;  //uniquePostingList.size();
-//				if(IndexWriter.termIndexAC!=null)
-//					for (String key : IndexWriter.termIndexAC.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexAC.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				
-//				if(IndexWriter.termIndexDG!=null)
-//					for (String key : IndexWriter.termIndexDG.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexDG.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				if(null!=IndexWriter.termIndexHK)
-//					for (String key : IndexWriter.termIndexHK.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexHK.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				if(null!=IndexWriter.termIndexLP)
-//					for (String key : IndexWriter.termIndexLP.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexLP.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				if(null!=IndexWriter.termIndexQS)
-//					for (String key : IndexWriter.termIndexQS.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexQS.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				if(null!=IndexWriter.termIndexTZ)
-//					for (String key : IndexWriter.termIndexTZ.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexTZ.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-//				if(null!=IndexWriter.termIndexMisc)
-//					for (String key : IndexWriter.termIndexMisc.keySet()) {
-//						for(Integer fileId:IndexWriter.termIndexMisc.get(key).keySet()){
-//							uniquePostingList.add(fileId);
-//						}
-//				    }
-				
 			case AUTHOR:
 				if(IndexWriter.AuthorIndex!=null && !IndexWriter.AuthorIndex.isEmpty()){
 					for (String key : IndexWriter.AuthorIndex.keySet()) {
@@ -190,7 +150,8 @@ public class IndexReader {
 		Map<String, Integer> postingsMap=null;
 		HashMap<Integer, Integer> postingList;
 		ArrayList<Integer> postingArray;
-		
+		LinkedList<String[]> docList;
+		String fileId;
 		switch(type){
 			case TERM:
 				if(null!=term && !term.isEmpty()){
@@ -331,11 +292,6 @@ public class IndexReader {
 					}
 					frequencyListing.put(cat, frequency);
 				}
-//				sortedFrequencyList= entriesComparator(frequencyListing);
-//				for(int i=0;i<k;i++){
-//					topKterms.add(sortedFrequencyList.get(i).getKey());
-//				}
-//				return topKterms;
 			case CATEGORY:
 				for(String cat: IndexWriter.CatIndex.keySet()){
 					frequency=0;
@@ -345,11 +301,6 @@ public class IndexReader {
 					}
 					frequencyListing.put(cat, frequency);
 				}
-//				sortedFrequencyList= entriesComparator(frequencyListing);
-//				for(int i=0;i<k;i++){
-//					topKterms.add(sortedFrequencyList.get(i).getKey());
-//				}
-//				return topKterms;
 			case PLACE:
 				for(String cat: IndexWriter.PlaceIndex.keySet()){
 					frequency=0;
@@ -359,11 +310,6 @@ public class IndexReader {
 					}
 					frequencyListing.put(cat, frequency);
 				}
-//				sortedFrequencyList= entriesComparator(frequencyListing);
-//				for(int i=0;i<k;i++){
-//					topKterms.add(sortedFrequencyList.get(i).getKey());
-//				}
-//				return topKterms;
 		}
 		sortedFrequencyList= entriesComparator(frequencyListing);
 		if(k>sortedFrequencyList.size()){
@@ -408,7 +354,83 @@ public class IndexReader {
 	 */
 	public Map<String, Integer> query(String... terms) {
 		// TODO : BONUS ONLY
-		return null;
+		try{
+		Map<String,Integer> queryMap= new HashMap<String,Integer>();
+		Map<Integer,Integer> queryWithDocId;
+		ArrayList<HashMap<Integer, Integer>> postingListArray=new ArrayList<HashMap<Integer,Integer>>();
+		String fileName;
+		int i=0;
+		for(String term: terms){
+			i++;
+			char termStart= term.toLowerCase().charAt(0);
+			HashMap<Integer, Integer> postingList;
+			
+			switch(termStart){
+			case 'a': case 'b': case 'c':
+				postingList=IndexWriter.termIndexAC.get(term);
+				if(null!=postingList){
+					postingListArray.add(postingList);
+				}
+				break;
+			case 'd': case 'e': case 'f': case 'g':
+				postingList=IndexWriter.termIndexDG.get(term);
+				break;
+			case 'h': case 'i': case 'j': case 'k':
+				postingList=IndexWriter.termIndexHK.get(term);
+				break;
+			case 'l': case 'm': case 'n': case 'o': case 'p':
+				postingList=IndexWriter.termIndexLP.get(term);
+				break;
+			case 'q': case 'r': case 's':
+				postingList=IndexWriter.termIndexQS.get(term);
+				break;
+			case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+				postingList=IndexWriter.termIndexTZ.get(term);
+				break;
+			default :
+				postingList=IndexWriter.termIndexMisc.get(term);
+			}
+			if(null!=postingList)
+				postingListArray.add(postingList);
+			
+			
+			
+		}
+		
+		queryWithDocId=intersect(postingListArray.subList(0, i).toArray(new HashMap[i-1]));
+		for( Integer docId: queryWithDocId.keySet()){
+			queryMap.put(IndexWriter.docCatList.get(docId),queryWithDocId.get(docId));
+		}
+		
+		
+		
+		return (queryMap.size()>0)?queryMap:null;
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	private Map<Integer, Integer> intersect(HashMap<Integer, Integer>...hashMaps) {
+		HashMap<Integer, Integer> main = new HashMap<Integer, Integer>(hashMaps[0]);
+		
+		int len = hashMaps.length,key,value;
+		for (int i = 1; i < len; i++) {
+			main.keySet().retainAll(hashMaps[i].keySet());
+			
+			for (Entry<Integer, Integer> etr : hashMaps[i].entrySet()) {
+				key = etr.getKey();
+				value = etr.getValue();
+				
+				if (main.containsKey(key)) {
+					main.put(key, main.get(key) + value);
+				}
+			}
+		}
+		
+		return main;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -435,9 +457,4 @@ public class IndexReader {
 		}
 	}
 	
-//	public void inverseMap(Map<Integer, String> map){
-//	Map<String, Integer> inverted = new HashMap<String, Integer>();
-//	for (Integer i : map.keySet())
-//	    inverted.put(map.get(i), i);
-//	}
 }
