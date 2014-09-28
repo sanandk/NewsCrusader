@@ -56,19 +56,14 @@ public class AnalyzerFactory {
 		
 		if(name==FieldNames.CONTENT){
 			
-			list.add(AccentFilterObject); //1.237
-	
-			list.add(DateFilterObject); //4.582 seconds
-		
-			list.add(SymbolFilterObject); //0.580 sec
-			list.add(SpecialCharFilterObject); // 0.656 sec
-			list.add(NumberFilterObject); // 1.017 sec
-			
-		
-			list.add(StopwordFilterObject); //0.836 sec
-			list.add(CapitalizationFilterObject); //1 .496 sec
-
-			list.add(StemmerFilterObject); //1.702 sec
+			list.add(AccentFilterObject); 
+			list.add(DateFilterObject); 
+			list.add(SymbolFilterObject); 
+			list.add(SpecialCharFilterObject); 
+			list.add(NumberFilterObject); 
+			list.add(StopwordFilterObject); 
+			list.add(CapitalizationFilterObject); 
+			list.add(StemmerFilterObject); 
 		
 		}
 		else if(name==FieldNames.AUTHOR || name==FieldNames.AUTHORORG)
