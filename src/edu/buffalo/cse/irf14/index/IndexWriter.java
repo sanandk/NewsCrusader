@@ -6,7 +6,6 @@ package edu.buffalo.cse.irf14.index;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -74,24 +73,26 @@ public class IndexWriter {
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexQS = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexTZ = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexMisc = new TreeMap<String, HashMap<Integer, Integer>>();
-	
+	Analyzer analyzer;
+	Token tp;
+	TokenStream t_stream = null;
+	Tokenizer t=new Tokenizer();
+	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
+	String[] tit,cont,cat,place,author,authororg;
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
      //   docBW.write(files + delim + fileName.get(files) + "\n");
-		Analyzer analyzer;
-		Token tp;
-		TokenStream t_stream = null;
-		Tokenizer t=new Tokenizer();
+		
 	//	if(FileUtilities.docId==7372)
 		//	System.out.println("FOUND!!!~"+d.getField(FieldNames.FILEID)[0]);
-		String[] tit = d.getField(FieldNames.TITLE);
-		String[] cont=d.getField(FieldNames.CONTENT);
-		String[] cat=d.getField(FieldNames.CATEGORY);
-		String[] place=d.getField(FieldNames.PLACE);
-		String[] author=d.getField(FieldNames.AUTHOR);
-		String[] authororg=d.getField(FieldNames.AUTHORORG);
-		final AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		tit = d.getField(FieldNames.TITLE);
+		cont=d.getField(FieldNames.CONTENT);
+		cat=d.getField(FieldNames.CATEGORY);
+		place=d.getField(FieldNames.PLACE);
+		author=d.getField(FieldNames.AUTHOR);
+		authororg=d.getField(FieldNames.AUTHORORG);
+		
 		
 		try {
 				
@@ -306,6 +307,7 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		// TODO
+	
 		FileUtilities.writeToDic(docList, DictType.DOC);
 		FileUtilities.writeIndexFile(termIndexAC,FileUtilities.indexAC);
 		FileUtilities.writeIndexFile(termIndexDG,FileUtilities.indexDG);
@@ -317,7 +319,15 @@ public class IndexWriter {
 		FileUtilities.writeIndexFile(CatIndex,FileUtilities.indexCat);
 		FileUtilities.writeIndexFile(PlaceIndex,FileUtilities.indexPlace);
 		FileUtilities.writeIndexFile(AuthorIndex,FileUtilities.indexAuth);
+		Runtime a = Runtime.getRuntime();
+		long total = a.totalMemory();
+		long free = a.freeMemory();
+		long used = total - free;
+		System.out.println("Total="+total+"\t free="+free+"Used="+used);
 		FileUtilities.closeDict();
+		
+		
+		
 		//read();
 	}
 	

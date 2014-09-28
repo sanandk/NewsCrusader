@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -100,7 +101,7 @@ public class FileUtilities {
 					f_out = new FileOutputStream(dictFile);
 					zip_out = new GZIPOutputStream(f_out);
 					obj_out = new ObjectOutputStream(zip_out);
-					TreeMap<String,LinkedList<String>> fileName = (TreeMap<String,LinkedList<String>>)data;
+					TreeMap<String,ArrayList<String>> fileName = (TreeMap<String,ArrayList<String>>)data;
 			
 					obj_out.writeObject(fileName);
 			
@@ -190,7 +191,7 @@ public class FileUtilities {
 	}
 	
 	public static void readIndexFile(String fileName) {
-		TreeMap<String, LinkedList<Integer>> indexMap;
+		TreeMap<String, ArrayList<Integer>> indexMap;
 		FileInputStream f_in = null;
 		ObjectInputStream obj_in = null;
 		GZIPInputStream zip_in=null;
@@ -200,7 +201,7 @@ public class FileUtilities {
 			f_in = new FileInputStream(indexFile);
 			zip_in = new GZIPInputStream(f_in);
 			obj_in = new ObjectInputStream(zip_in);
-			indexMap=(TreeMap<String, LinkedList<Integer>>)obj_in.readObject();
+			indexMap=(TreeMap<String, ArrayList<Integer>>)obj_in.readObject();
 			
 			for (String key : indexMap.keySet()) {
 				

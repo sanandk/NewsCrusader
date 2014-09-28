@@ -3,13 +3,13 @@
  */
 package edu.buffalo.cse.irf14.document;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,26 +38,29 @@ public class Parser {
 		Document doc = new Document();
 		ArrayList<String> docCatList; 
 		ArrayList<Integer> catList;
-		
+		FileReader inputFileReader;
+		BufferedReader inputBR;
 		String place=null;
 		try {
 				
 			String[] dirList = filename
 					.split(Pattern.quote(File.separator));
 			int dirLen = dirList.length;
+			String fileid,category;
 			if (dirLen > 2) {// if less then zero try throwing an error
 				// saying invalid file name
-				doc.setField(FieldNames.FILEID, dirList[dirLen - 1]);
-				doc.setField(FieldNames.CATEGORY, dirList[dirLen - 2]);
-			if(!IndexWriter.docList.containsKey(dirList[dirLen - 1])){
+				fileid=dirList[dirLen - 1];
+				category=dirList[dirLen - 2];
+				doc.setField(FieldNames.FILEID, fileid);
+				doc.setField(FieldNames.CATEGORY, category);
+			if(!IndexWriter.docList.containsKey(fileid)){
 				docCatList=new ArrayList<String>();
 				docCatList.add(String.valueOf(++FileUtilities.docId));
-				docCatList.add(dirList[dirLen - 2]);
-				IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
-				 	File inputFile = new File(filename);
+				docCatList.add(category);
+				IndexWriter.docList.put(fileid,docCatList);
 					
-					FileReader inputFileReader = new FileReader(inputFile);
-					BufferedReader inputBR = new BufferedReader(inputFileReader);
+				 	inputFileReader = new FileReader(filename);
+				 	inputBR = new BufferedReader(inputFileReader);
 					
 					String inputLine;
 					String content="";
@@ -71,16 +74,11 @@ public class Parser {
 									doc.setField(FieldNames.TITLE, inputLine);
 									titleFlag = false;
 								} else {
-									// if(){
-									// author names are separated by and
 									if (inputLine.startsWith("<AUTHOR>")) {
 										inputLine = inputLine.replace(
 												"<AUTHOR>", "");
 										inputLine = inputLine.replace(
 												"</AUTHOR>", "");
-									//	String byRegex = ;
-									//	inputLine = inputLine.replaceFirst(
-									//			byRegex, "");
 										m=byp.matcher(inputLine);
 										inputLine=m.replaceFirst("");
 										String[] authorData = inputLine
@@ -102,9 +100,6 @@ public class Parser {
 											String placeInfo = inputLine.substring(0, h);
 											content=inputLine.substring(h+1);
 											if (placeInfo.contains(",")) {
-//												String[] placeInfoList = placeInfo.split(",");
-//												doc.setField(FieldNames.PLACE,placeInfoList[0]);
-//												doc.setField(FieldNames.NEWSDATE,placeInfoList[1]);
 												h=placeInfo.lastIndexOf(",");
 												place=placeInfo.substring(0, h).trim();
 												doc.setField(FieldNames.PLACE,place);
@@ -119,22 +114,21 @@ public class Parser {
 										}
 									}
 
-									// }
 								}
 							}
 							doc.setField(FieldNames.CONTENT, content);
 						}
-						
+						inputBR.close();
 					} catch (IOException ioe) {
 							throw new ParserException();
 					}
 				}else{
 					
-					docCatList=IndexWriter.docList.get(dirList[dirLen - 1]);
+					docCatList=IndexWriter.docList.get(fileid);
 					
-					docCatList.add(dirList[dirLen - 2]);
-					IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
-					catList=IndexWriter.CatIndex.get(dirList[dirLen - 2]);
+					docCatList.add(category);
+					IndexWriter.docList.put(fileid,docCatList);
+					catList=IndexWriter.CatIndex.get(category);
 					if(catList==null)
 						catList=new ArrayList<Integer>();
 					catList.add(FileUtilities.docId);
