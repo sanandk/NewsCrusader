@@ -54,27 +54,34 @@ public class IndexReader {
 		// TODO : YOU MUST IMPLEMENT THIS
 		int totalKeyTerms=0;
 		switch (type) {
-		case TERM:
-			if(null!=IndexWriter.termIndexAC)
-				totalKeyTerms += IndexWriter.termIndexAC.size();
-			if(null!=IndexWriter.termIndexDG)
-				totalKeyTerms += IndexWriter.termIndexDG.size();
-			if(null!=IndexWriter.termIndexHK)
-				totalKeyTerms += IndexWriter.termIndexHK.size();
-			if(null!=IndexWriter.termIndexLP)
-				totalKeyTerms += IndexWriter.termIndexLP.size();
-			if(null!=IndexWriter.termIndexQS)
-				totalKeyTerms += IndexWriter.termIndexQS.size();
-			if(null!=IndexWriter.termIndexTZ)
-				totalKeyTerms += IndexWriter.termIndexTZ.size();
-			if(null!=IndexWriter.termIndexMisc)
-				totalKeyTerms += IndexWriter.termIndexMisc.size();
-			return totalKeyTerms;
-		case AUTHOR:
-			break;
-		case CATEGORY:
-			break;
-		case PLACE:
+			case TERM:
+				if(null!=IndexWriter.termIndexAC)
+					totalKeyTerms += IndexWriter.termIndexAC.size();
+				if(null!=IndexWriter.termIndexDG)
+					totalKeyTerms += IndexWriter.termIndexDG.size();
+				if(null!=IndexWriter.termIndexHK)
+					totalKeyTerms += IndexWriter.termIndexHK.size();
+				if(null!=IndexWriter.termIndexLP)
+					totalKeyTerms += IndexWriter.termIndexLP.size();
+				if(null!=IndexWriter.termIndexQS)
+					totalKeyTerms += IndexWriter.termIndexQS.size();
+				if(null!=IndexWriter.termIndexTZ)
+					totalKeyTerms += IndexWriter.termIndexTZ.size();
+				if(null!=IndexWriter.termIndexMisc)
+					totalKeyTerms += IndexWriter.termIndexMisc.size();
+				return totalKeyTerms;
+			case AUTHOR:
+				if(IndexWriter.AuthorIndex!=null)
+					totalKeyTerms=IndexWriter.AuthorIndex.size();
+				return totalKeyTerms;
+			case CATEGORY:
+				if(IndexWriter.CatIndex!=null)
+					totalKeyTerms=IndexWriter.CatIndex.size();
+				return totalKeyTerms;
+			case PLACE:
+				if(IndexWriter.PlaceIndex!=null)
+					totalKeyTerms=IndexWriter.PlaceIndex.size();
+				return totalKeyTerms;
 		}
 		return -1;
 	}
@@ -88,10 +95,10 @@ public class IndexReader {
 	public int getTotalValueTerms() {
 		// TODO: YOU MUST IMPLEMENT THIS
 //		int totalValueTerms=0;
-//		HashSet<Integer> uniquePostingList= new HashSet<Integer>();
+		HashSet<Integer> uniquePostingList= new HashSet<Integer>();
 		switch (type) { 
-		case TERM:
-			return (null!=IndexWriter.docList)?IndexWriter.docList.size():0;  //uniquePostingList.size();
+			case TERM:
+				return (null!=IndexWriter.docList)?IndexWriter.docList.size():0;  //uniquePostingList.size();
 //				if(IndexWriter.termIndexAC!=null)
 //					for (String key : IndexWriter.termIndexAC.keySet()) {
 //						for(Integer fileId:IndexWriter.termIndexAC.get(key).keySet()){
@@ -136,11 +143,36 @@ public class IndexReader {
 //						}
 //				    }
 				
-		case AUTHOR:
-			break;
-		case CATEGORY:
-			break;
-		case PLACE:
+			case AUTHOR:
+				if(IndexWriter.AuthorIndex!=null && !IndexWriter.AuthorIndex.isEmpty()){
+					for (String key : IndexWriter.AuthorIndex.keySet()) {
+						for(Integer fileId:IndexWriter.AuthorIndex.get(key)){
+							uniquePostingList.add(fileId);
+						}
+				    }
+				}
+				return uniquePostingList.size();
+				
+			case CATEGORY:
+				if(IndexWriter.AuthorIndex!=null && !IndexWriter.AuthorIndex.isEmpty()){
+					for (String key : IndexWriter.AuthorIndex.keySet()) {
+						for(Integer fileId:IndexWriter.AuthorIndex.get(key)){
+							uniquePostingList.add(fileId);
+						}
+				    }
+				}
+				return uniquePostingList.size();
+				
+			case PLACE:
+				if(IndexWriter.AuthorIndex!=null && !IndexWriter.AuthorIndex.isEmpty()){
+					for (String key : IndexWriter.AuthorIndex.keySet()) {
+						for(Integer fileId:IndexWriter.AuthorIndex.get(key)){
+							uniquePostingList.add(fileId);
+						}
+				    }
+				}
+				return uniquePostingList.size();
+				
 		}
 		return -1;
 	}
@@ -160,74 +192,103 @@ public class IndexReader {
 		// TODO:YOU MUST IMPLEMENT THIS
 		Map<String, Integer> postingsMap=null;
 		HashMap<Integer, Integer> postingList;
+		ArrayList<Integer> postingArray;
 		LinkedList<String[]> docList;
 		String fileId;
-		if(null!=term && !term.isEmpty()){
-			char termStart= term.toLowerCase().charAt(0);
-			switch(termStart){
-			case 'a': case 'b': case 'c':
-				postingList=IndexWriter.termIndexAC.get(term);
-				if(null!=postingList){
-					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+		switch(type){
+			case TERM:
+				if(null!=term && !term.isEmpty()){
+					char termStart= term.toLowerCase().charAt(0);
+					switch(termStart){
+					case 'a': case 'b': case 'c':
+						postingList=IndexWriter.termIndexAC.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					case 'd': case 'e': case 'f': case 'g':
+						postingList=IndexWriter.termIndexDG.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					case 'h': case 'i': case 'j': case 'k':
+						postingList=IndexWriter.termIndexHK.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					case 'l': case 'm': case 'n': case 'o': case 'p':
+						postingList=IndexWriter.termIndexLP.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					case 'q': case 'r': case 's':
+						postingList=IndexWriter.termIndexQS.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+						postingList=IndexWriter.termIndexTZ.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
+						break;
+					default :
+						postingList=IndexWriter.termIndexMisc.get(term);
+						if(null!=postingList){
+							postingsMap= new HashMap<String, Integer>();
+							for(Integer docId: postingList.keySet()){
+								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+							}
+						}
 					}
 				}
-				break;
-			case 'd': case 'e': case 'f': case 'g':
-				postingList=IndexWriter.termIndexDG.get(term);
-				if(null!=postingList){
+				
+			case AUTHOR:
+				postingArray=IndexWriter.AuthorIndex.get(term);
+				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+					for(Integer docId: postingArray){
+						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
 					}
 				}
-				break;
-			case 'h': case 'i': case 'j': case 'k':
-				postingList=IndexWriter.termIndexHK.get(term);
-				if(null!=postingList){
+			case CATEGORY:
+				postingArray=IndexWriter.CatIndex.get(term);
+				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+					for(Integer docId: postingArray){
+						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
 					}
 				}
-				break;
-			case 'l': case 'm': case 'n': case 'o': case 'p':
-				postingList=IndexWriter.termIndexLP.get(term);
-				if(null!=postingList){
+			case PLACE:
+				postingArray=IndexWriter.PlaceIndex.get(term);
+				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
+					for(Integer docId: postingArray){
+						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
 					}
 				}
-				break;
-			case 'q': case 'r': case 's':
-				postingList=IndexWriter.termIndexQS.get(term);
-				if(null!=postingList){
-					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-					}
-				}
-				break;
-			case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-				postingList=IndexWriter.termIndexTZ.get(term);
-				if(null!=postingList){
-					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-					}
-				}
-				break;
-			default :
-				postingList=IndexWriter.termIndexMisc.get(term);
-				if(null!=postingList){
-					postingsMap= new HashMap<String, Integer>();
-					for(Integer docId: postingList.keySet()){
-						postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-					}
-				}
-			}
 		}
 		return postingsMap;
 	}
@@ -246,7 +307,8 @@ public class IndexReader {
 		int frequency=0;
 		HashMap<Integer, Integer> postingList;
 		HashMap<String,Integer> frequencyListing= new HashMap<String, Integer>();
-		List<String> topKterms= new ArrayList<String>();
+		List<Entry<String, Integer>> sortedFrequencyList;
+		List<String> topKterms= null;
 		if(k>0){
 		switch (type) {
 			case TERM:
@@ -264,22 +326,59 @@ public class IndexReader {
 						frequencyListing.put(term, frequency);
 					}
 				}
-				List<Entry<String, Integer>> sortedFrequencyList= entriesComparator(frequencyListing);
-				for(int i=0;i<k;i++){
-					topKterms.add(sortedFrequencyList.get(i).getKey());
-//					System.out.println(sortedFrequencyList.get(i).getKey()+"==>"+sortedFrequencyList.get(i).getValue());
-				}
-				return topKterms;
-				
 			case AUTHOR:
-				break;
+				for(String cat: IndexWriter.AuthorIndex.keySet()){
+					frequency=0;
+					ArrayList<Integer> postingArray = IndexWriter.AuthorIndex.get(cat);
+					if(postingArray!=null){
+						frequency=postingArray.size();
+					}
+					frequencyListing.put(cat, frequency);
+				}
+//				sortedFrequencyList= entriesComparator(frequencyListing);
+//				for(int i=0;i<k;i++){
+//					topKterms.add(sortedFrequencyList.get(i).getKey());
+//				}
+//				return topKterms;
 			case CATEGORY:
-				break;
+				for(String cat: IndexWriter.CatIndex.keySet()){
+					frequency=0;
+					ArrayList<Integer> postingArray = IndexWriter.CatIndex.get(cat);
+					if(postingArray!=null){
+						frequency=postingArray.size();
+					}
+					frequencyListing.put(cat, frequency);
+				}
+//				sortedFrequencyList= entriesComparator(frequencyListing);
+//				for(int i=0;i<k;i++){
+//					topKterms.add(sortedFrequencyList.get(i).getKey());
+//				}
+//				return topKterms;
 			case PLACE:
-				
+				for(String cat: IndexWriter.PlaceIndex.keySet()){
+					frequency=0;
+					ArrayList<Integer> postingArray = IndexWriter.PlaceIndex.get(cat);
+					if(postingArray!=null){
+						frequency=postingArray.size();
+					}
+					frequencyListing.put(cat, frequency);
+				}
+//				sortedFrequencyList= entriesComparator(frequencyListing);
+//				for(int i=0;i<k;i++){
+//					topKterms.add(sortedFrequencyList.get(i).getKey());
+//				}
 //				return topKterms;
 		}
-			return null;
+		sortedFrequencyList= entriesComparator(frequencyListing);
+		if(k>sortedFrequencyList.size()){
+			k=sortedFrequencyList.size();
+		}
+		topKterms=new ArrayList<String>();
+		for(int i=0;i<k;i++){
+			topKterms.add(sortedFrequencyList.get(i).getKey());
+		}
+			return topKterms;
+//			return null;
 		}
 		else{
 			return null;
