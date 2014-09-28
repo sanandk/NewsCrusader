@@ -415,24 +415,27 @@ public class IndexReader {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void readIndex(IndexType type) {
 		FileUtilities.readDocDic();
 		switch (type) {
 		case TERM:
-			IndexWriter.termIndexAC = FileUtilities.readIndexFile(FileUtilities.indexAC);
-			IndexWriter.termIndexDG = FileUtilities.readIndexFile(FileUtilities.indexDG);
-			IndexWriter.termIndexHK = FileUtilities.readIndexFile(FileUtilities.indexHK);
-			IndexWriter.termIndexLP = FileUtilities.readIndexFile(FileUtilities.indexLP);
-			IndexWriter.termIndexQS = FileUtilities.readIndexFile(FileUtilities.indexQS);
-			IndexWriter.termIndexTZ = FileUtilities.readIndexFile(FileUtilities.indexTZ);
-			IndexWriter.termIndexMisc = FileUtilities.readIndexFile(FileUtilities.indexMisc);
+			IndexWriter.termIndexAC = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexAC);
+			IndexWriter.termIndexDG = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexDG);
+			IndexWriter.termIndexHK = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexHK);
+			IndexWriter.termIndexLP = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexLP);
+			IndexWriter.termIndexQS = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexQS);
+			IndexWriter.termIndexTZ = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexTZ);
+			IndexWriter.termIndexMisc = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexMisc);
 			break;
 		case AUTHOR:
+			IndexWriter.AuthorIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexAuth);
 			break;
 		case CATEGORY:
+			IndexWriter.CatIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexCat);
 			break;
 		case PLACE:
-
+			IndexWriter.PlaceIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexPlace);
 		}
 	}
 	

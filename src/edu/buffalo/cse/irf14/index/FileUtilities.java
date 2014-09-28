@@ -226,8 +226,8 @@ public class FileUtilities {
 
 	}
 	
-	public static TreeMap<String, HashMap<Integer,Integer>> readIndexFile(String fileName) {
-		TreeMap<String, HashMap<Integer,Integer>> indexMap=null;
+	public static Object readIndexFile(String fileName) {
+		Object indexMap=null;
 		FileInputStream f_in = null;
 		ObjectInputStream obj_in = null;
 		GZIPInputStream zip_in=null;
@@ -236,7 +236,7 @@ public class FileUtilities {
 			f_in = new FileInputStream(indexFile);
 			zip_in = new GZIPInputStream(f_in);
 			obj_in = new ObjectInputStream(zip_in);
-			indexMap=(TreeMap<String, HashMap<Integer,Integer>>)obj_in.readObject();
+			indexMap=obj_in.readObject();
 		} catch (Exception e) {
 		}
 		if (null != obj_in) {
