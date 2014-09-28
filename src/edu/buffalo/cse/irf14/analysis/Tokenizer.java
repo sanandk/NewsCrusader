@@ -32,6 +32,7 @@ public class Tokenizer {
 	public Tokenizer(String delim) {
 		//TODO : YOU MUST IMPLEMENT THIS METHOD
 		delimiter=delim;
+		del=Pattern.compile(delimiter);
 	}
 	
 	/**
@@ -60,10 +61,11 @@ public class Tokenizer {
 		
 		for(String text:t_strings){
 			text=text.trim();
-			Token tk=new Token(text);
+			Token tk = null;
 			len=text.length();
-			if(len>1)
+			if(len>0)
 			{
+				tk=new Token(text);
 				endChar=text.charAt(text.length()-1);
 				tk.lineEnd=(".?!".indexOf(endChar)!=-1);
 			}

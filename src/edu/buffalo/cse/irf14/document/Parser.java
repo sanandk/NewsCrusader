@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 
@@ -28,17 +29,21 @@ public class Parser {
 	 *             In case any error occurs during parsing
 	 */
 	public static int skippedCount=0;
+
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		// Code edited by Karthik-j on Sept 9, 2014- Starts
 		Document doc = new Document();
 		LinkedList<String> docCatList; 
+		LinkedList<Integer> catList;
+		LinkedList<Integer> placeList;
+		String place=null;
 		try {
 				
 			String[] dirList = filename
 					.split(Pattern.quote(File.separator));
 			int dirLen = dirList.length;
-			if (dirLen > 0) {// if less then zero try throwing an error
+			if (dirLen > 2) {// if less then zero try throwing an error
 				// saying invalid file name
 				doc.setField(FieldNames.FILEID, dirList[dirLen - 1]);
 				doc.setField(FieldNames.CATEGORY, dirList[dirLen - 2]);
@@ -47,7 +52,6 @@ public class Parser {
 				docCatList.add(String.valueOf(++FileUtilities.docId));
 				docCatList.add(dirList[dirLen - 2]);
 				IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
-//				IndexWriter.docList.put(dirList[dirLen - 1],Fi);
 				 	File inputFile = new File(filename);
 					
 					FileReader inputFileReader = new FileReader(inputFile);
@@ -96,10 +100,12 @@ public class Parser {
 //												String[] placeInfoList = placeInfo.split(",");
 //												doc.setField(FieldNames.PLACE,placeInfoList[0]);
 //												doc.setField(FieldNames.NEWSDATE,placeInfoList[1]);
-												doc.setField(FieldNames.PLACE,placeInfo.substring(0, placeInfo.lastIndexOf(",")).trim());
+												place=placeInfo.substring(0, placeInfo.lastIndexOf(",")).trim();
+												doc.setField(FieldNames.PLACE,place);
 												doc.setField(FieldNames.NEWSDATE,placeInfo.substring(placeInfo.lastIndexOf(",")+1).trim());
 											} else {
-												doc.setField(FieldNames.PLACE,placeInfo.trim());
+												place=placeInfo.trim();
+												doc.setField(FieldNames.PLACE,place);
 											}
 										} else {
 											content+=" "+inputLine;
@@ -117,9 +123,17 @@ public class Parser {
 							throw new ParserException();
 					}
 				}else{
+					
 					docCatList=IndexWriter.docList.get(dirList[dirLen - 1]);
+					
 					docCatList.add(dirList[dirLen - 2]);
 					IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
+					catList=IndexWriter.CatIndex.get(dirList[dirLen - 2]);
+					if(catList==null)
+						catList=new LinkedList<Integer>();
+					catList.add(FileUtilities.docId);
+					IndexWriter.CatIndex.put(dirList[dirLen - 2], catList);
+					
 					skippedCount++;
 				}
 			

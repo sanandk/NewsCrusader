@@ -48,9 +48,9 @@ public class NumberFilter extends TokenFilter {
 					str+=temp;
 				}
 				if(repMatcher==null)
-					(repMatcher=repPattern.matcher(str)).replaceAll("");
+					str=(repMatcher=repPattern.matcher(str)).replaceAll("");
 				else
-					repMatcher.reset(str).replaceAll("");
+					str=repMatcher.reset(str).replaceAll("");
 			
 				if("".equals(str))
 					t_stream.remove();
@@ -67,7 +67,7 @@ public class NumberFilter extends TokenFilter {
 				}
 				else if(len!=8)
 				{
-					str=numberMatcher.replaceAll(str);
+					str=numberMatcher.replaceAll("");
 				//str=str.replaceAll(numberRegex, "");
 				
 				if("".equals(str))

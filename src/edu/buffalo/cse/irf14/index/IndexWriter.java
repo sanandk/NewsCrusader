@@ -3,9 +3,7 @@
  */
 package edu.buffalo.cse.irf14.index;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -25,7 +23,7 @@ import edu.buffalo.cse.irf14.index.FileUtilities.DictType;
 /**
  * @author nikhillo Class responsible for writing indexes to disk
  */
-public class IndexWriter {
+public class IndexWriter  implements Runnable{  
 	
 	String outputDir;
 	
@@ -64,9 +62,11 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
-//	public static int tokenSize =0;
-
+	static int tokens=0;
 	public static TreeMap<String,LinkedList<String>> docList= new TreeMap<String,LinkedList<String>>();
+	public static TreeMap<String, LinkedList<Integer>> CatIndex = new TreeMap<String, LinkedList<Integer>>();
+	public static TreeMap<String, LinkedList<Integer>> PlaceIndex = new TreeMap<String, LinkedList<Integer>>();
+	public static TreeMap<String, LinkedList<Integer>> AuthorIndex = new TreeMap<String, LinkedList<Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexAC = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexDG = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexHK = new TreeMap<String, HashMap<Integer, Integer>>();
@@ -78,30 +78,37 @@ public class IndexWriter {
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
-		
-//		FileUtilities.writeToDic(d.getField(FieldNames.CATEGORY)[0]+File.separator+d.getField(FieldNames.FILEID)[0]  , DictType.DOC);
-		
+     //   docBW.write(files + delim + fileName.get(files) + "\n");
+		Analyzer analyzer;
+		Token tp;
 		TokenStream t_stream = null;
 		Tokenizer t=new Tokenizer();
+	//	if(FileUtilities.docId==7372)
+		//	System.out.println("FOUND!!!~"+d.getField(FieldNames.FILEID)[0]);
+		String[] tit = d.getField(FieldNames.TITLE);
+		String[] cont=d.getField(FieldNames.CONTENT);
+		String[] cat=d.getField(FieldNames.CATEGORY);
+		String[] place=d.getField(FieldNames.PLACE);
+		String[] author=d.getField(FieldNames.AUTHOR);
+		String[] authororg=d.getField(FieldNames.AUTHORORG);
 		AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		
 		try {
-			if(d.getField(FieldNames.CONTENT)!=null){
-			t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
-			Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
-			
-	//		t_stream=t.consume(d.getField(FieldNames.CONTENT)[0]);
-	//		Analyzer analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
-			
-			while (analyzer.increment()) {
 				
-			}
-//			tokenSize+=t_stream.my_stream.size();
-//			System.out.println("FileID:"+d.getField(FieldNames.FILEID)[0]+" Tokens:"+t_stream.my_stream.size()+" total:"+tokenSize);
+			if(cont!=null || tit!=null){	
+				if(tit!=null){
+						t_stream=t.consume(tit[0]);
+						t_stream.append(t.consume(cont[0]));
+				}
+				else
+					t_stream=t.consume(cont[0]);
+				analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
+					while (analyzer.increment()) {
+				
+					}
 			t_stream.reset();
-//			System.out.println("Content is "+d.getField(FieldNames.CONTENT)[0]);
-//			System.out.print("Content is ");
-			Token tp;
-			HashMap<Integer,Integer> termPosting ;
+			
+			HashMap<Integer,Integer> termPosting;
 			Integer frequency=0;
 			while(t_stream.hasNext())
 			{
@@ -113,8 +120,8 @@ public class IndexWriter {
 					//A-C D-G H-K L-P Q-S T-Z
 					switch(Character.toLowerCase(termValue.charAt(0))){
 						case 'a': case 'b': case 'c':
-							if(termIndexAC.containsKey(termValue)){
-								termPosting=termIndexAC.get(termValue);
+							if(IndexWriter.termIndexAC.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexAC.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -123,11 +130,11 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexAC.put(termValue,termPosting );
+							IndexWriter.termIndexAC.put(termValue,termPosting );
 							break;
 						case 'd': case 'e': case 'f': case 'g':
-							if(termIndexDG.containsKey(termValue)){
-								termPosting=termIndexDG.get(termValue);
+							if(IndexWriter.termIndexDG.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexDG.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -136,11 +143,11 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexDG.put(termValue,termPosting );
+							IndexWriter.termIndexDG.put(termValue,termPosting );
 							break;
 						case 'h': case 'i': case 'j': case 'k':
-							if(termIndexHK.containsKey(termValue)){
-								termPosting=termIndexHK.get(termValue);
+							if(IndexWriter.termIndexHK.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexHK.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -149,11 +156,11 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexHK.put(termValue,termPosting );
+							IndexWriter.termIndexHK.put(termValue,termPosting );
 							break;
 						case 'l': case 'm': case 'n': case 'o': case 'p':
-							if(termIndexLP.containsKey(termValue)){
-								termPosting=termIndexLP.get(termValue);
+							if(IndexWriter.termIndexLP.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexLP.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -162,11 +169,11 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexLP.put(termValue,termPosting );
+							IndexWriter.termIndexLP.put(termValue,termPosting );
 							break;
 						case 'q': case 'r': case 's':
-							if(termIndexQS.containsKey(termValue)){
-								termPosting=termIndexQS.get(termValue);
+							if(IndexWriter.termIndexQS.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexQS.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -175,11 +182,11 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexQS.put(termValue,termPosting );
+							IndexWriter.termIndexQS.put(termValue,termPosting );
 							break;
 						case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-							if(termIndexTZ.containsKey(termValue)){
-								termPosting=termIndexTZ.get(termValue);
+							if(IndexWriter.termIndexTZ.containsKey(termValue)){
+								termPosting=IndexWriter.termIndexTZ.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -188,16 +195,12 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexTZ.put(termValue,termPosting );
+							IndexWriter.termIndexTZ.put(termValue,termPosting );
 							break;
 						default :
-							if(termIndexMisc.containsKey(termValue)){
-//								termPosting=termIndexMisc.get(termValue);
-//								
-//							}
-//							termPosting.append(","+FileUtilities.docId);
-//							termIndexMisc.put(termValue,termPosting );
-								termPosting=termIndexMisc.get(termValue);
+							if(IndexWriter.termIndexMisc.containsKey(termValue)){
+
+								termPosting=IndexWriter.termIndexMisc.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
 									termPosting.put(FileUtilities.docId, 1);
@@ -206,103 +209,93 @@ public class IndexWriter {
 								}
 							}else
 								termPosting.put(FileUtilities.docId, 1);
-							termIndexMisc.put(termValue,termPosting );
+							IndexWriter.termIndexMisc.put(termValue,termPosting );
 					}
-					
-					
+			
+				}
+
+			}
+			}
+
+			
+			if(place!=null && place[0].length()>1){
+				t_stream=t.consume(place[0]);
+
+				analyzer = fact.getAnalyzerForField(FieldNames.PLACE, t_stream);
+				while(analyzer.increment())
+				{
 					
 				}
-//				System.out.print(tp.toString()+"|");
+				
+				StringBuilder sb=new StringBuilder();
+				while(t_stream.hasNext())
+					sb.append(t_stream.next()).toString();
+				String s=sb.toString();
+				LinkedList<Integer> ll=PlaceIndex.get(s);
+				if(ll==null)
+					ll=new LinkedList<Integer>();
+				ll.add(FileUtilities.docId);
+				PlaceIndex.put(s, ll);
 			}
+			if(cat!=null){
+				LinkedList<Integer> ll=CatIndex.get(cat[0]);
+				if(ll==null)
+					ll=new LinkedList<Integer>();
+				ll.add(FileUtilities.docId);
+				CatIndex.put(cat[0], ll);
+			
+				}
+			
+			if(author!=null && author[0].length()>1){
+				String a[] = author[0].split(" and ");
+				StringBuilder sb=new StringBuilder();
+				for(String auth:a)
+				{
+					t_stream=t.consume(auth);
+					analyzer = fact.getAnalyzerForField(FieldNames.AUTHOR, t_stream);
+					while(analyzer.increment())
+					{
+					}
+					
+					while(t_stream.hasNext())
+						sb.append(t_stream.next()).toString();
+					
+					if(authororg!=null &&  authororg[0].length()>1)
+					{
+						t_stream=t.consume(authororg[0]);
+						analyzer = fact.getAnalyzerForField(FieldNames.AUTHORORG, t_stream);
+						while(analyzer.increment())
+						{
+						}
+						int i=0;
+						while(t_stream.hasNext())
+						{
+							if(i==0)
+								sb.append("(");
+							sb.append(t_stream.next()).toString();
+						}
+						sb.append(")");
+					}
+					
+					String s=sb.toString();
+					LinkedList<Integer> ll=AuthorIndex.get(s);
+					if(ll==null)
+						ll=new LinkedList<Integer>();
+					ll.add(FileUtilities.docId);
+					AuthorIndex.put(s, ll);
+				}
 			}
-//			System.out.print(termIndex.size());
+			
 		}
 		catch (TokenizerException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Exception!");
 			e.printStackTrace();
 		}
-		
-//		while (t_stream.hasNext()) {
-//            System.out.println("Item is: " + t_stream.next());
-//        }
+
+	}
 
 	
-		// Code added by Karthik-J on Sept 9, 2014 - Starts
-//		printDoc(d);
-//		System.out.println("File Parsed " + i++ + "==> "
-//				+ d.getField(FieldNames.CATEGORY)[0] + File.separator
-//				+ d.getField(FieldNames.FILEID)[0]);
-//		System.out.println(d.getField(FieldNames.TITLE)[0]);
-//		// System.out.println(d.getField(FieldNames.AUTHOR)[0]);
-//		// System.out.println(d.getField(FieldNames.AUTHORORG)[0]);
-//		if (d.getField(FieldNames.PLACE) != null) {
-//			System.out.println(d.getField(FieldNames.PLACE)[0]);
-//			if (d.getField(FieldNames.NEWSDATE) != null) {
-//				System.out.println(d.getField(FieldNames.NEWSDATE)[0]);
-//			} else {
-//				b.add(d.getField(FieldNames.CATEGORY)[0] + File.separator
-//						+ d.getField(FieldNames.FILEID)[0]);
-//			}
-//		} else {
-//			a.add(d.getField(FieldNames.CATEGORY)[0] + File.separator
-//					+ d.getField(FieldNames.FILEID)[0]);
-//		}
-//		System.out.println(d.getField(FieldNames.CONTENT)[0]);
-//		System.out
-//				.println("==============================================================================================================");
-		// Code added by Karthik-J on Sept 9, 2014 - Ends
-	}
-
-	public void printDoc(Document d) {
-		try {
-			File DocumentContent = new File(
-					"D:\\UB\\Project\\IR\\project dataset\\DocOutput.txt");
-			FileWriter docFW = new FileWriter(DocumentContent,true);
-			BufferedWriter docBW = new BufferedWriter(docFW);
-			
-			docBW.write("File Parsed " + i++ + "==> "
-					+ d.getField(FieldNames.CATEGORY)[0] + File.separator
-					+ d.getField(FieldNames.FILEID)[0]);
-			docBW.write("\nTitle==>"+d.getField(FieldNames.TITLE)[0]);
-			if(d.getField(FieldNames.AUTHOR) != null){
-				docBW.write("\nAuthor==>"+d.getField(FieldNames.AUTHOR)[0]);
-				if(d.getField(FieldNames.AUTHORORG) != null){
-					docBW.write("\nAuthorOrg==>"+d.getField(FieldNames.AUTHORORG)[0]);
-				}	
-			}
-			if (d.getField(FieldNames.PLACE) != null) {
-				docBW.write("\nPlace==>"+d.getField(FieldNames.PLACE)[0]);
-				if (d.getField(FieldNames.NEWSDATE) != null) {
-					docBW.write("\nNewsDate==>"+d.getField(FieldNames.NEWSDATE)[0]);
-				} else {
-					b.add(d.getField(FieldNames.CATEGORY)[0] + File.separator
-							+ d.getField(FieldNames.FILEID)[0]);
-				}
-			} else {
-				a.add(d.getField(FieldNames.CATEGORY)[0] + File.separator
-						+ d.getField(FieldNames.FILEID)[0]);
-			}
-			docBW.write("\nContent==>"+d.getField(FieldNames.CONTENT)[0]);
-			docBW.write("\n==============================================================================================================\n");
-			docBW.close();
-		} catch (Exception e) {
-
-		}
-	}
-
-	public void printA() {
-		for (String d : a) {
-			System.out.println(d);
-		}
-	}
-
-	public void printB() {
-		for (String d : b) {
-			System.out.println(d);
-		}
-
-	}
 
 	/**
 	 * Method that indicates that all open resources must be closed and cleaned
@@ -321,16 +314,32 @@ public class IndexWriter {
 		FileUtilities.writeIndexFile(termIndexQS,FileUtilities.indexQS);
 		FileUtilities.writeIndexFile(termIndexTZ,FileUtilities.indexTZ);
 		FileUtilities.writeIndexFile(termIndexMisc,FileUtilities.indexMisc);
+		FileUtilities.writeIndexFile(CatIndex,FileUtilities.indexCat);
+		FileUtilities.writeIndexFile(PlaceIndex,FileUtilities.indexPlace);
+		FileUtilities.writeIndexFile(AuthorIndex,FileUtilities.indexAuth);
 		FileUtilities.closeDict();
+		read();
 	}
 	
 	public void read() {
-		FileUtilities.readIndexFile(FileUtilities.indexAC);
-		FileUtilities.readIndexFile(FileUtilities.indexDG);
-		FileUtilities.readIndexFile(FileUtilities.indexHK);
-		FileUtilities.readIndexFile(FileUtilities.indexLP);
-		FileUtilities.readIndexFile(FileUtilities.indexQS);
-		FileUtilities.readIndexFile(FileUtilities.indexTZ);
-		FileUtilities.readIndexFile(FileUtilities.indexMisc);
+//		FileUtilities.readIndexFile(FileUtilities.indexAC);
+//		FileUtilities.readIndexFile(FileUtilities.indexDG);
+//		FileUtilities.readIndexFile(FileUtilities.indexHK);
+//		FileUtilities.readIndexFile(FileUtilities.indexLP);
+//		FileUtilities.readIndexFile(FileUtilities.indexQS);
+//		FileUtilities.readIndexFile(FileUtilities.indexTZ);
+//		FileUtilities.readIndexFile(FileUtilities.indexMisc);
+//		FileUtilities.readIndexFile(FileUtilities.indexCat);
+//		FileUtilities.readIndexFile(FileUtilities.indexPlace);
+//		FileUtilities.readIndexFile(FileUtilities.indexAuth);
+		System.out.println("Tokens"+tokens);
+	}
+
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
 	}
 }

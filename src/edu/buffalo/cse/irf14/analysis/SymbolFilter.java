@@ -130,14 +130,17 @@ public class SymbolFilter extends TokenFilter {
 		} 
 		
 		}
-		if(str.length()<1){
-			t_stream.remove();
-			
-		}
+		
 		if(!str.equals(old))
 		{
+			if(str.length()<1){
+				t_stream.remove();	
+			}
+			else
+			{
 			current_token.setTermText(str);
 			t_stream.replace(current_token);
+			}
 		
 		}
 			
