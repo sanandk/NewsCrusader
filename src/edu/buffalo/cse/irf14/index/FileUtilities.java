@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -18,9 +17,9 @@ import java.util.zip.GZIPOutputStream;
 
 public class FileUtilities {
 
-	public enum DictType {
-		DOC, TERM, TITLE, AUTHOR, DATE;
-	};
+//	public enum DictType {
+//		DOC, TERM, TITLE, AUTHOR, DATE;
+//	};
 
 	public enum Type {
 		DICT, INDEX;
@@ -30,6 +29,7 @@ public class FileUtilities {
 	
 	//Dictionary Files
 	public static String docDict = "DocDictionary";
+	public static String docCatDict = "DocCatDictionary";
 	public static String termDict = "TermDictionary";
 	public static String authorDict = "AutDictionary";
 	
@@ -45,6 +45,7 @@ public class FileUtilities {
 	public static String indexCat="CatIndex";
 	public static String indexPlace="PlaceIndex";
 	public static String indexAuth="AuthIndex";
+	
 	
 	
 	public static String delim = "~";
@@ -84,68 +85,112 @@ public class FileUtilities {
 		}
 	}
 
-	public static void writeToDic(Object data, DictType type) {
-		
-			switch (type) {
-			case DOC:
-				
-				FileOutputStream f_out = null;
-				ObjectOutputStream obj_out = null;
-				GZIPOutputStream zip_out=null;
-				File dictFile= new File(outputDir + File.separator + docDict);
-
-				try {
-					if(dictFile.exists()){
-						dictFile.delete();
-					}
-					f_out = new FileOutputStream(dictFile);
-					zip_out = new GZIPOutputStream(f_out);
-					obj_out = new ObjectOutputStream(zip_out);
-					TreeMap<String,ArrayList<String>> fileName = (TreeMap<String,ArrayList<String>>)data;
+	public static void writeDocDic() {
+		FileOutputStream f_out = null;
+		ObjectOutputStream obj_out = null;
+		GZIPOutputStream zip_out=null;
+		File docDicFile= new File(outputDir+File.separator+docDict);
+		File docCatDicFile= new File(outputDir+File.separator+docCatDict);
+		try {
 			
-					obj_out.writeObject(fileName);
-			
-				} catch (Exception e) {
-						e.printStackTrace();
-				}
-				if (null != obj_out) {
-					try {
-						obj_out.close();
-					} catch (IOException e) {
+			if (docDicFile.exists()) {
+				docDicFile.delete();
 
-					}
-				}
-				if (null != zip_out) {
-					try {
-						zip_out.close();
-					} catch (IOException e) {
-
-					}
-				}
-				if (null != f_out) {
-					try {
-						f_out.close();
-					} catch (IOException e) {
-
-					}
-				}		
 			}
+			f_out = new FileOutputStream(docDicFile);
+			zip_out = new GZIPOutputStream(f_out);
+			obj_out = new ObjectOutputStream(zip_out);
+			obj_out.writeObject(IndexWriter.docList);
+			obj_out.close();
+			zip_out.close();
+			f_out.close();
+			f_out = new FileOutputStream(docCatDicFile);
+			zip_out = new GZIPOutputStream(f_out);
+			obj_out = new ObjectOutputStream(zip_out);
+			obj_out.writeObject(IndexWriter.docCatList);
+			obj_out.close();
+			zip_out.close();
+			f_out.close();
+		} catch (IOException e) {
+
+		
+		if (null != obj_out) {
+			try {
+				obj_out.close();
+			} catch (IOException ex) {
+
+			}
+		}
+		if (null != zip_out) {
+			try {
+				zip_out.close();
+			} catch (IOException ex) {
+
+			}
+		}
+		if (null != f_out) {
+			try {
+				f_out.close();
+			} catch (IOException ex) {
+
+			}
+		}
+		}
 	}
 
-	public static void closeDict() {
-		
+	public static void readDocDic() {
+		FileInputStream f_in = null;
+		ObjectInputStream obj_in = null;
+		GZIPInputStream zip_in=null;
+		IndexWriter.docList=null;
+		IndexWriter.docCatList=null;
+		File docDicFile= new File(outputDir+File.separator+docDict);
+		File docCatDicFile= new File(outputDir+File.separator+docCatDict);
+		try {
+			f_in = new FileInputStream(docDicFile);
+			zip_in = new GZIPInputStream(f_in);
+			obj_in = new ObjectInputStream(zip_in);
+			IndexWriter.docList= (TreeMap<String,Integer>)obj_in.readObject();
+			obj_in.close();
+			zip_in.close();
+			f_in.close();
+			f_in = new FileInputStream(docCatDicFile);
+			zip_in = new GZIPInputStream(f_in);
+			obj_in = new ObjectInputStream(zip_in);
+			IndexWriter.docCatList=(TreeMap<Integer,String>)obj_in.readObject();
+			obj_in.close();
+			zip_in.close();
+			f_in.close();
+		} catch (Exception e) {
+			if (null != obj_in) {
+				try {
+					obj_in.close();
+				} catch (IOException ex) {
+	
+				}
+			}
+			if (null != zip_in) {
+				try {
+					zip_in.close();
+				} catch (IOException ex) {
+	
+				}
+			}
+			if (null != f_in) {
+				try {
+					f_in.close();
+				} catch (IOException ex) {
+	
+				}
+			}
+		}
 	}
 
 	public static void writeIndexFile(Object indexMap,String fileName) {
-		//itype
-		//TreeMap<String, HashMap<Integer,Integer>> indexMap = (TreeMap<String, HashMap<Integer,Integer>> )obj;
 		FileOutputStream f_out = null;
 		ObjectOutputStream obj_out = null;
 		GZIPOutputStream zip_out=null;
 		File indexFile= new File(outputDir+File.separator+fileName);
-//		BufferedWriter indexBW= null;
-//		FileWriter indexFW= null;
-//		HashMap<Integer,Integer> fileFrequencyMap;
 		try {
 			if(indexFile.exists()){
 				indexFile.delete();
@@ -154,15 +199,6 @@ public class FileUtilities {
 			zip_out = new GZIPOutputStream(f_out);
 			obj_out = new ObjectOutputStream(zip_out);
 			obj_out.writeObject(indexMap);
-			
-//			indexFW= new FileWriter(indexFile);
-//			indexBW= new BufferedWriter(indexFW);
-//			
-//			for (String key : indexMap.keySet()) {
-//				
-//				indexBW.write("\n"+key + delim + indexMap.get(key));
-//		    }
-			
 		} catch (Exception e) {
 				e.printStackTrace();
 		}
@@ -190,28 +226,18 @@ public class FileUtilities {
 
 	}
 	
-	public static void readIndexFile(String fileName) {
-		TreeMap<String, ArrayList<Integer>> indexMap;
+	public static TreeMap<String, HashMap<Integer,Integer>> readIndexFile(String fileName) {
+		TreeMap<String, HashMap<Integer,Integer>> indexMap=null;
 		FileInputStream f_in = null;
 		ObjectInputStream obj_in = null;
 		GZIPInputStream zip_in=null;
 		File indexFile= new File(outputDir+File.separator+fileName);
-
 		try {
 			f_in = new FileInputStream(indexFile);
 			zip_in = new GZIPInputStream(f_in);
 			obj_in = new ObjectInputStream(zip_in);
-			indexMap=(TreeMap<String, ArrayList<Integer>>)obj_in.readObject();
-			
-			for (String key : indexMap.keySet()) {
-				
-				IndexWriter.tokens++;
-				System.out.println("\n"+key + delim + indexMap.get(key));
-		    }
-			
-					
+			indexMap=(TreeMap<String, HashMap<Integer,Integer>>)obj_in.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		if (null != obj_in) {
 			try {
@@ -227,6 +253,7 @@ public class FileUtilities {
 
 			}
 		}
+		return indexMap;
 	}
 
 	public static void printToFile() {
