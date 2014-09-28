@@ -225,15 +225,18 @@ public class IndexWriter {
 					
 				}
 				
-				StringBuilder sb=new StringBuilder();
+				String s;
+				ArrayList<Integer> ll;
 				while(t_stream.hasNext())
-					sb.append(t_stream.next()).toString();
-				String s=sb.toString();
-				ArrayList<Integer> ll=PlaceIndex.get(s);
-				if(ll==null)
-					ll=new ArrayList<Integer>();
-				ll.add(FileUtilities.docId);
-				PlaceIndex.put(s, ll);
+				{
+					s=t_stream.next().toString();
+					ll=PlaceIndex.get(s);
+					if(ll==null)
+						ll=new ArrayList<Integer>();
+					ll.add(FileUtilities.docId);
+					PlaceIndex.put(s, ll);
+				}
+					
 			}
 			if(cat!=null){
 				ArrayList<Integer> ll=CatIndex.get(cat[0]);
