@@ -37,7 +37,7 @@ public class Runner {
 		//more? idk!
 		
 		File ipDirectory = new File(ipDir);
-		String[] catDirectories = ipDirectory.list();
+		final String[] catDirectories = ipDirectory.list();
 		
 		String[] files;
 		File dir;
@@ -54,7 +54,7 @@ public class Runner {
 				if (files == null)
 					continue;
 				
-				for (String f : files) {
+				for (String f : files) { // NOPMD by SAnanda on 28/9/14 2:41 AM
 					try {
 						d = Parser.parse(dir.getAbsolutePath() + File.separator +f);
 //						System.out.println("Parsed:"+d.getField(FieldNames.FILEID)[0]);
@@ -70,7 +70,7 @@ public class Runner {
 			}
 			
 			writer.close();
-			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)/1000+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
+			System.out.println("\nTime Taken="+(System.currentTimeMillis()-startTime)+"\n"+"\nParser Skipped File:"+Parser.skippedCount);
 		} catch (IndexerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

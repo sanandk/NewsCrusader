@@ -7,11 +7,9 @@ import java.util.regex.Pattern;
 public class NumberFilter extends TokenFilter {
 
 	
-	TokenStream t_stream;
-	final String repRegex="\\.|-|,";
-	final String numberRegex="([\\.]*[-]*(\\d)+[\\.]*[,]*[-]*(\\d)*)";
-	final Pattern numberRegexPattern= Pattern.compile(numberRegex);
-	final Pattern repPattern= Pattern.compile(repRegex);
+	
+	final Pattern numberRegexPattern= Pattern.compile("([\\.]*[-]*(\\d)+[\\.]*[,]*[-]*(\\d)*)");
+	final Pattern repPattern= Pattern.compile("\\.|-|,");
 	final Pattern remove_no=Pattern.compile("\\d");
 	Matcher numberMatcher=null;
 	Matcher repMatcher=null;

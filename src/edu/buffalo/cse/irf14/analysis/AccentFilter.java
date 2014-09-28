@@ -1,14 +1,13 @@
 package edu.buffalo.cse.irf14.analysis;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+
 import java.text.Normalizer;
-import java.util.regex.Pattern;
+
 
 public class AccentFilter  extends TokenFilter {
 	// Update on 17th Sep by anand
 	
-	TokenStream t_stream;
+	
 	public AccentFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
@@ -38,7 +37,7 @@ public class AccentFilter  extends TokenFilter {
 			if(current_token==null)
 				return false;
 			String str=current_token.toString();
-			String old=str;	   
+			final String old=str;	   
 	
 			char c;
 			char[] out = new char[str.length()];

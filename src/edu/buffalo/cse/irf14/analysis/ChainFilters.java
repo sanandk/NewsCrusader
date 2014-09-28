@@ -5,7 +5,8 @@ import java.util.ArrayList;
 public class ChainFilters implements Analyzer{
 
 	ArrayList<Analyzer> chain;
-	TokenStream stream;
+	private TokenStream stream;
+	
 	public ChainFilters(ArrayList<Analyzer> list,TokenStream s) {
 		// TODO Auto-generated constructor stub
 		chain=list;
@@ -22,7 +23,7 @@ public class ChainFilters implements Analyzer{
 		int i=0;
 		while(i<chain.size())
 		{
-			TokenFilter a=(TokenFilter) chain.get(i);
+			final TokenFilter a=(TokenFilter) chain.get(i);
 			while(a.increment())
 			{
 			}

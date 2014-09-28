@@ -4,8 +4,6 @@
 package edu.buffalo.cse.irf14.analysis;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.regex.Pattern;
 
 /**
@@ -55,7 +53,7 @@ public class Tokenizer {
 		if(str==null || str.length()<1)
 			throw new TokenizerException();
 		String[] t_strings = del.split(str);
-		LinkedList<Token> t_list=new LinkedList<Token>();
+		ArrayList<Token> t_list=new ArrayList<Token>();
 		char endChar;
 		int len;
 		

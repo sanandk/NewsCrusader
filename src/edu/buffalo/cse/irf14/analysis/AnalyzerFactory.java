@@ -43,7 +43,7 @@ public class AnalyzerFactory {
 	public Analyzer getAnalyzerForField(FieldNames name, TokenStream stream) {
 		//TODO : YOU NEED TO IMPLEMENT THIS METHOD
 		ArrayList<Analyzer> list=new ArrayList<Analyzer>();
-		TokenFilterFactory factory = TokenFilterFactory.getInstance();
+		final TokenFilterFactory factory = TokenFilterFactory.getInstance();
 		final TokenFilter AccentFilterObject = factory.getFilterByType(TokenFilterType.ACCENT, stream);
 		final TokenFilter SymbolFilterObject = factory.getFilterByType(TokenFilterType.SYMBOL, stream);
 		final TokenFilter CapitalizationFilterObject = factory.getFilterByType(TokenFilterType.CAPITALIZATION, stream);
@@ -102,7 +102,7 @@ public class AnalyzerFactory {
 			list.add(SymbolFilterObject);
 			list.add(SpecialCharFilterObject);
 		}
-		ChainFilters cf=new ChainFilters(list, stream);
-		return cf;
+		
+		return new ChainFilters(list, stream);
 	}
 }

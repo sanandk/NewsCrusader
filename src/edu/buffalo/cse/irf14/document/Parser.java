@@ -8,8 +8,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
-import java.util.LinkedList;
+import java.util.ArrayList;
+
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.index.FileUtilities;
@@ -29,14 +30,15 @@ public class Parser {
 	 *             In case any error occurs during parsing
 	 */
 	public static int skippedCount=0;
-
+	final static Pattern byp=Pattern.compile("By|by|BY");
+	static Matcher m;
 	public static Document parse(String filename) throws ParserException {
 		// TODO YOU MUST IMPLEMENT THIS
 		// Code edited by Karthik-j on Sept 9, 2014- Starts
 		Document doc = new Document();
-		LinkedList<String> docCatList; 
-		LinkedList<Integer> catList;
-		LinkedList<Integer> placeList;
+		ArrayList<String> docCatList; 
+		ArrayList<Integer> catList;
+		
 		String place=null;
 		try {
 				
@@ -48,7 +50,7 @@ public class Parser {
 				doc.setField(FieldNames.FILEID, dirList[dirLen - 1]);
 				doc.setField(FieldNames.CATEGORY, dirList[dirLen - 2]);
 			if(!IndexWriter.docList.containsKey(dirList[dirLen - 1])){
-				docCatList=new LinkedList<String>();
+				docCatList=new ArrayList<String>();
 				docCatList.add(String.valueOf(++FileUtilities.docId));
 				docCatList.add(dirList[dirLen - 2]);
 				IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
@@ -76,9 +78,11 @@ public class Parser {
 												"<AUTHOR>", "");
 										inputLine = inputLine.replace(
 												"</AUTHOR>", "");
-										String byRegex = "By|by|BY";
-										inputLine = inputLine.replaceFirst(
-												byRegex, "");
+									//	String byRegex = ;
+									//	inputLine = inputLine.replaceFirst(
+									//			byRegex, "");
+										m=byp.matcher(inputLine);
+										inputLine=m.replaceFirst("");
 										String[] authorData = inputLine
 												.split(",");
 										if (inputLine.contains(",")) {
@@ -94,15 +98,17 @@ public class Parser {
 										// PLACE, NEWSDATE, CONTENT
 										if (inputLine.contains("-")&& placeFlag) {
 											placeFlag=false;
-											String placeInfo = inputLine.substring(0, inputLine.indexOf("-"));
-											content=inputLine.substring(inputLine.indexOf("-")+1);
+											int h=inputLine.indexOf("-");
+											String placeInfo = inputLine.substring(0, h);
+											content=inputLine.substring(h+1);
 											if (placeInfo.contains(",")) {
 //												String[] placeInfoList = placeInfo.split(",");
 //												doc.setField(FieldNames.PLACE,placeInfoList[0]);
 //												doc.setField(FieldNames.NEWSDATE,placeInfoList[1]);
-												place=placeInfo.substring(0, placeInfo.lastIndexOf(",")).trim();
+												h=placeInfo.lastIndexOf(",");
+												place=placeInfo.substring(0, h).trim();
 												doc.setField(FieldNames.PLACE,place);
-												doc.setField(FieldNames.NEWSDATE,placeInfo.substring(placeInfo.lastIndexOf(",")+1).trim());
+												doc.setField(FieldNames.NEWSDATE,placeInfo.substring(h+1).trim());
 											} else {
 												place=placeInfo.trim();
 												doc.setField(FieldNames.PLACE,place);
@@ -130,7 +136,7 @@ public class Parser {
 					IndexWriter.docList.put(dirList[dirLen - 1],docCatList);
 					catList=IndexWriter.CatIndex.get(dirList[dirLen - 2]);
 					if(catList==null)
-						catList=new LinkedList<Integer>();
+						catList=new ArrayList<Integer>();
 					catList.add(FileUtilities.docId);
 					IndexWriter.CatIndex.put(dirList[dirLen - 2], catList);
 					

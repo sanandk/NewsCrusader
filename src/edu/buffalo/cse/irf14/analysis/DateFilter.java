@@ -12,7 +12,7 @@ public class DateFilter  extends TokenFilter {
 	final Pattern p = Pattern.compile("(\\d{4})(-)(\\d{2}|\\d{4})(.|,|!|\\?|:|;)*");
 	Matcher m1=null;
 	Matcher int_matcher = null; 
-	TokenStream t_stream;
+	
 	public DateFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
@@ -49,6 +49,7 @@ public class DateFilter  extends TokenFilter {
     
 	public static String Number(String string,boolean suffix){
 		String ch="";
+		StringBuilder sb=new StringBuilder();
 		int i;
 	    try {
 	    	if(!Character.isDigit(string.charAt(string.length()-1)))
@@ -59,13 +60,23 @@ public class DateFilter  extends TokenFilter {
 	    	i=Integer.parseInt(string);
 	    	String delim=(ch=="")?"":"^";
 	    	if(!suffix && i>1800 && i<2100)
-	    		return "~"+String.format("%04d", i)+delim+ch;
-	    	if(i<32)
-	    		return String.format("%02d", i);
-	    	if(suffix)
-	    		return "~"+String.format("%04d", i)+delim+ch;
+	    	{		sb.append('~');
+	    	sb.append(String.format("%04d", i));
+	    	sb.append(delim);
+	    	sb.append(ch);
+	    }
+	    		//return "~"+String.format("%04d", i)+delim+ch;
+	    	else if(i<32)
+	    	{
+	    		sb.append(String.format("%02d", i));	
+	    	}
+	    		//return String.format("%02d", i);
+	    	else if(suffix){
+	    		sb.append('~');
+	    		sb.append(String.format("%02d", i));
+	    	}
 	    	
-	    	 return "";
+	    	 return sb.toString();
 	    } catch (Exception e) {
 	       return "";
 	        

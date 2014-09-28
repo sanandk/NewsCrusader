@@ -7,7 +7,6 @@ public class SymbolFilter extends TokenFilter {
 	// Updated by anand on Sep 15
 	// Fixed after changes made on 17th Sep
 	
-	TokenStream t_stream;
 	public SymbolFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
@@ -16,8 +15,9 @@ public class SymbolFilter extends TokenFilter {
 	}
 	
     final Pattern intpattern = Pattern.compile("(.)*(\\d)(.)*");
+    final Pattern alphap=Pattern.compile("[a-zA-Z]+");
 //	final Pattern p = Pattern.compile("\'|-|.|,|:|;|\\?|!");
-//	Matcher m;
+	Matcher m,matcher;
 	@Override
 	public boolean increment() throws TokenizerException {
 		// TODO Auto-generated method stub
@@ -33,7 +33,7 @@ public class SymbolFilter extends TokenFilter {
 		String str=current_token.toString();
 		int len=str.length();
 //		m=p.matcher(str);
-		String old=str;
+		final String old=str;
 		if(len>0)
 		{
 			
@@ -101,17 +101,18 @@ public class SymbolFilter extends TokenFilter {
 			}
 			if(str.contains("-"))
 			{
-			 	 Matcher matcher = intpattern.matcher(str);
+			 	 matcher = intpattern.matcher(str);
 		         boolean isMatched = matcher.matches();
 		        
 		         if (!isMatched)
 		         {
-		        	String [] sp=str.split(String.valueOf("-"));
-		        	String alphapattern= "[a-zA-Z]+";
+		        	final String [] sp=str.split(String.valueOf("-"));
+		        	//String alphapattern= "[a-zA-Z]+";
 		        	int char_flag=0,h_flag=0;
 		        	for(int i=0;i<sp.length;i++)
 		        	{
-		        		if(sp[i].matches(alphapattern))
+		        		m=alphap.matcher(sp[i]);
+		        		if(m.matches())
 		        			char_flag++;
 		        		else
 		        			h_flag++;

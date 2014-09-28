@@ -6,7 +6,7 @@ package edu.buffalo.cse.irf14.index;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -23,7 +23,7 @@ import edu.buffalo.cse.irf14.index.FileUtilities.DictType;
 /**
  * @author nikhillo Class responsible for writing indexes to disk
  */
-public class IndexWriter  implements Runnable{  
+public class IndexWriter {  
 	
 	String outputDir;
 	
@@ -63,10 +63,10 @@ public class IndexWriter  implements Runnable{
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
 	static int tokens=0;
-	public static TreeMap<String,LinkedList<String>> docList= new TreeMap<String,LinkedList<String>>();
-	public static TreeMap<String, LinkedList<Integer>> CatIndex = new TreeMap<String, LinkedList<Integer>>();
-	public static TreeMap<String, LinkedList<Integer>> PlaceIndex = new TreeMap<String, LinkedList<Integer>>();
-	public static TreeMap<String, LinkedList<Integer>> AuthorIndex = new TreeMap<String, LinkedList<Integer>>();
+	public static TreeMap<String,ArrayList<String>> docList= new TreeMap<String,ArrayList<String>>();
+	public static TreeMap<String, ArrayList<Integer>> CatIndex = new TreeMap<String, ArrayList<Integer>>();
+	public static TreeMap<String, ArrayList<Integer>> PlaceIndex = new TreeMap<String, ArrayList<Integer>>();
+	public static TreeMap<String, ArrayList<Integer>> AuthorIndex = new TreeMap<String, ArrayList<Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexAC = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexDG = new TreeMap<String, HashMap<Integer, Integer>>();
 	public static TreeMap<String, HashMap<Integer, Integer>> termIndexHK = new TreeMap<String, HashMap<Integer, Integer>>();
@@ -91,7 +91,7 @@ public class IndexWriter  implements Runnable{
 		String[] place=d.getField(FieldNames.PLACE);
 		String[] author=d.getField(FieldNames.AUTHOR);
 		String[] authororg=d.getField(FieldNames.AUTHORORG);
-		AnalyzerFactory fact = AnalyzerFactory.getInstance();
+		final AnalyzerFactory fact = AnalyzerFactory.getInstance();
 		
 		try {
 				
@@ -231,16 +231,16 @@ public class IndexWriter  implements Runnable{
 				while(t_stream.hasNext())
 					sb.append(t_stream.next()).toString();
 				String s=sb.toString();
-				LinkedList<Integer> ll=PlaceIndex.get(s);
+				ArrayList<Integer> ll=PlaceIndex.get(s);
 				if(ll==null)
-					ll=new LinkedList<Integer>();
+					ll=new ArrayList<Integer>();
 				ll.add(FileUtilities.docId);
 				PlaceIndex.put(s, ll);
 			}
 			if(cat!=null){
-				LinkedList<Integer> ll=CatIndex.get(cat[0]);
+				ArrayList<Integer> ll=CatIndex.get(cat[0]);
 				if(ll==null)
-					ll=new LinkedList<Integer>();
+					ll=new ArrayList<Integer>();
 				ll.add(FileUtilities.docId);
 				CatIndex.put(cat[0], ll);
 			
@@ -271,16 +271,16 @@ public class IndexWriter  implements Runnable{
 						while(t_stream.hasNext())
 						{
 							if(i==0)
-								sb.append("(");
+								sb.append('(');
 							sb.append(t_stream.next()).toString();
 						}
-						sb.append(")");
+						sb.append(')');
 					}
 					
 					String s=sb.toString();
-					LinkedList<Integer> ll=AuthorIndex.get(s);
+					ArrayList<Integer> ll=AuthorIndex.get(s);
 					if(ll==null)
-						ll=new LinkedList<Integer>();
+						ll=new ArrayList<Integer>();
 					ll.add(FileUtilities.docId);
 					AuthorIndex.put(s, ll);
 				}
@@ -318,7 +318,7 @@ public class IndexWriter  implements Runnable{
 		FileUtilities.writeIndexFile(PlaceIndex,FileUtilities.indexPlace);
 		FileUtilities.writeIndexFile(AuthorIndex,FileUtilities.indexAuth);
 		FileUtilities.closeDict();
-		read();
+		//read();
 	}
 	
 	public void read() {
@@ -337,9 +337,4 @@ public class IndexWriter  implements Runnable{
 
 
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
 }

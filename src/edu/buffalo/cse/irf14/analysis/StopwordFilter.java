@@ -6,7 +6,6 @@ import java.util.Set;
 
 public class StopwordFilter extends TokenFilter {
 
-	TokenStream t_stream;
 	final static Set<String> stopwordList = new HashSet<String>(
 			Arrays.asList("a", "able", "about", "across", "after", "all",
 					"almost", "also", "am", "among", "an", "and", "any", "are",

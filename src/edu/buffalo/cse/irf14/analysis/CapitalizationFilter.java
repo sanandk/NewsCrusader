@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class CapitalizationFilter extends TokenFilter {
 
-	TokenStream t_stream;
+	
 	// int lineStart;
 	final String camelCaseRegex = "([a-z]*[A-Z]+[a-z]*)+";
 	final String camelCaseRegex2 = "([a-z]*[A-Z]+[a-z]*[ ]*)+";
@@ -50,8 +50,7 @@ public class CapitalizationFilter extends TokenFilter {
 							m2.reset(current_token.getTermText());
 					else
 						m2=null;
-//					String tempStr=current_token.getTermText(); 
-//					tempStr=tempStr.replace(" ","");
+
                 if (null!=m2 && m2.matches()) {
 					t_stream.remove();
 					previous_token = t_stream.previous();

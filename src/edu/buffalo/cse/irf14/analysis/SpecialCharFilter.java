@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class SpecialCharFilter  extends TokenFilter {
 	// Update on 17th Sep by anand
 	
-	TokenStream t_stream;
+	
 	public SpecialCharFilter(TokenStream stream) {
 		super(stream);
 		// TODO Auto-generated constructor stub
