@@ -58,7 +58,7 @@ public class IndexerTest {
 
 	@Before
 	public final void before() {
-		reader = new IndexReader("D:/Projects/news_training/training/output", IndexType.TERM);
+		reader = new IndexReader(System.getProperty("INDEX.DIR"), IndexType.TERM);
 	}
 	
 	/**
