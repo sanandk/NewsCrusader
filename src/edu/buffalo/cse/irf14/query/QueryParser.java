@@ -8,6 +8,12 @@ package edu.buffalo.cse.irf14.query;
  * Static parser that converts raw text to Query objects
  */
 public class QueryParser {
+	
+	//created for testing purpose
+	public static void main(String args[]){
+		System.out.println(parse("\"Hello World\"","").toString());
+	}
+	
 	/**
 	 * MEthod to parse the given user query into a Query object
 	 * @param userQuery : The query to parse
@@ -16,6 +22,14 @@ public class QueryParser {
 	 */
 	public static Query parse(String userQuery, String defaultOperator) {
 		//TODO: YOU MUST IMPLEMENT THIS METHOD
-		return null;
+		
+		if(defaultOperator.equals("AND")){
+			defaultOperator= "AND";
+		}else{
+			defaultOperator= "OR";
+		}
+		
+		Query q= new Query(userQuery);
+		return q;
 	}
 }
