@@ -148,7 +148,7 @@ public class IndexReader {
 	public Map<String, Integer> getPostings(String term) {
 		// TODO:YOU MUST IMPLEMENT THIS
 		Map<String, Integer> postingsMap=null;
-		HashMap<Integer, Integer> postingList;
+		HashMap<Integer, Double> postingList;
 		ArrayList<Integer> postingArray;
 		LinkedList<String[]> docList;
 		String fileId;
@@ -159,65 +159,37 @@ public class IndexReader {
 					switch(termStart){
 					case 'a': case 'b': case 'c':
 						postingList=IndexWriter.termIndexAC.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					case 'd': case 'e': case 'f': case 'g':
 						postingList=IndexWriter.termIndexDG.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					case 'h': case 'i': case 'j': case 'k':
 						postingList=IndexWriter.termIndexHK.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					case 'l': case 'm': case 'n': case 'o': case 'p':
 						postingList=IndexWriter.termIndexLP.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					case 'q': case 'r': case 's':
 						postingList=IndexWriter.termIndexQS.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
 						postingList=IndexWriter.termIndexTZ.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
-						}
+						
 						break;
 					default :
 						postingList=IndexWriter.termIndexMisc.get(term);
-						if(null!=postingList){
-							postingsMap= new HashMap<String, Integer>();
-							for(Integer docId: postingList.keySet()){
-								postingsMap.put(IndexWriter.docCatList.get(docId), postingList.get(docId));
-							}
+						
+					}
+					
+					if(null!=postingList){
+						postingsMap= new HashMap<String, Integer>();
+						for(Integer docId: postingList.keySet()){
+							postingsMap.put(IndexWriter.docCatList.get(docId)[0], postingList.get(docId).intValue());
 						}
 					}
 				}
@@ -227,7 +199,7 @@ public class IndexReader {
 				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
 					for(Integer docId: postingArray){
-						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
+						postingsMap.put(IndexWriter.docCatList.get(docId)[0], 1);
 					}
 				}
 			case CATEGORY:
@@ -235,7 +207,7 @@ public class IndexReader {
 				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
 					for(Integer docId: postingArray){
-						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
+						postingsMap.put(IndexWriter.docCatList.get(docId)[0], 1);
 					}
 				}
 			case PLACE:
@@ -243,7 +215,7 @@ public class IndexReader {
 				if(postingArray!=null){
 					postingsMap= new HashMap<String, Integer>();
 					for(Integer docId: postingArray){
-						postingsMap.put(IndexWriter.docCatList.get(docId), 1);
+						postingsMap.put(IndexWriter.docCatList.get(docId)[0], 1);
 					}
 				}
 		}
@@ -262,18 +234,18 @@ public class IndexReader {
 	public List<String> getTopK(int k) {
 		// TODO YOU MUST IMPLEMENT THIS
 		int frequency=0;
-		HashMap<Integer, Integer> postingList;
+		HashMap<Integer, Double> postingList;
 		HashMap<String,Integer> frequencyListing= new HashMap<String, Integer>();
 		List<Entry<String, Integer>> sortedFrequencyList;
 		List<String> topKterms= null;
 		if(k>0){
 		switch (type) {
 			case TERM:
-				List<TreeMap<String, HashMap<Integer, Integer>>> IndexList= new LinkedList<TreeMap<String,HashMap<Integer,Integer>>>();
+				List<TreeMap<String, HashMap<Integer, Double>>> IndexList= new LinkedList<TreeMap<String,HashMap<Integer,Double>>>();
 				IndexList.add(IndexWriter.termIndexAC);IndexList.add(IndexWriter.termIndexDG);IndexList.add(IndexWriter.termIndexHK);
 				IndexList.add(IndexWriter.termIndexLP);IndexList.add(IndexWriter.termIndexQS);IndexList.add(IndexWriter.termIndexTZ);
 				IndexList.add(IndexWriter.termIndexMisc);
-				for(TreeMap<String, HashMap<Integer, Integer>> index: IndexList){
+				for(TreeMap<String, HashMap<Integer, Double>> index: IndexList){
 					for(String term: index.keySet()){
 						postingList=index.get(term);
 						frequency=0;
@@ -356,21 +328,18 @@ public class IndexReader {
 		// TODO : BONUS ONLY
 		try{
 		Map<String,Integer> queryMap= new HashMap<String,Integer>();
-		Map<Integer,Integer> queryWithDocId;
-		ArrayList<HashMap<Integer, Integer>> postingListArray=new ArrayList<HashMap<Integer,Integer>>();
+		Map<Integer,Double> queryWithDocId;
+		ArrayList<HashMap<Integer, Double>> postingListArray=new ArrayList<HashMap<Integer,Double>>();
 		String fileName;
 		int i=0;
 		for(String term: terms){
 			i++;
 			char termStart= term.toLowerCase().charAt(0);
-			HashMap<Integer, Integer> postingList;
+			HashMap<Integer, Double> postingList;
 			
 			switch(termStart){
 			case 'a': case 'b': case 'c':
 				postingList=IndexWriter.termIndexAC.get(term);
-				if(null!=postingList){
-					postingListArray.add(postingList);
-				}
 				break;
 			case 'd': case 'e': case 'f': case 'g':
 				postingList=IndexWriter.termIndexDG.get(term);
@@ -393,13 +362,11 @@ public class IndexReader {
 			if(null!=postingList)
 				postingListArray.add(postingList);
 			
-			
-			
 		}
 		
 		queryWithDocId=intersect(postingListArray.subList(0, i).toArray(new HashMap[i-1]));
 		for( Integer docId: queryWithDocId.keySet()){
-			queryMap.put(IndexWriter.docCatList.get(docId),queryWithDocId.get(docId));
+			queryMap.put(IndexWriter.docCatList.get(docId)[0],queryWithDocId.get(docId).intValue());
 		}
 		
 		
@@ -413,14 +380,15 @@ public class IndexReader {
 	}
 	
 	
-	private Map<Integer, Integer> intersect(HashMap<Integer, Integer>...hashMaps) {
-		HashMap<Integer, Integer> main = new HashMap<Integer, Integer>(hashMaps[0]);
+	private Map<Integer, Double> intersect(HashMap<Integer, Double>...hashMaps) {
+		HashMap<Integer, Double> main = new HashMap<Integer, Double>(hashMaps[0]);
 		
-		int len = hashMaps.length,key,value;
+		int len = hashMaps.length,key;
+		double value;
 		for (int i = 1; i < len; i++) {
 			main.keySet().retainAll(hashMaps[i].keySet());
 			
-			for (Entry<Integer, Integer> etr : hashMaps[i].entrySet()) {
+			for (Entry<Integer, Double> etr : hashMaps[i].entrySet()) {
 				key = etr.getKey();
 				value = etr.getValue();
 				
@@ -438,13 +406,13 @@ public class IndexReader {
 		FileUtilities.readDocDic();
 		switch (type) {
 		case TERM:
-			IndexWriter.termIndexAC = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexAC);
-			IndexWriter.termIndexDG = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexDG);
-			IndexWriter.termIndexHK = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexHK);
-			IndexWriter.termIndexLP = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexLP);
-			IndexWriter.termIndexQS = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexQS);
-			IndexWriter.termIndexTZ = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexTZ);
-			IndexWriter.termIndexMisc = (TreeMap<String, HashMap<Integer,Integer>>) FileUtilities.readIndexFile(FileUtilities.indexMisc);
+			IndexWriter.termIndexAC = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexAC);
+			IndexWriter.termIndexDG = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexDG);
+			IndexWriter.termIndexHK = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexHK);
+			IndexWriter.termIndexLP = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexLP);
+			IndexWriter.termIndexQS = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexQS);
+			IndexWriter.termIndexTZ = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexTZ);
+			IndexWriter.termIndexMisc = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexMisc);
 			break;
 		case AUTHOR:
 			IndexWriter.AuthorIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexAuth);

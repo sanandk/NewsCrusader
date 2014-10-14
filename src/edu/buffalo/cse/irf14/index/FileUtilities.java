@@ -157,7 +157,7 @@ public class FileUtilities {
 			f_in = new FileInputStream(docCatDicFile);
 			zip_in = new GZIPInputStream(f_in);
 			obj_in = new ObjectInputStream(zip_in);
-			IndexWriter.docCatList=(TreeMap<Integer,String>)obj_in.readObject();
+			IndexWriter.docCatList=(TreeMap<Integer,String[]>)obj_in.readObject();
 			obj_in.close();
 			zip_in.close();
 			f_in.close();

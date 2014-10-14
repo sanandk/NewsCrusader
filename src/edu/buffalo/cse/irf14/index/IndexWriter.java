@@ -5,6 +5,7 @@ package edu.buffalo.cse.irf14.index;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
@@ -41,7 +42,6 @@ public class IndexWriter {
 		    theDir.mkdir();
 		  }
 		  FileUtilities.setOutputDir(indexDir);
-		  
 	}
 
 	/**
@@ -58,19 +58,19 @@ public class IndexWriter {
 	static int i = 1;
 	static List<String> a = new ArrayList<String>();
 	static List<String> b = new ArrayList<String>();
-
-	public static TreeMap<String,Integer> docList= new TreeMap<String,Integer>();
+	int docCount;
+	public static TreeMap<String, Integer> docList= new TreeMap<String,Integer>();
 	public static TreeMap<String, ArrayList<Integer>> CatIndex = new TreeMap<String, ArrayList<Integer>>();
 	public static TreeMap<String, ArrayList<Integer>> PlaceIndex = new TreeMap<String, ArrayList<Integer>>();
 	public static TreeMap<String, ArrayList<Integer>> AuthorIndex = new TreeMap<String, ArrayList<Integer>>();
-	public static TreeMap<Integer,String> docCatList= new TreeMap<Integer,String>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexAC = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexDG = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexHK = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexLP = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexQS = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexTZ = new TreeMap<String, HashMap<Integer, Integer>>();
-	public static TreeMap<String, HashMap<Integer, Integer>> termIndexMisc = new TreeMap<String, HashMap<Integer, Integer>>();
+	public static TreeMap<Integer,String[]> docCatList= new TreeMap<Integer,String[]>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexAC = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexDG = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexHK = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexLP = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexQS = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexTZ = new TreeMap<String, HashMap<Integer, Double>>();
+	public static TreeMap<String, HashMap<Integer, Double>> termIndexMisc = new TreeMap<String, HashMap<Integer, Double>>();
 	String termValue;
 	Analyzer analyzer;
 	Token tp;
@@ -81,6 +81,7 @@ public class IndexWriter {
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
+		String[] str=new String[2];
 		fid=d.getField(FieldNames.FILEID);
         tit = d.getField(FieldNames.TITLE);
 		cont=d.getField(FieldNames.CONTENT);
@@ -89,9 +90,10 @@ public class IndexWriter {
 		author=d.getField(FieldNames.AUTHOR);
 		authororg=d.getField(FieldNames.AUTHORORG);
 		try {
-
+			str[0]=fid[0];
 			IndexWriter.docList.put(fid[0],++FileUtilities.docId);
-			IndexWriter.docCatList.put(FileUtilities.docId,fid[0]);
+			
+			IndexWriter.docCatList.put(FileUtilities.docId,str);
 
 			
 			if(cont!=null || tit!=null){	
@@ -107,12 +109,12 @@ public class IndexWriter {
 				
 			}
 
-			HashMap<Integer,Integer> termPosting ;
-			Integer frequency=0;
+			HashMap<Integer,Double> termPosting ;
+			Double frequency=0.0;
 			while(t_stream.hasNext())
 			{
 				tp=t_stream.next();
-				termPosting= new HashMap<Integer,Integer>();
+				termPosting= new HashMap<Integer,Double>();
 			
 				if(tp!=null && (termValue=tp.toString()).length()>0){
 					
@@ -123,12 +125,12 @@ public class IndexWriter {
 								termPosting=termIndexAC.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexAC.put(termValue,termPosting );
 							break;
 						case 'd': case 'e': case 'f': case 'g':
@@ -136,12 +138,12 @@ public class IndexWriter {
 								termPosting=termIndexDG.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexDG.put(termValue,termPosting );
 							break;
 						case 'h': case 'i': case 'j': case 'k':
@@ -149,12 +151,12 @@ public class IndexWriter {
 								termPosting=termIndexHK.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexHK.put(termValue,termPosting );
 							break;
 						case 'l': case 'm': case 'n': case 'o': case 'p':
@@ -162,12 +164,12 @@ public class IndexWriter {
 								termPosting=termIndexLP.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexLP.put(termValue,termPosting );
 							break;
 						case 'q': case 'r': case 's':
@@ -175,12 +177,12 @@ public class IndexWriter {
 								termPosting=termIndexQS.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexQS.put(termValue,termPosting );
 							break;
 						case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
@@ -188,12 +190,12 @@ public class IndexWriter {
 								termPosting=termIndexTZ.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexTZ.put(termValue,termPosting );
 							break;
 						default :
@@ -202,16 +204,14 @@ public class IndexWriter {
 								termPosting=termIndexMisc.get(termValue);
 								frequency=termPosting.get(FileUtilities.docId);
 								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1);
+									termPosting.put(FileUtilities.docId, 1.0);
 								}else{
 									termPosting.put(FileUtilities.docId, ++frequency);
 								}
 							}else
-								termPosting.put(FileUtilities.docId, 1);
+								termPosting.put(FileUtilities.docId, 1.0);
 							termIndexMisc.put(termValue,termPosting );
 					}
-					
-					
 					
 				}
 			}
@@ -294,6 +294,50 @@ public class IndexWriter {
 		}
 		
 	}
+	double df,idf;
+//	public void calculateIDF()
+//	{
+//		
+//		for (String term : termIndexAC.keySet()) {
+//			df=0;
+//			HashMap<Integer, Double> docs=termIndexAC.get(term);
+//			for(Double d : docs.values())
+//			{
+//				df+=d;
+//			}
+//			idf=Math.log10(docCount/df);
+//			docs.put(-1,idf);
+//			termIndexAC.put(term, docs);
+//	    }
+//			
+//	}
+	public void calculateVectorLength(TreeMap<String, HashMap<Integer, Double>> imap)
+	{
+		String str2[]=new String[2];
+		int size;
+		double w;
+		for (String term : imap.keySet()) {
+			df=0;
+			HashMap<Integer, Double> docs=imap.get(term);
+			if(docs!=null)
+			{
+			size=docs.size();
+			idf=Math.log10(docCount/size);
+			docs.put(-1,idf);
+			for(Integer d : docs.keySet())
+			{
+				
+				str2=docCatList.get(d);
+				w=idf*size;
+				w=w*w+(Double.parseDouble(str2[1]));
+				str2[1]=String.valueOf(w);
+				docCatList.put(d, str2);
+			}
+			imap.put(term, docs);
+			}
+	    }
+		
+	}
 
 	/**
 	 * Method that indicates that all open resources must be closed and cleaned
@@ -304,6 +348,17 @@ public class IndexWriter {
 	 */
 	public void close() throws IndexerException {
 		// TODO
+		
+		docCount=docList.size();
+		
+		//calculateIDF();
+		calculateVectorLength(termIndexAC);
+		calculateVectorLength(termIndexDG);
+		calculateVectorLength(termIndexHK);
+		calculateVectorLength(termIndexLP);
+		calculateVectorLength(termIndexQS);
+		calculateVectorLength(termIndexTZ);
+		
 		FileUtilities.writeDocDic();
 		FileUtilities.writeIndexFile(termIndexAC,FileUtilities.indexAC);
 		FileUtilities.writeIndexFile(termIndexDG,FileUtilities.indexDG);
