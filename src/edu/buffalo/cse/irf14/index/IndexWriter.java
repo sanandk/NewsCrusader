@@ -89,6 +89,8 @@ public class IndexWriter {
 		place=d.getField(FieldNames.PLACE);
 		author=d.getField(FieldNames.AUTHOR);
 		authororg=d.getField(FieldNames.AUTHORORG);
+		if(fid[0].equals("x"))
+			return;
 		try {
 			str[0]=fid[0];
 			IndexWriter.docList.put(fid[0],++FileUtilities.docId);
@@ -315,7 +317,7 @@ public class IndexWriter {
 	{
 		String str2[]=new String[2];
 		int size;
-		double w;
+		double w=0.0;
 		for (String term : imap.keySet()) {
 			df=0;
 			HashMap<Integer, Double> docs=imap.get(term);
@@ -326,12 +328,21 @@ public class IndexWriter {
 			docs.put(-1,idf);
 			for(Integer d : docs.keySet())
 			{
-				
-				str2=docCatList.get(d);
-				w=idf*size;
-				w=w*w+(Double.parseDouble(str2[1]));
-				str2[1]=String.valueOf(w);
-				docCatList.put(d, str2);
+				if(d!=-1)
+				{
+					str2=docCatList.get(d);
+					w=idf*size;
+					try
+					{
+					w=w*w+(Double.parseDouble(str2[1]));
+					}
+					catch(Exception e)
+					{
+						w=w*w;	
+					}
+					str2[1]=String.valueOf(w);
+					docCatList.put(d, str2);
+				}
 			}
 			imap.put(term, docs);
 			}

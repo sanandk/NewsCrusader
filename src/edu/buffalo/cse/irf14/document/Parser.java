@@ -120,6 +120,7 @@ public class Parser {
 				}
 				
 				}else{
+					doc.setField(FieldNames.FILEID, "x");
 					skippedCount++;
 				}
 			}

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import edu.buffalo.cse.irf14.index.FileUtilities;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.IndexWriter;
 import edu.buffalo.cse.irf14.query.Query;
@@ -28,7 +29,15 @@ import edu.buffalo.cse.irf14.query.QueryParser;
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
 	
+	public static void main(String args[])
+	{
+		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
+		r.query("laser", ScoringModel.TFIDF);
+	}
+	
 	PrintStream o_stream;
+	char mode;
+	String indexDir;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -39,7 +48,31 @@ public class SearchRunner {
 	public SearchRunner(String indexDir, String corpusDir, 
 			char mode, PrintStream stream) {
 		//TODO: IMPLEMENT THIS METHOD
+		
+		this.indexDir = indexDir;
+		this.mode = mode;
+		FileUtilities.setOutputDir(indexDir);
+		readIndex();
 		o_stream=stream;
+		
+	}
+	
+	public void readIndex() {
+		FileUtilities.readDocDic();
+		
+			IndexWriter.termIndexAC = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexAC);
+			IndexWriter.termIndexDG = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexDG);
+			IndexWriter.termIndexHK = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexHK);
+			IndexWriter.termIndexLP = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexLP);
+			IndexWriter.termIndexQS = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexQS);
+			IndexWriter.termIndexTZ = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexTZ);
+			IndexWriter.termIndexMisc = (TreeMap<String, HashMap<Integer,Double>>) FileUtilities.readIndexFile(FileUtilities.indexMisc);
+		
+			IndexWriter.AuthorIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexAuth);
+		
+			IndexWriter.CatIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexCat);
+		
+			IndexWriter.PlaceIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexPlace);
 		
 	}
 	
@@ -86,7 +119,8 @@ public class SearchRunner {
 						postingList=IndexWriter.termIndexMisc.get(term);
 						
 					}
-				
+					if(postingList!=null)
+					{
 						idf=postingList.get(-1);
 						for(Integer docId: postingList.keySet()){
 							tf=postingList.get(docId);
@@ -100,9 +134,10 @@ public class SearchRunner {
 							postingsMap.put(docId, w);
 							qterms.put(term, qw);
 						}
+					}
 					
 				}
-				
+				break;
 			case AUTHOR:
 				postingArray=IndexWriter.AuthorIndex.get(term);
 				if(postingArray!=null){
@@ -115,6 +150,7 @@ public class SearchRunner {
 						postingsMap.put(docId, w);
 					}
 				}
+				break;
 			case CATEGORY:
 				postingArray=IndexWriter.CatIndex.get(term);
 				if(postingArray!=null){
@@ -127,6 +163,7 @@ public class SearchRunner {
 						postingsMap.put(docId, w);
 					}
 				}
+				break;
 			case PLACE:
 				postingArray=IndexWriter.PlaceIndex.get(term);
 				if(postingArray!=null){
@@ -139,6 +176,7 @@ public class SearchRunner {
 						postingsMap.put(docId, w);
 					}
 				}
+				break;
 		}
 		
 		if(op.equals("AND"))
@@ -281,6 +319,7 @@ public class SearchRunner {
 				postings=processblock(postings,val,k);
 			}
 		}
+		 postings.remove(-1);
 		double length=0,doc_len=0,score=0;
 		for(double d:qterms.values())
 		{
@@ -310,26 +349,27 @@ public class SearchRunner {
 		    };
 		    
 		   
+		    
 		    List<Map.Entry<Integer, Double>> finalp = new ArrayList<Map.Entry<Integer, Double>>();
 		    
 		  
 		    finalp.addAll(postings.entrySet());
 		  
 		    Collections.sort(finalp, byMapValues);
-		
+		    
 		long time=System.currentTimeMillis()-startTime;
 		
 		
 		o_stream.println("Query: "+fq);
-		o_stream.println("Query time: "+time);
+		o_stream.println("Query time: "+time + " seconds");
 		o_stream.println("\n");
 		Entry<Integer, Double> doc;
-		for(int i=0;i<10;i++)
+		for(int i=0;i<10 && i<finalp.size();i++)
 		{
 			doc = finalp.get(i);
-			o_stream.println("Result Rank: "+i+1);
+			o_stream.println("Result Rank: "+(i+1));
 			o_stream.println("Result title: "+doc.getKey());
-			o_stream.println("Result snippet: "+i+1);
+			o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
 			o_stream.println("Result relevance: "+doc.getValue());
 			o_stream.println("\n");
 		}
