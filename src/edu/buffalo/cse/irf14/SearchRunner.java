@@ -1,6 +1,11 @@
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.zip.GZIPInputStream;
 
 import edu.buffalo.cse.irf14.index.FileUtilities;
 import edu.buffalo.cse.irf14.index.IndexType;
@@ -32,7 +38,8 @@ public class SearchRunner {
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
-		r.query("laser", ScoringModel.TFIDF);
+//		r.query("laser", ScoringModel.TFIDF);
+		r.query(new File("D:\\UB\\Project\\IR\\project dataset\\QueryFile.txt"));
 	}
 	
 	PrintStream o_stream;
@@ -386,6 +393,50 @@ public class SearchRunner {
 	 */
 	public void query(File queryFile) {
 		//TODO: IMPLEMENT THIS METHOD
+//		numQueries=3
+//				Q_1A63C:{hello world}
+//				Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}
+//				Q_4K66L:{long query with several words}
+		
+		FileReader f_in = null;
+		BufferedReader br= null;
+				
+		try {
+			f_in = new FileReader(queryFile);
+			br= new BufferedReader(f_in);
+			String line;
+			int queryNum=0;
+			String queryId;
+			String userQuery;
+			Query query;
+			if((line=br.readLine())!=null){
+				if(line.trim().startsWith("numQueries=")){
+					queryNum=Integer.parseInt(line.substring(line.indexOf("numQueries=")+11));
+				}else{
+					System.out.println("Corrupted Query File.Invalid numQueries statement");
+				}
+			}
+			int i=0;
+			while(i++<queryNum){
+				if((line=br.readLine())!=null){
+					if(line.contains(":")){
+						queryId=line.substring(0,line.indexOf(":"));
+						userQuery=line.substring(line.indexOf(":")+2,line.length()-1);
+						query=QueryParser.parse(userQuery, "OR");
+					}else{
+						System.out.println("Error at line "+i+" in QueryString");
+						break;
+					}
+				}else{
+					System.out.println("Query "+i+" missing in file");
+					break;
+				}
+			}
+			
+		}catch(IOException ioe){
+			
+		}
+
 	}
 	
 	/**

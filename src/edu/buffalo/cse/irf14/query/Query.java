@@ -17,6 +17,7 @@ import edu.buffalo.cse.irf14.index.IndexType;
 public class Query {
 	
 	private String queryText;
+	private String queryString;
 	private String defOp="OR";
 	
 	final static Set<String> keywordList = new HashSet<String>(Arrays.asList("AND","OR","NOT"));
@@ -24,31 +25,7 @@ public class Query {
 	
 	Query(String queryText){
 		this.queryText= queryText;
-	}
-	
-	
-	final Pattern quotesPattern= Pattern.compile("\"[^\"]*\"");
-	Matcher quotesMatcher=null;
-	
-	/**
-	 * Method to convert given parsed query into string
-	 */
-	public String toString() {
-		//TODO: YOU MUST IMPLEMENT THIS
-//		User query		String representation 
-//		hello	{ Term:hello }
-//		hello world	{ Term:hello OR Term:world }
-//		“hello world”	{ Term:”hello world” }
-//		orange AND yellow 	{ Term:orange AND Term:yellow }
-//		(black OR blue) AND bruises	{ [ Term:black OR Term:blue ] AND Term:bruises }
-//		Author:rushdie NOT jihad	{ Author:rushdie AND <Term:jihad> }
-//		Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels	{ Category:War AND Author:Dutt AND Place:Baghdad AND [ Term:prisoners OR Term:detainees OR Term:rebels ] }
-//		(Love NOT War) AND Category:(movies NOT crime)	{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }
-
 		
-		
-		//doubts: will query text contain combination of quotes and no qoute text
-		String queryString="";
 		String currentIndexType="Term"; 
 		String tempIndex;
 		String[] queryTextArray;
@@ -227,7 +204,7 @@ public class Query {
 //				}
 //			}
 //		}
-		queryString+="{ ";
+		queryString="{ ";
 		String query;
 		for(int i=0,len=queryList.size();i<len;i++){
 //		for(String query:queryList){
@@ -242,6 +219,28 @@ public class Query {
 				queryString+=query+ " ";
 		}
 		queryString+="}";
-		return queryString;
+
+	}
+	
+	
+	final Pattern quotesPattern= Pattern.compile("\"[^\"]*\"");
+	Matcher quotesMatcher=null;
+	
+	/**
+	 * Method to convert given parsed query into string
+	 */
+	public String toString() {
+		//TODO: YOU MUST IMPLEMENT THIS
+//		User query		String representation 
+//		hello	{ Term:hello }
+//		hello world	{ Term:hello OR Term:world }
+//		“hello world”	{ Term:”hello world” }
+//		orange AND yellow 	{ Term:orange AND Term:yellow }
+//		(black OR blue) AND bruises	{ [ Term:black OR Term:blue ] AND Term:bruises }
+//		Author:rushdie NOT jihad	{ Author:rushdie AND <Term:jihad> }
+//		Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels	{ Category:War AND Author:Dutt AND Place:Baghdad AND [ Term:prisoners OR Term:detainees OR Term:rebels ] }
+//		(Love NOT War) AND Category:(movies NOT crime)	{ [ Term:Love AND <Term:War> ] AND [ Category:movies AND <Category:crime> ] }
+		//doubts: will query text contain combination of quotes and no qoute text
+				return queryString;
 	}
 }
