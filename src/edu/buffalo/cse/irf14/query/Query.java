@@ -18,7 +18,7 @@ public class Query {
 	
 	private String queryText;
 	private String queryString;
-	private String defOp="OR";
+	public static String defOp="OR";
 	
 	final static Set<String> keywordList = new HashSet<String>(Arrays.asList("AND","OR","NOT"));
 	final static Set<String> stopwordList = new HashSet<String>(Arrays.asList("Term","Category","Place","Author"));

@@ -45,7 +45,7 @@ public class QueryParser {
 		}else{
 			defaultOperator= "OR";
 		}
-		
+		Query.defOp=defaultOperator;
 		Query q= new Query(userQuery);
 		
 		return q;
