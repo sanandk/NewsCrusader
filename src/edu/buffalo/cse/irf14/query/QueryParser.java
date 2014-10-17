@@ -20,7 +20,8 @@ public class QueryParser {
 		System.out.println(parse("\"hello\"","").toString());
 		System.out.println(parse("\"hello world","").toString());
 		System.out.println(parse("orange AND yellow","").toString());
-		System.out.println(parse("(black OR blue) AND bruises","").toString());
+		System.out.println(parse("(black OR blue OR yellow) AND bruises","").toString());
+		System.out.println(parse("Category:(black OR blue OR yellow) AND bruises","").toString());
 		System.out.println(parse("(black blue) AND bruises","").toString());
 		System.out.println(parse("Author:rushdie AND jihad","").toString());
 		System.out.println(parse("Author:rushdie NOT jihad","").toString());
