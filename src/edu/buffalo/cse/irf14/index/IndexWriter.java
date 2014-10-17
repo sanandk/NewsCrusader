@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
@@ -78,6 +80,108 @@ public class IndexWriter {
 	Tokenizer t=new Tokenizer();
 	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
 	String[] fid,tit,cont,cat,place,author,authororg;
+	
+	public void addtoIndex(String termValue)
+	{
+		Double frequency=0.0;
+		//A-C D-G H-K L-P Q-S T-Z
+		switch(termValue.charAt(0)){
+			case 'a': case 'b': case 'c':
+				if(termIndexAC.containsKey(termValue)){
+					termPosting=termIndexAC.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexAC.put(termValue,termPosting );
+				break;
+			case 'd': case 'e': case 'f': case 'g':
+				if(termIndexDG.containsKey(termValue)){
+					termPosting=termIndexDG.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexDG.put(termValue,termPosting );
+				break;
+			case 'h': case 'i': case 'j': case 'k':
+				if(termIndexHK.containsKey(termValue)){
+					termPosting=termIndexHK.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexHK.put(termValue,termPosting );
+				break;
+			case 'l': case 'm': case 'n': case 'o': case 'p':
+				if(termIndexLP.containsKey(termValue)){
+					termPosting=termIndexLP.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexLP.put(termValue,termPosting );
+				break;
+			case 'q': case 'r': case 's':
+				if(termIndexQS.containsKey(termValue)){
+					termPosting=termIndexQS.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexQS.put(termValue,termPosting );
+				break;
+			case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+				if(termIndexTZ.containsKey(termValue)){
+					termPosting=termIndexTZ.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexTZ.put(termValue,termPosting );
+				break;
+			default :
+				if(termIndexMisc.containsKey(termValue)){
+
+					termPosting=termIndexMisc.get(termValue);
+					frequency=termPosting.get(FileUtilities.docId);
+					if(frequency==null){
+						termPosting.put(FileUtilities.docId, 1.0);
+					}else{
+						termPosting.put(FileUtilities.docId, ++frequency);
+					}
+				}else
+					termPosting.put(FileUtilities.docId, 1.0);
+				termIndexMisc.put(termValue,termPosting );
+		}
+	}
+	HashMap<Integer,Double> termPosting ;
+	Pattern p=Pattern.compile(".*\\d.*");
+	Matcher m;
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
@@ -99,122 +203,49 @@ public class IndexWriter {
 
 			
 			if(cont!=null || tit!=null){	
-				if(tit!=null){
-						t_stream=t.consume(tit[0]);
-						t_stream.append(t.consume(cont[0]));
-				}
-				else
+				
 					t_stream=t.consume(cont[0]);
 				analyzer = fact.getAnalyzerForField(FieldNames.CONTENT, t_stream);
 	
 			while (analyzer.increment()) {
 				
 			}
-
-			HashMap<Integer,Double> termPosting ;
-			Double frequency=0.0;
+			if(tit!=null){
+				TokenStream ft_stream=t.consume(tit[0]);
+				ft_stream.append(t_stream);
+				t_stream=ft_stream;
+			}
+			
+			String spl[];
 			while(t_stream.hasNext())
 			{
 				tp=t_stream.next();
 				termPosting= new HashMap<Integer,Double>();
 			
 				if(tp!=null && (termValue=tp.toString()).length()>0){
-					
-					//A-C D-G H-K L-P Q-S T-Z
-					switch(Character.toLowerCase(termValue.charAt(0))){
-						case 'a': case 'b': case 'c':
-							if(termIndexAC.containsKey(termValue)){
-								termPosting=termIndexAC.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexAC.put(termValue,termPosting );
-							break;
-						case 'd': case 'e': case 'f': case 'g':
-							if(termIndexDG.containsKey(termValue)){
-								termPosting=termIndexDG.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexDG.put(termValue,termPosting );
-							break;
-						case 'h': case 'i': case 'j': case 'k':
-							if(termIndexHK.containsKey(termValue)){
-								termPosting=termIndexHK.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexHK.put(termValue,termPosting );
-							break;
-						case 'l': case 'm': case 'n': case 'o': case 'p':
-							if(termIndexLP.containsKey(termValue)){
-								termPosting=termIndexLP.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexLP.put(termValue,termPosting );
-							break;
-						case 'q': case 'r': case 's':
-							if(termIndexQS.containsKey(termValue)){
-								termPosting=termIndexQS.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexQS.put(termValue,termPosting );
-							break;
-						case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
-							if(termIndexTZ.containsKey(termValue)){
-								termPosting=termIndexTZ.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexTZ.put(termValue,termPosting );
-							break;
-						default :
-							if(termIndexMisc.containsKey(termValue)){
-
-								termPosting=termIndexMisc.get(termValue);
-								frequency=termPosting.get(FileUtilities.docId);
-								if(frequency==null){
-									termPosting.put(FileUtilities.docId, 1.0);
-								}else{
-									termPosting.put(FileUtilities.docId, ++frequency);
-								}
-							}else
-								termPosting.put(FileUtilities.docId, 1.0);
-							termIndexMisc.put(termValue,termPosting );
+					termValue=termValue.toLowerCase();
+					addtoIndex(termValue);
+					if(termValue.contains(" "))
+					{
+						spl=termValue.split(" ");
+						for(int i=0;i<spl.length;i++)
+						{
+							if(spl[i].length()>0)
+								addtoIndex(spl[i]);
+						}
 					}
 					
+					m=p.matcher(termValue);
+					if(termValue.contains("-"))//!m.matches()
+					{
+					
+						spl=termValue.split("-");
+						for(int i=0;i<spl.length;i++)
+						{
+							if(spl[i].length()>1)
+								addtoIndex(spl[i]);
+						}
+					}
 				}
 			}
 			}
@@ -331,7 +362,7 @@ public class IndexWriter {
 				if(d!=-1)
 				{
 					str2=docCatList.get(d);
-					w=idf*size;
+					w=idf*docs.get(d);
 					try
 					{
 					w=w*w+(Double.parseDouble(str2[1]));

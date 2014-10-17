@@ -66,6 +66,8 @@ public class SymbolFilter extends TokenFilter {
 			}
 			if(str.contains("\'")) // Handling apostrophe
 			{
+				if(str.indexOf("\'")>0)
+				{
 					str=str.replaceAll("let\'s", "let us");
 					str=str.replaceAll("\'s", "");
 					str=str.replaceAll("\'ve", " have");
@@ -79,6 +81,7 @@ public class SymbolFilter extends TokenFilter {
 					str=str.replaceAll("\'em", "them");
 					str=str.replaceAll("n\'t", " not");
 					str=str.replaceAll("\'ve", " of the clock");
+				}
 			}
 	
 			int in=str.indexOf('\'');
@@ -102,7 +105,7 @@ public class SymbolFilter extends TokenFilter {
 		        
 		         if (!isMatched)
 		         {
-		        	final String [] sp=str.split(String.valueOf("-"));
+		        	final String [] sp=str.split("-");
 		        	//String alphapattern= "[a-zA-Z]+";
 		        	int char_flag=0,h_flag=0;
 		        	for(int i=0;i<sp.length;i++)
@@ -112,6 +115,7 @@ public class SymbolFilter extends TokenFilter {
 		        			char_flag++;
 		        		else
 		        			h_flag++;
+		        		
 		        	}
 		            if((char_flag-h_flag)>1)
 		            	str=str.replaceAll("-", " ");
@@ -119,8 +123,8 @@ public class SymbolFilter extends TokenFilter {
 		            {
 		            	while(str.contains("-"))
 		            		str=str.replaceAll("-", "");
-		     
 		            }
+		          
 		         }
 			}
 			

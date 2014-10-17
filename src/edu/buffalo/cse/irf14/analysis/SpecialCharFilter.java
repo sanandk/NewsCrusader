@@ -43,6 +43,8 @@ public class SpecialCharFilter  extends TokenFilter {
 			        if(isMatched)
 			        	 res=res.append(a);
 				}
+				else if(a==' ')
+					res=res.append(a);
 			}
 			
 			if(!(str.equals(res.toString())))
