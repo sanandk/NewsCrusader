@@ -45,7 +45,7 @@ public class SearchRunner {
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
-		r.query("leverage", ScoringModel.TFIDF);
+		r.query("chase manhattan", ScoringModel.TFIDF);
 
 	}
 	
@@ -87,7 +87,16 @@ public class SearchRunner {
 			IndexWriter.CatIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexCat);
 		
 			IndexWriter.PlaceIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexPlace);
-		
+			//if(term.equals("leverage"))
+				for(Entry<String, HashMap<Integer, Double>> id:IndexWriter.termIndexLP.entrySet())
+				{
+					if(id.getKey().startsWith("leverage"))
+					{
+					System.out.print("\n"+id.getKey()+":");
+					for(Integer a:id.getValue().keySet())
+						System.out.print(" "+a+",");
+					}
+				}
 	}
 	
 	HashMap<String, Double> qterms=new HashMap<String, Double>();
@@ -148,6 +157,7 @@ public class SearchRunner {
 						break;
 					case 'l': case 'm': case 'n': case 'o': case 'p':
 						postingList=IndexWriter.termIndexLP.get(term);
+						
 						
 						break;
 					case 'q': case 'r': case 's':
@@ -419,11 +429,11 @@ public class SearchRunner {
 		long time=System.currentTimeMillis()-startTime;
 		
 		double sc=0.0;
-		o_stream.println("Query: "+fq);
+		o_stream.println("Query: "+userQuery);
 		o_stream.println("Query time: "+time + " seconds");
 		o_stream.println("\n");
 		Entry<Integer, Double> doc;
-		for(int i=0;i<10 && i<finalp.size();i++)
+		for(int i=0;i<finalp.size();i++)
 		{
 			
 			doc = finalp.get(i);
@@ -434,7 +444,7 @@ public class SearchRunner {
 			o_stream.println("Result relevance: "+doc.getValue());
 			o_stream.println("\n");
 		}
-	//	o_stream.close();
+	//	
 	}
 	
 	
@@ -498,6 +508,7 @@ public class SearchRunner {
 	 */
 	public void close() {
 		//TODO : IMPLEMENT THIS METHOD
+		o_stream.close();
 	}
 	
 	/**

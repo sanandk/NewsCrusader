@@ -85,6 +85,9 @@ public class IndexWriter {
 	{
 		Double frequency=0.0;
 		//A-C D-G H-K L-P Q-S T-Z
+		
+		if(termValue.contains("leverage"))
+			System.out.println("docid" + FileUtilities.docId +"docname: "+str[0]+" term value: "+termValue);
 		switch(termValue.charAt(0)){
 			case 'a': case 'b': case 'c':
 				if(termIndexAC.containsKey(termValue)){
@@ -126,6 +129,10 @@ public class IndexWriter {
 				termIndexHK.put(termValue,termPosting );
 				break;
 			case 'l': case 'm': case 'n': case 'o': case 'p':
+//				if(termValue.equals("leverag"))
+//					System.out.println("docid" + FileUtilities.docId +"docname: "+str[0]);
+				if(FileUtilities.docId==7676)
+					System.out.println("termValue: " +termValue);
 				if(termIndexLP.containsKey(termValue)){
 					termPosting=termIndexLP.get(termValue);
 					frequency=termPosting.get(FileUtilities.docId);
@@ -182,10 +189,11 @@ public class IndexWriter {
 	HashMap<Integer,Double> termPosting ;
 	Pattern p=Pattern.compile(".*\\d.*");
 	Matcher m;
+	String[] str;
 	public void addDocument(Document d) throws IndexerException {
 		// TODO : YOU MUST IMPLEMENT THIS
 		// Updated by anand on Sep 14
-		String[] str=new String[2];
+		str=new String[2];
 		fid=d.getField(FieldNames.FILEID);
         tit = d.getField(FieldNames.TITLE);
 		cont=d.getField(FieldNames.CONTENT);
@@ -197,6 +205,8 @@ public class IndexWriter {
 			return;
 		try {
 			str[0]=fid[0];
+			if(str[0].equals("0007847"))
+				System.out.println("A");
 			IndexWriter.docList.put(fid[0],++FileUtilities.docId);
 			
 			IndexWriter.docCatList.put(FileUtilities.docId,str);
@@ -393,6 +403,10 @@ public class IndexWriter {
 		// TODO
 		
 		docCount=docList.size();
+		HashMap<Integer,Double> lpMap=termIndexLP.get("leverage");
+		for(Integer temp: lpMap.keySet()){
+			System.out.println(temp);
+		}
 		
 		//calculateIDF();
 		calculateVectorLength(termIndexAC);
@@ -401,6 +415,11 @@ public class IndexWriter {
 		calculateVectorLength(termIndexLP);
 		calculateVectorLength(termIndexQS);
 		calculateVectorLength(termIndexTZ);
+		
+		lpMap=termIndexLP.get("leverage");
+		for(Integer temp: lpMap.keySet()){
+			System.out.println(temp);
+		}
 		
 		FileUtilities.writeDocDic();
 		FileUtilities.writeIndexFile(termIndexAC,FileUtilities.indexAC);
