@@ -210,6 +210,7 @@ public class IndexWriter {
 			while (analyzer.increment()) {
 				
 			}
+			
 			if(tit!=null){
 				TokenStream ft_stream=t.consume(tit[0]);
 				ft_stream.append(t_stream);
