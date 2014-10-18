@@ -26,7 +26,7 @@ public class Query {
 	Query(String queryText){
 		this.queryText= queryText;
 		
-		String currentIndexType="Term"; 
+		String currentIndexType="Term",prev=""; 
 		String tempIndex;
 		String[] queryTextArray;
 		ArrayList<String> queryList=new ArrayList<String>();
@@ -91,7 +91,7 @@ public class Query {
 						queryList.add("[");
 						tempIndex=tempIndex.substring(1);//to remove the brace from the string
 						braceFlag=true;
-					}else if(queryList.contains("AND") && i+1<len && !termFlag && !keywordList.contains(queryTextArray[i]) && !keywordList.contains(queryTextArray[i+1])){
+					}else if(queryList.contains("AND") && !prev.equals(currentIndexType) && i+1<len && !termFlag && !keywordList.contains(queryTextArray[i]) && !keywordList.contains(queryTextArray[i+1])){
 							queryList.add("[");
 							termFlag=true;
 					}
@@ -144,6 +144,7 @@ public class Query {
 //							}
 //						}
 						i++;
+						prev=currentIndexType;
 						if(i<len){
 							tempIndex=queryTextArray[i];
 							if(!tempIndex.equals("AND")&&!tempIndex.equals("OR")&&!tempIndex.equals("NOT")){

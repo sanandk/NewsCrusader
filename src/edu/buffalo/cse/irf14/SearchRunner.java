@@ -28,6 +28,7 @@ import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.FileUtilities;
+import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.IndexWriter;
 import edu.buffalo.cse.irf14.query.Query;
@@ -45,10 +46,14 @@ public class SearchRunner {
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
-		r.query("chase manhattan", ScoringModel.OKAPI);
+	//	r.query("laser", ScoringModel.OKAPI);
+	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
+			r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
+		//		r.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
 
 	}
-	final double k1=1.2,k3=1.5,b=0.75;
+	TreeMap <Integer, Double> final_result;
+	final double k1=1.2,k3=2,b=0.75;
 	PrintStream o_stream;
 	char mode;
 	String indexDir;
@@ -68,9 +73,10 @@ public class SearchRunner {
 		FileUtilities.setOutputDir(indexDir);
 		readIndex();
 		o_stream=stream;
-		
+		 final_result=new TreeMap<Integer, Double>();
+		 finalp= new ArrayList<Map.Entry<Integer, Double>>();
 	}
-	
+	List<Map.Entry<Integer, Double>> finalp ;
 	public void readIndex() {
 		FileUtilities.readDocDic();
 		
@@ -87,7 +93,7 @@ public class SearchRunner {
 			IndexWriter.CatIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexCat);
 		
 			IndexWriter.PlaceIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexPlace);
-			//if(term.equals("leverage"))
+			/*
 				for(Entry<String, HashMap<Integer, Double>> id:IndexWriter.termIndexLP.entrySet())
 				{
 					if(id.getKey().startsWith("leverage"))
@@ -97,17 +103,21 @@ public class SearchRunner {
 						System.out.print(" "+a+",");
 					}
 				}
+				*/
 	}
 	
 	HashMap<String, Double> qterms=new HashMap<String, Double>();
-	//HashMap<Integer, Double> doclen=new HashMap<Integer, Double>();
+	//HashMap<Integer, Double> docterms=new HashMap<Integer, Double>();
+	String ori_term="";
 	Tokenizer t=new Tokenizer();
 	Analyzer analyzer;
+	
 	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
 	int flag=0;
 	public TreeMap<Integer, Double> getPostings(String term, IndexType type, String op) 
 	{
 		String term_f;
+		
 		TreeMap<Integer, Double> postingsMap_f=new TreeMap<Integer, Double>();
 		try
 		{
@@ -117,12 +127,18 @@ public class SearchRunner {
 		while (analyzer.increment()) {
 			
 		}
+		if(t_stream!=null && t_stream.hasNext())
+		{
+			term_f=t_stream.next().toString();
 		
-		term_f=t_stream.next().toString();
-			if(flag==0){
+			if(flag==0 && !term_f.equals(term)){
+				ori_term=term;
 				flag=1;
 				postingsMap_f=getPostings(term_f, type, "OR");
 			}
+		}
+			if(ori_term.equals(""))
+				ori_term=term;
 		}
 		catch(TokenizerException e)
 		{
@@ -132,16 +148,15 @@ public class SearchRunner {
 		TreeMap<Integer, Double> postingsMap=new TreeMap<Integer, Double>();
 		HashMap<Integer, Double> postingList;
 		ArrayList<Integer> postingArray;
-		double idf=0,tf=0,num,den;
-		Double qw=0.0,Ld=0.0,Lave=0.0;
+		double idf=0,tf=0,num;
+		Double qw=0.0,Ld=0.0,Lave=0.0,den;
 		Double w=0.0;
-		// if(op.equals("OR") || op.equals("AND"))
-		//	 postingsMap=postings;
+		
 		switch(type){
 			case TERM:
 				if(null!=term && !term.isEmpty()){
 					term=term.toLowerCase();
-				//	char termStart= term.toLowerCase().charAt(0);
+				
 					switch(term.charAt(0)){
 					case 'a': case 'b': case 'c':
 						postingList=IndexWriter.termIndexAC.get(term);
@@ -157,8 +172,7 @@ public class SearchRunner {
 						break;
 					case 'l': case 'm': case 'n': case 'o': case 'p':
 						postingList=IndexWriter.termIndexLP.get(term);
-						
-						
+							
 						break;
 					case 'q': case 'r': case 's':
 						postingList=IndexWriter.termIndexQS.get(term);
@@ -179,7 +193,7 @@ public class SearchRunner {
 							tf=postingList.get(docId);
 							
 							w=postingsMap.get(docId);
-							qw=qterms.get(term);
+							qw=qterms.get(ori_term);
 							
 							if(qw==null)
 								qw=0.0;
@@ -187,7 +201,14 @@ public class SearchRunner {
 								w=0.0;
 							
 							if(currentmodel==ScoringModel.TFIDF)
-								w+=qw*tf*idf; // or use log(1+tf).idf
+							{
+								num=(1+Math.log(tf))*idf;
+								w+=qw*idf*num; // or use log(1+tf).idf
+							//	den=docterms.get(docId);
+							//	if(den==null)
+							//		den=0.0;
+							//	docterms.put(docId, den + (num * num));
+							}
 							else
 							{
 								try
@@ -213,7 +234,7 @@ public class SearchRunner {
 							}
 			
 							postingsMap.put(docId, w);
-							qterms.put(term, qw);
+						//	qterms.put(term, qw);
 						}
 					}
 					
@@ -311,8 +332,11 @@ public class SearchRunner {
 				}
 				val=val.replace("\"", "");
 			}
+			Double temp=qterms.get(val);
+			if(temp==null)
+				temp=0.0;
 			if(op!="NOT")
-				qterms.put(val, 1.0);
+				qterms.put(val, temp + 1.0);
 			else
 				qterms.put(val, 0.0);
 			flag=0;
@@ -331,7 +355,6 @@ public class SearchRunner {
 		Integer[] akeys;
 		if(operator.equals("AND"))
 		{
-			System.out.println(operator);
 			akeys=A.keySet().toArray(new Integer[A.size()]);
 			for(Integer a:akeys)
 			{
@@ -361,21 +384,28 @@ public class SearchRunner {
 		}
 		return A;
 	}
+	int recur_flag=0;
 	ScoringModel currentmodel;
+	int res_count=1,res_total=10;
+	long startTime;
 	/**
 	 * Method to execute given query in the Q mode
 	 * @param userQuery : Query to be parsed and executed
 	 * @param model : Scoring Model to use for ranking results
 	 */
+	TreeMap<Integer, Double> postings=null;
+	
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
 		currentmodel=model;
 		
-		long startTime=System.currentTimeMillis();
+		if(recur_flag==0)
+			startTime=System.currentTimeMillis();
 		Query q=QueryParser.parse(userQuery, defOp);
 		String fq=q.toString();
 		String[] k=fq.split(" ");
-		TreeMap<Integer, Double> postings=new TreeMap<Integer,Double>();
+		if(postings==null)
+		postings=new TreeMap<Integer,Double>();
 		String tempop=defOp;
 		String val;
 		for(iter=0;iter<k.length;iter++)
@@ -420,6 +450,7 @@ public class SearchRunner {
 				{
 					doc_len=0.0;
 				}
+			//	doc_len=Math.sqrt(docterms.get(docID));
 				score=postings.get(docID)/(length * doc_len);
 				postings.put(docID, score);
 			}	
@@ -432,44 +463,75 @@ public class SearchRunner {
 				postings.put(docID, score);
 			}
 		}
+		   Double min=0.0,max=0.0;
+		    if(postings.size()>0)
+		    {
+		    	
+		    for(Entry<Integer, Double> ent : postings.entrySet())
+		    {
+		    	min=final_result.get(ent.getKey());
+		    	if(min==null)
+		    		min=0.0;
+		    	postings.put(ent.getKey(), Math.max(ent.getValue(),min));
+		    }
+		    
+		    final_result.putAll(postings);
+		    finalp=IndexReader.entriesComparator(final_result);
+		    }
 		
 		
-		 Comparator<Map.Entry<Integer, Double>> byMapValues = new Comparator<Map.Entry<Integer, Double>>() {
-		        @Override
-		        public int compare(Map.Entry<Integer, Double> left, Map.Entry<Integer, Double> right) {
-		            return right.getValue().compareTo(left.getValue());
-		        }
-		    };
-		    
-		   
-		    
-		    List<Map.Entry<Integer, Double>> finalp = new ArrayList<Map.Entry<Integer, Double>>();
-		    
-		  
-		    finalp.addAll(postings.entrySet());
-		  
-		    Collections.sort(finalp, byMapValues);
-		    double min=Collections.min(postings.values());
-		    double max=Collections.max(postings.values());
-		long time=System.currentTimeMillis()-startTime;
-		
-		double sc=0.0;
-		o_stream.println("Query: "+userQuery);
-		o_stream.println("Query time: "+time + " seconds");
-		o_stream.println("\n");
 		Entry<Integer, Double> doc;
-		for(int i=0;i<finalp.size();i++)
+		if(recur_flag==0 && finalp.size()<10)
+		{
+			recur_flag=1;
+			defOp="OR";
+			op="OR";
+			qterms.clear();
+			query(userQuery,model);
+			recur_flag=0;
+			op="AND";
+			defOp="AND";
+		}
+		else
+		{
+		double sc=0.0;   
+		max=Collections.max(postings.values());
+		//max=Math.max(max, Collections.max(final_result.values()));
+		long time=System.currentTimeMillis()-startTime;
+		o_stream.println("Query: "+userQuery+"| "+fq);
+		o_stream.println("Query time: "+time*0.001 + " seconds");
+		o_stream.println("\n");
+		for(int i=0;res_count<=res_total && i<finalp.size();i++)
 		{
 			
 			doc = finalp.get(i);
 			sc=(doc.getValue()-min)/(max-min);
-			o_stream.println("Result Rank: "+(i+1));
+			if(sc==0 || doc.getKey()==0)
+				i++;
+			else
+			{
+			o_stream.println("Result Rank: "+res_count++);
 			o_stream.println("Result title: "+doc.getKey());
 			o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
 			o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
 			o_stream.println("\n");
+			}
 		}
-	//	
+		}
+//		for(Entry<Integer, Double> res:final_result.entrySet())
+//		{
+//			doc=res;
+//			sc=(doc.getValue()-min)/(max-min);
+//			if(sc!=0 && doc.getKey()!=0)
+//			{
+//				o_stream.println("Result Rank: "+res_count++);
+//				o_stream.println("Result title: "+doc.getKey());
+//				o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+//				o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
+//				o_stream.println("\n");
+//			}
+//		}
+		
 	}
 	
 	

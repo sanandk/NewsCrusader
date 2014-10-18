@@ -302,7 +302,7 @@ public class IndexReader {
 	
 
 	 
-	static <K,V extends Comparable<? super V>> List<Entry<K, V>> entriesComparator(Map<K,V> map) {
+	public static <K,V extends Comparable<? super V>> List<Entry<K, V>> entriesComparator(Map<K,V> map) {
 		List<Entry<K,V>> sortedEntries = new ArrayList<Entry<K,V>>(map.entrySet());
 		Collections.sort(sortedEntries,new Comparator<Entry<K,V>>() {
 	        @Override

@@ -367,14 +367,14 @@ public class IndexWriter {
 			if(docs!=null)
 			{
 			size=docs.size();
-			idf=Math.log10(docCount/size);
+			idf=1+Math.log10(docCount/size);
 			docs.put(-1,idf);
 			for(Integer d : docs.keySet())
 			{
 				if(d!=-1)
 				{
 					str2=docCatList.get(d);
-					w=idf*docs.get(d);
+					w=idf*(1+(Math.log(docs.get(d))));
 					try
 					{
 					w=w*w+(Double.parseDouble(str2[1]));

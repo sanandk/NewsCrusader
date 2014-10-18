@@ -28,6 +28,7 @@ public class QueryParser {
 		System.out.println(parse("Category:War AND Author:Dutt AND Place:Baghdad AND prisoners","").toString());
 		System.out.println(parse("Category:War AND Author:Dutt AND Place:Baghdad AND prisoners detainees rebels","").toString());
 		System.out.println(parse("(Love NOT War) AND Category:(movies NOT crime)","").toString());
+		System.out.println(parse("fully convertible non convertible optionally convertible pct convertible debentures","").toString());
 		
 	}
 	
