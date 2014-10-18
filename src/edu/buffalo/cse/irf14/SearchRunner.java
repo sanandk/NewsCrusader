@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,14 +40,18 @@ public class SearchRunner {
 	
 	public static void main(String args[])
 	{
-		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
+//		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
 	//	r.query(new File("D:\\output\\q.txt"));
-		r.query("laser", ScoringModel.OKAPI);
+//		r.query("laser", ScoringModel.OKAPI);
 	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
 			//r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
 			//r.getQueryTerms();
 		//		r.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
-
+		SearchRunner r=new SearchRunner("D:\\UB\\Project\\IR\\project dataset\\news_training\\index","D:\\UB\\Project\\IR\\project dataset\\corpus_dataset",'Q',System.out);
+		r.q=QueryParser.parse("he*lo worl?","AND");
+//		r.query(new File("D:\\UB\\Project\\IR\\project dataset\\QueryFile.txt"));
+		r.getWCQueryTerms();
+		System.out.println(r.wcQueryTerms.size());
 	}
 	TreeMap <Integer, Double> final_result;
 	final double k1=1.2,k3=2,b=0.75;
@@ -54,6 +59,7 @@ public class SearchRunner {
 	char mode;
 	private String corpusDir;
 	String indexDir;
+	Query q;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -637,7 +643,7 @@ public class SearchRunner {
     	ScoringModel model=currentmodel;
     	if(recur_flag==0)
 			startTime=System.currentTimeMillis();
-    	Query q=QueryParser.parse(userQuery, defOp);
+    	q=QueryParser.parse(userQuery, defOp);
 		String fq=q.toString();
 		String[] k=fq.split(" ");
 		if(postings==null)
@@ -809,9 +815,342 @@ public class SearchRunner {
 	 */
 	public Map<String, List<String>> getQueryTerms() {
 		//TODO:IMPLEMENT THIS METHOD IFF WILDCARD BONUS ATTEMPTED
-		return null;
-		
+		return wcQueryTerms;
 	}
+	
+	HashMap<String, List<String>> wcQueryTerms;
+	public void getWCQueryTerms() {
+		//TODO:IMPLEMENT THIS METHOD IFF WILDCARD BONUS ATTEMPTED
+		//wcIndexes
+		wcQueryTerms=new HashMap<String, List<String>>();
+		List<String> wcTermList;
+		HashMap<Integer,Double> postingList;
+		ArrayList<Integer> postingArray;
+		String queryString=q.toString();
+		String[] wildCardList,wcInfo;
+		String wildCardQuery,wildCardIndexType;
+		queryString=queryString.replaceAll("\\{|\\}|\\<|\\>|\\[|\\]","");
+		if(queryString.contains("*") || queryString.contains("?")){
+			wildCardList=queryString.split("AND|OR");
+			for(String wcTerm: wildCardList){
+				wcTermList= new ArrayList<String>();
+				wcInfo=wcTerm.split(":");
+				wildCardIndexType=wcInfo[0].trim();
+				wildCardQuery= wcInfo[1].trim();
+				if(wildCardQuery.contains("*")){
+					if(wildCardQuery.startsWith("*")){
+						String searchText=wildCardQuery.substring(1);
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+						List<TreeMap<String, HashMap<Integer, Double>>> IndexList= new LinkedList<TreeMap<String,HashMap<Integer,Double>>>();
+						IndexList.add(IndexWriter.termIndexAC);IndexList.add(IndexWriter.termIndexDG);IndexList.add(IndexWriter.termIndexHK);
+						IndexList.add(IndexWriter.termIndexLP);IndexList.add(IndexWriter.termIndexQS);IndexList.add(IndexWriter.termIndexTZ);
+						IndexList.add(IndexWriter.termIndexMisc);
+						for(TreeMap<String, HashMap<Integer, Double>> index: IndexList){
+							if(index!=null)
+							for(String term: index.keySet()){
+								if(term.endsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+						}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.endsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.endsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.endsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+						}
+						
+					}else if(wildCardQuery.endsWith("*")){
+						String searchText=wildCardQuery.substring(0,wildCardQuery.length()-1);
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+							searchText=searchText.toLowerCase();
+							TreeMap<String, HashMap<Integer, Double>> tempIndex;
+							switch(searchText.charAt(0)){
+								case 'a': case 'b': case 'c':
+									tempIndex=IndexWriter.termIndexAC;
+									break;
+								case 'd': case 'e': case 'f': case 'g':
+									tempIndex=IndexWriter.termIndexDG;
+									break;
+								case 'h': case 'i': case 'j': case 'k':
+									tempIndex=IndexWriter.termIndexHK;
+									break;
+								case 'l': case 'm': case 'n': case 'o': case 'p':
+									tempIndex=IndexWriter.termIndexLP;
+									break;
+								case 'q': case 'r': case 's':
+									tempIndex=IndexWriter.termIndexQS;
+									break;
+								case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+									tempIndex=IndexWriter.termIndexTZ;
+									break;
+								default :
+									tempIndex=IndexWriter.termIndexMisc;
+								}
+							if(tempIndex!=null){
+								for(String term:tempIndex.keySet()){
+									if(term.startsWith(searchText)){
+										wcTermList.add(term);
+									}	
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.startsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.startsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.startsWith(searchText)){
+									wcTermList.add(term);
+								}
+							}
+						}
+					}else{
+						String[] searcTextStrings= wildCardQuery.split("\\*");
+						String searchText1=searcTextStrings[0];
+						String searchText2=searcTextStrings[1];
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+							searchText1=searchText1.toLowerCase();
+							searchText2=searchText2.toLowerCase();
+							TreeMap<String, HashMap<Integer, Double>> tempIndex;
+							switch(searchText1.charAt(0)){
+								case 'a': case 'b': case 'c':
+									tempIndex=IndexWriter.termIndexAC;
+									break;
+								case 'd': case 'e': case 'f': case 'g':
+									tempIndex=IndexWriter.termIndexDG;
+									break;
+								case 'h': case 'i': case 'j': case 'k':
+									tempIndex=IndexWriter.termIndexHK;
+									break;
+								case 'l': case 'm': case 'n': case 'o': case 'p':
+									tempIndex=IndexWriter.termIndexLP;
+									break;
+								case 'q': case 'r': case 's':
+									tempIndex=IndexWriter.termIndexQS;
+									break;
+								case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+									tempIndex=IndexWriter.termIndexTZ;
+									break;
+								default :
+									tempIndex=IndexWriter.termIndexMisc;
+								}
+							if(tempIndex!=null){
+								for(String term:tempIndex.keySet()){
+									if(term.startsWith(searchText1) && term.endsWith(searchText2)){
+										wcTermList.add(term);
+									}	
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2)){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2)){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2)){
+									wcTermList.add(term);
+								}
+							}
+						}
+					}
+					
+				}else if(wildCardQuery.contains("?")){
+					int len= wildCardQuery.length();
+					if(wildCardQuery.startsWith("?")){
+						String searchText=wildCardQuery.substring(1);
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+						List<TreeMap<String, HashMap<Integer, Double>>> IndexList= new LinkedList<TreeMap<String,HashMap<Integer,Double>>>();
+						IndexList.add(IndexWriter.termIndexAC);IndexList.add(IndexWriter.termIndexDG);IndexList.add(IndexWriter.termIndexHK);
+						IndexList.add(IndexWriter.termIndexLP);IndexList.add(IndexWriter.termIndexQS);IndexList.add(IndexWriter.termIndexTZ);
+						IndexList.add(IndexWriter.termIndexMisc);
+						for(TreeMap<String, HashMap<Integer, Double>> index: IndexList){
+							if(index!=null)
+							for(String term: index.keySet()){
+								if(term.endsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.endsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.endsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.endsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}
+						
+					}else if(wildCardQuery.endsWith("?")){
+						String searchText=wildCardQuery.substring(0,wildCardQuery.length()-1);
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+							searchText=searchText.toLowerCase();
+							TreeMap<String, HashMap<Integer, Double>> tempIndex;
+							switch(searchText.charAt(0)){
+								case 'a': case 'b': case 'c':
+									tempIndex=IndexWriter.termIndexAC;
+									break;
+								case 'd': case 'e': case 'f': case 'g':
+									tempIndex=IndexWriter.termIndexDG;
+									break;
+								case 'h': case 'i': case 'j': case 'k':
+									tempIndex=IndexWriter.termIndexHK;
+									break;
+								case 'l': case 'm': case 'n': case 'o': case 'p':
+									tempIndex=IndexWriter.termIndexLP;
+									break;
+								case 'q': case 'r': case 's':
+									tempIndex=IndexWriter.termIndexQS;
+									break;
+								case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+									tempIndex=IndexWriter.termIndexTZ;
+									break;
+								default :
+									tempIndex=IndexWriter.termIndexMisc;
+								}
+							if(tempIndex!=null){
+								for(String term:tempIndex.keySet()){
+									if(term.startsWith(searchText) && term.length()==len){
+										if(term.contains("wo")){
+											System.out.println(term);
+										}
+										wcTermList.add(term);
+									}	
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.startsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.startsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.startsWith(searchText) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}
+					}else{
+						String[] searcTextStrings= wildCardQuery.split("\\?");
+						String searchText1=searcTextStrings[0];
+						String searchText2=searcTextStrings[1];
+						if(wildCardIndexType.equalsIgnoreCase("term")){
+							searchText1=searchText1.toLowerCase();
+							searchText2=searchText2.toLowerCase();
+							TreeMap<String, HashMap<Integer, Double>> tempIndex;
+							switch(searchText1.charAt(0)){
+								case 'a': case 'b': case 'c':
+									tempIndex=IndexWriter.termIndexAC;
+									break;
+								case 'd': case 'e': case 'f': case 'g':
+									tempIndex=IndexWriter.termIndexDG;
+									break;
+								case 'h': case 'i': case 'j': case 'k':
+									tempIndex=IndexWriter.termIndexHK;
+									break;
+								case 'l': case 'm': case 'n': case 'o': case 'p':
+									tempIndex=IndexWriter.termIndexLP;
+									break;
+								case 'q': case 'r': case 's':
+									tempIndex=IndexWriter.termIndexQS;
+									break;
+								case 't': case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+									tempIndex=IndexWriter.termIndexTZ;
+									break;
+								default :
+									tempIndex=IndexWriter.termIndexMisc;
+								}
+							if(tempIndex!=null){
+								for(String term:tempIndex.keySet()){
+									if(term.startsWith(searchText1) && term.endsWith(searchText2) && term.length()==len){
+										wcTermList.add(term);
+									}	
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("author")){
+							for(String term: IndexWriter.AuthorIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+							
+						}else if(wildCardIndexType.equalsIgnoreCase("category")){
+							for(String term: IndexWriter.CatIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}else if(wildCardIndexType.equalsIgnoreCase("place")){
+							for(String term: IndexWriter.PlaceIndex.keySet()){
+								if(term.startsWith(searchText1) && term.endsWith(searchText2) && term.length()==len){
+									wcTermList.add(term);
+								}
+							}
+						}
+					}
+				}
+				if(!wcTermList.isEmpty()){
+					wcQueryTerms.put(wcTerm, wcTermList);
+				}else{
+					wcQueryTerms.put(wcTerm, null);
+				}
+			}
+		}
+//		return wcQueryTerms;
+	}
+
 	
 	/**
 	 * Method to indicate if speel correct queries are supported
