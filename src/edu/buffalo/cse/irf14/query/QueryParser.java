@@ -15,7 +15,7 @@ public class QueryParser {
 	public static void main(String args[]){
 		
 		System.out.println(parse("hello","").toString());
-		System.out.println(parse("hello world","").toString());
+		System.out.println(parse("hello world one","AND").toString());
 		System.out.println(parse("\"hello world\"","").toString());
 		System.out.println(parse("\"hello\"","").toString());
 		System.out.println(parse("\"hello world","").toString());

@@ -2,32 +2,28 @@ package edu.buffalo.cse.irf14;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-import java.util.zip.GZIPInputStream;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
-import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
 import edu.buffalo.cse.irf14.document.FieldNames;
 import edu.buffalo.cse.irf14.index.FileUtilities;
+import edu.buffalo.cse.irf14.index.IndexReader;
 import edu.buffalo.cse.irf14.index.IndexType;
 import edu.buffalo.cse.irf14.index.IndexWriter;
 import edu.buffalo.cse.irf14.query.Query;
@@ -44,14 +40,20 @@ public class SearchRunner {
 	
 	public static void main(String args[])
 	{
-		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
+		SearchRunner r=new SearchRunner("D:\\UB\\Project\\IR\\project dataset\\news_training\\index","D:\\UB\\Project\\IR\\project dataset\\corpus_dataset",'Q',System.out);
 		r.query("chase manhattan", ScoringModel.OKAPI);
+//		r.query("adobe", ScoringModel.OKAPI);
+//		System.out.println("++++++++++++Snippet gen for 000005++++++++++++++++");
+//		r.getSnippet("0000005");
+//		System.out.println("++++++++++++Snippet gen for 000529++++++++++++++++");
+//		r.getSnippet("0000529");
 
 	}
 	final double k1=1.2,k3=1.5,b=0.75;
 	PrintStream o_stream;
 	char mode;
 	String indexDir;
+	private String corpusDir;
 	/**
 	 * Default (and only public) constuctor
 	 * @param indexDir : The directory where the index resides
@@ -459,14 +461,16 @@ public class SearchRunner {
 		o_stream.println("Query time: "+time + " seconds");
 		o_stream.println("\n");
 		Entry<Integer, Double> doc;
-		for(int i=0;i<finalp.size();i++)
+		String[] snippet_title;
+		for(int i=0;i<finalp.size()&&i<10;i++)
 		{
 			
 			doc = finalp.get(i);
+			snippet_title=getSnippet_title(IndexWriter.docCatList.get(doc.getKey())[0]);
 			sc=(doc.getValue()-min)/(max-min);
 			o_stream.println("Result Rank: "+(i+1));
-			o_stream.println("Result title: "+doc.getKey());
-			o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+			o_stream.println("Result title: "+snippet_title[0]);
+			o_stream.println("Result snippet: "+snippet_title[1]);
 			o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
 			o_stream.println("\n");
 		}
@@ -613,19 +617,74 @@ public class SearchRunner {
 	}
 	
 	
-	public void getSnippet(String docId ){
-		String snippet;
+	public String[] getSnippet_title(String docId ){
+		String[] snippet_title= new String[2];
+		String snippet="";
+		String docContent="";
+		ArrayList<String> sentenceList=new ArrayList<String>();
+		HashMap<String,Integer> sentenceWeight=new HashMap<String,Integer>();
 		File doc=new File(corpusDir+File.separator+docId);
 		try{
 			FileReader fr= new FileReader(doc);
 			BufferedReader br= new BufferedReader(fr);
-			
-			
-			
+			String line;
+			String title="NO TITLE FOUND";
+			boolean titleFlag=true;
+			while((line=br.readLine())!=null){
+				if (!line.trim().isEmpty() && titleFlag) {
+					title= line;
+					titleFlag = false;
+				}
+				docContent+=line+" ";
+			}
+			Pattern sentencePattern = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
+		    Matcher sentenceMatcher = sentencePattern.matcher(docContent);
+		    while (sentenceMatcher.find()) {
+		    	sentenceList.add(sentenceMatcher.group());
+		    }
+		    int weight;
+		    Pattern termPattern;
+		    Matcher termMatcher;
+		    boolean uniqueFlag;
+		    int uniqueCount=0;
+		    String matchedString;
+		    for(String sentence: sentenceList){
+		    	weight=0;
+		    	uniqueCount=0;
+			    for(String term: qterms.keySet()){
+			    	uniqueFlag=true;
+			    	if(qterms.get(term)!=0){
+			    	termPattern=Pattern.compile("(?i)"+term);
+			    	termMatcher= termPattern.matcher(sentence);
+		    			while (termMatcher.find()) {
+		    				matchedString= termMatcher.group();
+		    				sentence=sentence.replaceFirst(matchedString, "<b>"+matchedString+"</b>");
+		    				if(uniqueFlag){
+		    					uniqueCount++;
+		    					uniqueFlag=false;
+		    				}
+		    		    	weight++;
+		    		    }
+		    		}
+			    }
+			    sentenceWeight.put(sentence, weight*uniqueCount);
+		    }
+		   List<Entry<String,Integer>> sortedSentenceWeight= IndexReader.entriesComparator(sentenceWeight);
+		   
+//		   int i;==
+		   for(int i=0,len= sortedSentenceWeight.size();i<len && i<3;i++ ){
+			   snippet+=sortedSentenceWeight.get(i).getKey()+"...";
+		   }
+		   
+		   snippet_title[0]=title;
+		   snippet_title[1]=snippet;
+		  
 		}catch(IOException ioe){
-			
+//			ioe.printStackTrace();
+		}catch(Exception e){
+//			e.printStackTrace();
 		}
-		
+		return snippet_title;
 	}
 	
 	
