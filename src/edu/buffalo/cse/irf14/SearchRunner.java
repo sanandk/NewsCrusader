@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
@@ -45,7 +47,7 @@ public class SearchRunner {
 	
 	public static void main(String args[])
 	{
-		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
+		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
 	//	r.query("laser", ScoringModel.OKAPI);
 	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
 			r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
@@ -56,6 +58,7 @@ public class SearchRunner {
 	final double k1=1.2,k3=2,b=0.75;
 	PrintStream o_stream;
 	char mode;
+	private String corpusDir;
 	String indexDir;
 	/**
 	 * Default (and only public) constuctor
@@ -69,6 +72,7 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD
 		
 		this.indexDir = indexDir;
+		this.corpusDir= corpusDir;
 		this.mode = mode;
 		FileUtilities.setOutputDir(indexDir);
 		readIndex();
@@ -501,19 +505,26 @@ public class SearchRunner {
 		o_stream.println("Query: "+userQuery+"| "+fq);
 		o_stream.println("Query time: "+time*0.001 + " seconds");
 		o_stream.println("\n");
+		String[] snippet_title;
 		for(int i=0;res_count<=res_total && i<finalp.size();i++)
 		{
 			
 			doc = finalp.get(i);
+			snippet_title=getSnippet_title(IndexWriter.docCatList.get(doc.getKey())[0]);
 			sc=(doc.getValue()-min)/(max-min);
 			if(sc==0 || doc.getKey()==0)
 				i++;
 			else
 			{
 			o_stream.println("Result Rank: "+res_count++);
-			o_stream.println("Result title: "+doc.getKey());
-			o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-			o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
+			o_stream.println("Result title: "+snippet_title[0]);
+            o_stream.println("Result snippet: "+snippet_title[1]);
+			o_stream.println("Result relevance: "+sc);
+			// DELETE BEFORE SUBMIT!
+			o_stream.println("Result docId: "+doc.getKey());
+			o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+			o_stream.println("Result before normalization: "+doc.getValue());
+			
 			o_stream.println("\n");
 			}
 		}
@@ -551,7 +562,9 @@ public class SearchRunner {
 		
 		FileReader f_in = null;
 		BufferedReader br= null;
-				
+		 List<Map.Entry<Integer, Double>> finalPostings;
+	        ArrayList<String> outputLines= new ArrayList<String>(); 
+	        String outputLine;
 		try {
 			f_in = new FileReader(queryFile);
 			br= new BufferedReader(f_in);
@@ -574,6 +587,17 @@ public class SearchRunner {
 						queryId=line.substring(0,line.indexOf(":"));
 						userQuery=line.substring(line.indexOf(":")+2,line.length()-1);
 						query=QueryParser.parse(userQuery, "OR");
+						 finalPostings= queryProcessor(query);
+	                        if(finalPostings!=null && !finalPostings.isEmpty()){
+	                            outputLine=queryId+":{";
+	                            for(Map.Entry<Integer,Double> posting: finalPostings){
+	                                outputLine+=posting.getKey()+"#"+posting.getValue()+", ";
+	                            }
+	                            outputLine=outputLine.substring(0, outputLine.length()-2)+"}";
+	                            outputLines.add(outputLine);
+	                        }
+	                        
+	                        
 					}else{
 						System.out.println("Error at line "+i+" in QueryString");
 						break;
@@ -583,11 +607,150 @@ public class SearchRunner {
 					break;
 				}
 			}
-			
+			if(outputLines!=null && !outputLines.isEmpty() ){
+                o_stream.println("numResults="+outputLines.size());
+                for(String temp: outputLines){
+                    o_stream.println(temp);
+                }
+            }else{
+                
+                o_stream.println("numResults=0");
+            }
+            
+        }catch(IOException ioe){
+            
+        }
+ 
+    }
+ 
+    
+    public List<Map.Entry<Integer, Double>> queryProcessor(Query q){
+//      Query q=QueryParser.parse(userQuery, "OR");
+        String fq=q.toString();
+        String[] k=fq.split(" ");
+        TreeMap<Integer, Double> postings=new TreeMap<Integer,Double>();
+        String tempop="OR";
+        String val;
+        for(iter=0;iter<k.length;iter++)
+        {
+            val=k[iter];
+            if(val.equals("["))
+            {
+                TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
+                val=k[++iter];
+                tempop=op;
+                while(!val.equals("]"))
+                {
+                    temp=processblock(temp, val,  k);
+                    val=k[++iter];
+                }
+                postings=mergePostings(postings,temp,tempop);
+            }
+            else if(!val.equals("{") && !val.equals("}"))
+            {
+                postings=processblock(postings,val,k);
+            }
+        }
+         postings.remove(-1);
+        double length=0,doc_len=0,score=0;
+        for(double d:qterms.values())
+        {
+            length+=d*d;
+        }
+        length=Math.sqrt(length);
+        for(Integer docID:postings.keySet())
+        {
+            String[] str2=IndexWriter.docCatList.get(docID);
+            try
+            {
+                doc_len=Math.sqrt((Double.parseDouble(str2[1])));
+            }
+            catch(Exception e)
+            {
+                doc_len=0;
+            }
+            score=postings.get(docID)/(length * doc_len);
+            postings.put(docID, score);
+        }
+        
+         Comparator<Map.Entry<Integer, Double>> byMapValues = new Comparator<Map.Entry<Integer, Double>>() {
+                @Override
+                public int compare(Map.Entry<Integer, Double> left, Map.Entry<Integer, Double> right) {
+                    return right.getValue().compareTo(left.getValue());
+                }
+            };
+            List<Map.Entry<Integer, Double>> finalp = new ArrayList<Map.Entry<Integer, Double>>();
+            finalp.addAll(postings.entrySet());
+            Collections.sort(finalp, byMapValues);
+            return finalp;
+    }
+    
+    
+    public String[] getSnippet_title(String docId ){
+        String[] snippet_title= new String[2];
+        String snippet="";
+        String docContent="";
+        ArrayList<String> sentenceList=new ArrayList<String>();
+        HashMap<String,Integer> sentenceWeight=new HashMap<String,Integer>();
+        File doc=new File(corpusDir+File.separator+docId);
+        try{
+            FileReader fr= new FileReader(doc);
+            BufferedReader br= new BufferedReader(fr);
+            String line;
+            String title="NO TITLE FOUND";
+            boolean titleFlag=true;
+            while((line=br.readLine())!=null){
+                if (!line.trim().isEmpty() && titleFlag) {
+                    title= line;
+                    titleFlag = false;
+                }
+                docContent+=line+" ";
+            }
+            Pattern sentencePattern = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)[^.!?]*)*[.!?]?['\"]?(?=\\s|$)", Pattern.MULTILINE | Pattern.COMMENTS);
+            Matcher sentenceMatcher = sentencePattern.matcher(docContent);
+            while (sentenceMatcher.find()) {
+                sentenceList.add(sentenceMatcher.group());
+            }
+            int weight;
+            Pattern termPattern;
+            Matcher termMatcher;
+            boolean uniqueFlag;
+            int uniqueCount=0;
+            String matchedString;
+            for(String sentence: sentenceList){
+                weight=0;
+                uniqueCount=0;
+                for(String term: qterms.keySet()){
+                    uniqueFlag=true;
+                    if(qterms.get(term)!=0){
+                    termPattern=Pattern.compile("(?i)"+term);
+                    termMatcher= termPattern.matcher(sentence);
+                        while (termMatcher.find()) {
+                            matchedString= termMatcher.group();
+                            sentence=sentence.replaceFirst(matchedString, "<b>"+matchedString+"</b>");
+                            if(uniqueFlag){
+                                uniqueCount++;
+                                uniqueFlag=false;
+                            }
+                            weight++;
+                        }
+                    }
+                }
+                sentenceWeight.put(sentence, weight*uniqueCount);
+            }
+           List<Entry<String,Integer>> sortedSentenceWeight= IndexReader.entriesComparator(sentenceWeight);
+           
+//         int i;==
+           for(int i=0,len= sortedSentenceWeight.size();i<len && i<3;i++ ){
+               snippet+=sortedSentenceWeight.get(i).getKey()+"...";
+           }
+           
+           snippet_title[0]=title;
+           snippet_title[1]=snippet;
 		}catch(IOException ioe){
 			
 		}
-
+        return snippet_title;
 	}
 	
 	/**
