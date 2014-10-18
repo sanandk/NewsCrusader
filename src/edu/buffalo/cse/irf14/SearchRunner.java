@@ -64,6 +64,7 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD
 		
 		this.indexDir = indexDir;
+		this.corpusDir= corpusDir;
 		this.mode = mode;
 		FileUtilities.setOutputDir(indexDir);
 		readIndex();
@@ -475,7 +476,6 @@ public class SearchRunner {
 	
 	 
 	
-	
 	/**
 	 * Method to execute queries in E mode
 	 * @param queryFile : The file from which queries are to be read and executed
@@ -484,12 +484,14 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD
 //		numQueries=3
 //				Q_1A63C:{hello world}
-//				Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}
+//				Q_6V87S:{Category:oil AND place:Dubai AND (price OR cost)}
 //				Q_4K66L:{long query with several words}
 		
 		FileReader f_in = null;
 		BufferedReader br= null;
-				
+		List<Map.Entry<Integer, Double>> finalPostings;
+		ArrayList<String> outputLines= new ArrayList<String>(); 
+		String outputLine;
 		try {
 			f_in = new FileReader(queryFile);
 			br= new BufferedReader(f_in);
@@ -512,6 +514,16 @@ public class SearchRunner {
 						queryId=line.substring(0,line.indexOf(":"));
 						userQuery=line.substring(line.indexOf(":")+2,line.length()-1);
 						query=QueryParser.parse(userQuery, "OR");
+						finalPostings= queryProcessor(query);
+						if(finalPostings!=null && !finalPostings.isEmpty()){
+							outputLine=queryId+":{";
+							for(Map.Entry<Integer,Double> posting: finalPostings){
+								outputLine+=posting.getKey()+"#"+posting.getValue()+", ";
+							}
+							outputLine=outputLine.substring(0, outputLine.length()-2)+"}";
+							outputLines.add(outputLine);
+						}
+						
 					}else{
 						System.out.println("Error at line "+i+" in QueryString");
 						break;
@@ -522,11 +534,100 @@ public class SearchRunner {
 				}
 			}
 			
+			if(outputLines!=null && !outputLines.isEmpty() ){
+				o_stream.println("numResults="+outputLines.size());
+				for(String temp: outputLines){
+					o_stream.println(temp);
+				}
+			}else{
+				
+				o_stream.println("numResults=0");
+			}
+			
 		}catch(IOException ioe){
 			
 		}
 
 	}
+
+	
+	public List<Map.Entry<Integer, Double>> queryProcessor(Query q){
+//		Query q=QueryParser.parse(userQuery, "OR");
+		String fq=q.toString();
+		String[] k=fq.split(" ");
+		TreeMap<Integer, Double> postings=new TreeMap<Integer,Double>();
+		String tempop="OR";
+		String val;
+		for(iter=0;iter<k.length;iter++)
+		{
+			val=k[iter];
+			if(val.equals("["))
+			{
+				TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
+				val=k[++iter];
+				tempop=op;
+				while(!val.equals("]"))
+				{
+					temp=processblock(temp, val,  k);
+					val=k[++iter];
+				}
+				postings=mergePostings(postings,temp,tempop);
+			}
+			else if(!val.equals("{") && !val.equals("}"))
+			{
+				postings=processblock(postings,val,k);
+			}
+		}
+		 postings.remove(-1);
+		double length=0,doc_len=0,score=0;
+		for(double d:qterms.values())
+		{
+			length+=d*d;
+		}
+		length=Math.sqrt(length);
+		for(Integer docID:postings.keySet())
+		{
+			String[] str2=IndexWriter.docCatList.get(docID);
+			try
+			{
+				doc_len=Math.sqrt((Double.parseDouble(str2[1])));
+			}
+			catch(Exception e)
+			{
+				doc_len=0;
+			}
+			score=postings.get(docID)/(length * doc_len);
+			postings.put(docID, score);
+		}
+		
+		 Comparator<Map.Entry<Integer, Double>> byMapValues = new Comparator<Map.Entry<Integer, Double>>() {
+		        @Override
+		        public int compare(Map.Entry<Integer, Double> left, Map.Entry<Integer, Double> right) {
+		            return right.getValue().compareTo(left.getValue());
+		        }
+		    };
+		    List<Map.Entry<Integer, Double>> finalp = new ArrayList<Map.Entry<Integer, Double>>();
+		    finalp.addAll(postings.entrySet());
+		    Collections.sort(finalp, byMapValues);
+		    return finalp;
+	}
+	
+	
+	public void getSnippet(String docId ){
+		String snippet;
+		File doc=new File(corpusDir+File.separator+docId);
+		try{
+			FileReader fr= new FileReader(doc);
+			BufferedReader br= new BufferedReader(fr);
+			
+			
+			
+		}catch(IOException ioe){
+			
+		}
+		
+	}
+	
 	
 	/**
 	 * General cleanup method
