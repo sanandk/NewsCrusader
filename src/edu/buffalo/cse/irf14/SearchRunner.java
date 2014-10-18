@@ -45,10 +45,10 @@ public class SearchRunner {
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\flattened",'Q',System.out);
-		r.query("chase manhattan", ScoringModel.TFIDF);
+		r.query("chase manhattan", ScoringModel.OKAPI);
 
 	}
-	
+	final double k1=1.2,k3=1.5,b=0.75;
 	PrintStream o_stream;
 	char mode;
 	String indexDir;
@@ -100,7 +100,7 @@ public class SearchRunner {
 	}
 	
 	HashMap<String, Double> qterms=new HashMap<String, Double>();
-	HashMap<Integer, Double> doclen=new HashMap<Integer, Double>();
+	//HashMap<Integer, Double> doclen=new HashMap<Integer, Double>();
 	Tokenizer t=new Tokenizer();
 	Analyzer analyzer;
 	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
@@ -132,8 +132,8 @@ public class SearchRunner {
 		TreeMap<Integer, Double> postingsMap=new TreeMap<Integer, Double>();
 		HashMap<Integer, Double> postingList;
 		ArrayList<Integer> postingArray;
-		double idf=0,tf=0;
-		Double qw=0.0;
+		double idf=0,tf=0,num,den;
+		Double qw=0.0,Ld=0.0,Lave=0.0;
 		Double w=0.0;
 		// if(op.equals("OR") || op.equals("AND"))
 		//	 postingsMap=postings;
@@ -181,14 +181,37 @@ public class SearchRunner {
 							w=postingsMap.get(docId);
 							qw=qterms.get(term);
 							
-							if(qw==null || qw!=0.0)
-								qw=idf;
+							if(qw==null)
+								qw=0.0;
 							if(w==null)
 								w=0.0;
-							w+=qw*tf*idf; // or use log(1+tf).idf
 							
-							doclen.put(docId, tf*idf);
-					//		w+=qw*tf; 
+							if(currentmodel==ScoringModel.TFIDF)
+								w+=qw*tf*idf; // or use log(1+tf).idf
+							else
+							{
+								try
+								{
+								Ld=Double.parseDouble(IndexWriter.docCatList.get(docId)[1]);
+								}
+								catch(Exception e)
+								{
+								Ld=0.0;
+								}
+								try
+								{
+								Lave=Double.parseDouble(IndexWriter.docCatList.get(-1)[1]);
+								}
+								catch(Exception e)
+								{
+								Lave=0.0;
+								}
+								num=idf*(k1+1)*tf*(k3+1)*qw;
+								den=k1 * ((1-b) + (b * (Ld/Lave)));
+								w+=num/((k3+qw)*(den+tf));
+								
+							}
+			
 							postingsMap.put(docId, w);
 							qterms.put(term, qw);
 						}
@@ -236,20 +259,7 @@ public class SearchRunner {
 				}
 				break;
 		}
-	//	postings=;
-	/*	if(op.equals("AND"))
-		{
-			postings=postingsMap;
-			postings.keySet().retainAll(postingsMap.keySet());
-		}
-		else if(op.equals("OR"))
-		{
-			postings=postingsMap;
-		}
-		else
-		{
-			postings.keySet().removeAll(postingsMap.keySet());
-		}*/
+	
 		if(postingsMap_f.size()>0)
 			postingsMap=mergePostings(postingsMap, postingsMap_f, "OR");
 		return postingsMap;
@@ -351,7 +361,7 @@ public class SearchRunner {
 		}
 		return A;
 	}
-	
+	ScoringModel currentmodel;
 	/**
 	 * Method to execute given query in the Q mode
 	 * @param userQuery : Query to be parsed and executed
@@ -359,7 +369,7 @@ public class SearchRunner {
 	 */
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
-		
+		currentmodel=model;
 		
 		long startTime=System.currentTimeMillis();
 		Query q=QueryParser.parse(userQuery, defOp);
@@ -391,23 +401,38 @@ public class SearchRunner {
 				tempop=val;
 		}
 		 postings.remove(-1);
-		double length=0,doc_len=0,score=0;
-		for(double d:qterms.values())
+		double doc_len=0,score=0;
+	
+	
+		if(model==ScoringModel.TFIDF)
 		{
-			length+=d*d;
+			double length=0;
+			for(double d:qterms.values())
+				length+=d*d;
+			length=Math.sqrt(length);
+			for(Integer docID:postings.keySet())
+			{
+				try
+				{
+				doc_len=Double.parseDouble(IndexWriter.docCatList.get(docID)[1]);
+				}
+				catch(Exception e)
+				{
+					doc_len=0.0;
+				}
+				score=postings.get(docID)/(length * doc_len);
+				postings.put(docID, score);
+			}	
 		}
-		length=Math.sqrt(length);
-		doc_len=0;
-		for(double d:doclen.values())
+		else
 		{
-			doc_len+=d*d;
+			for(Integer docID:postings.keySet())
+			{
+				score=postings.get(docID);
+				postings.put(docID, score);
+			}
 		}
-		doc_len=Math.sqrt(doc_len);
-		for(Integer docID:postings.keySet())
-		{
-			score=postings.get(docID)/(length * doc_len);
-			postings.put(docID, score);
-		}
+		
 		
 		 Comparator<Map.Entry<Integer, Double>> byMapValues = new Comparator<Map.Entry<Integer, Double>>() {
 		        @Override
@@ -441,7 +466,7 @@ public class SearchRunner {
 			o_stream.println("Result Rank: "+(i+1));
 			o_stream.println("Result title: "+doc.getKey());
 			o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-			o_stream.println("Result relevance: "+doc.getValue());
+			o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
 			o_stream.println("\n");
 		}
 	//	

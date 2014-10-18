@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -359,7 +360,7 @@ public class IndexWriter {
 	{
 		String str2[]=new String[2];
 		int size;
-		double w=0.0;
+		double w=0.0,ave=0.0;
 		for (String term : imap.keySet()) {
 			df=0;
 			HashMap<Integer, Double> docs=imap.get(term);
@@ -389,7 +390,26 @@ public class IndexWriter {
 			imap.put(term, docs);
 			}
 	    }
-		
+		for(Entry<Integer, String[]> s:docCatList.entrySet())
+		{
+			str2=s.getValue();
+			try
+			{
+			w=Double.parseDouble(str2[1]);
+			w=Math.sqrt(w);
+			ave+=w;
+			}
+			catch(Exception e)
+			{
+				w=0.0;
+			}
+			str2[1]=String.valueOf(w);
+			docCatList.put(s.getKey(), str2);
+		}
+		ave/=docCatList.size();
+		str2[0]="";
+		str2[1]=String.valueOf(ave);
+		docCatList.put(-1, str2);
 	}
 
 	/**
