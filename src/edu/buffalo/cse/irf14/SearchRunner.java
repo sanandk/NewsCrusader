@@ -2,29 +2,21 @@ package edu.buffalo.cse.irf14;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 import edu.buffalo.cse.irf14.analysis.Analyzer;
 import edu.buffalo.cse.irf14.analysis.AnalyzerFactory;
-import edu.buffalo.cse.irf14.analysis.Token;
 import edu.buffalo.cse.irf14.analysis.TokenStream;
 import edu.buffalo.cse.irf14.analysis.Tokenizer;
 import edu.buffalo.cse.irf14.analysis.TokenizerException;
@@ -82,7 +74,15 @@ public class SearchRunner {
 		 final_result=new TreeMap<Integer, Double>();
 		 finalp= new ArrayList<Map.Entry<Integer, Double>>();
 	}
-	List<Map.Entry<Integer, Double>> finalp ;
+	HashMap<String, Double> qterms=new HashMap<String, Double>();
+	//HashMap<Integer, Double> docterms=new HashMap<Integer, Double>();
+	String ori_term="";
+	Tokenizer t=new Tokenizer();
+	Analyzer analyzer;
+	List<Map.Entry<Integer, Double>> finalp;
+	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
+	int flag=0;
+	
 	public void readIndex() {
 		FileUtilities.readDocDic();
 		
@@ -112,14 +112,6 @@ public class SearchRunner {
 				*/
 	}
 	
-	HashMap<String, Double> qterms=new HashMap<String, Double>();
-	//HashMap<Integer, Double> docterms=new HashMap<Integer, Double>();
-	String ori_term="";
-	Tokenizer t=new Tokenizer();
-	Analyzer analyzer;
-	
-	final AnalyzerFactory fact = AnalyzerFactory.getInstance();
-	int flag=0;
 	public TreeMap<Integer, Double> getPostings(String term, IndexType type, String op) 
 	{
 		String term_f;
@@ -403,7 +395,7 @@ public class SearchRunner {
 	
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
-		 Double min=0.0,max=0.0;
+		 Double max=0.0;
 		currentmodel=model;
 		queryProcessor(userQuery);
 //		if(recur_flag==0)
@@ -572,7 +564,7 @@ public class SearchRunner {
 			int queryNum=0;
 			String queryId;
 			String userQuery;
-			Query query;
+			
 			if((line=br.readLine())!=null){
 				if(line.trim().startsWith("numQueries=")){
 					queryNum=Integer.parseInt(line.substring(line.indexOf("numQueries=")+11));
@@ -591,9 +583,7 @@ public class SearchRunner {
 						final_result.clear();
 						currentmodel=ScoringModel.OKAPI;
 						 finalPostings= queryProcessor(userQuery);
-						 
-
-							Entry<Integer, Double> doc;
+					
 							if(recur_flag==0 && finalPostings.size()<10)
 							{
 								recur_flag=1;
@@ -696,7 +686,7 @@ public class SearchRunner {
 				{
 					doc_len=0.0;
 				}
-			//	doc_len=Math.sqrt(docterms.get(docID));
+			
 				score=postings.get(docID)/(length * doc_len);
 				postings.put(docID, score);
 			}	
@@ -709,7 +699,7 @@ public class SearchRunner {
 				postings.put(docID, score);
 			}
 		}
-		   Double min=0.0,max=0.0;
+		   Double min=0.0;
 		    if(postings.size()>0)
 		    {
 		    	
@@ -783,7 +773,6 @@ public class SearchRunner {
             }
            List<Entry<String,Integer>> sortedSentenceWeight= IndexReader.entriesComparator(sentenceWeight);
            
-//         int i;==
            for(int i=0,len= sortedSentenceWeight.size();i<len && i<3;i++ ){
                snippet+=sortedSentenceWeight.get(i).getKey()+"...";
            }
