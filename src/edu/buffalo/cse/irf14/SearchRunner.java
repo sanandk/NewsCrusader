@@ -48,9 +48,11 @@ public class SearchRunner {
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
-	//	r.query("laser", ScoringModel.OKAPI);
+	//	r.query(new File("D:\\output\\q.txt"));
+		r.query("laser", ScoringModel.OKAPI);
 	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
-			r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
+			//r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
+			//r.getQueryTerms();
 		//		r.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
 
 	}
@@ -401,11 +403,251 @@ public class SearchRunner {
 	
 	public void query(String userQuery, ScoringModel model) {
 		//TODO: IMPLEMENT THIS METHOD
+		 Double min=0.0,max=0.0;
 		currentmodel=model;
+		queryProcessor(userQuery);
+//		if(recur_flag==0)
+//			startTime=System.currentTimeMillis();
+//		Query q=QueryParser.parse(userQuery, defOp);
+//		String fq=q.toString();
+//		String[] k=fq.split(" ");
+//		if(postings==null)
+//		postings=new TreeMap<Integer,Double>();
+//		String tempop=defOp;
+//		String val;
+//		for(iter=0;iter<k.length;iter++)
+//		{
+//			val=k[iter];
+//			if(val.equals("["))
+//			{
+//				TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
+//				val=k[++iter];
+//				tempop=op;
+//				while(!val.equals("]"))
+//				{
+//					temp=processblock(temp, val,  k);
+//					val=k[++iter];
+//				}
+//				postings=mergePostings(postings,temp,tempop);
+//			}
+//			else if(!val.equals("{") && !val.equals("}"))
+//			{
+//				postings=processblock(postings,val,k);
+//			}
+//			else if(val.equals("AND") || val.equals("OR"))
+//				tempop=val;
+//		}
+//		 postings.remove(-1);
+//		double doc_len=0,score=0;
+//	
+//	
+//		if(model==ScoringModel.TFIDF)
+//		{
+//			double length=0;
+//			for(double d:qterms.values())
+//				length+=d*d;
+//			length=Math.sqrt(length);
+//			for(Integer docID:postings.keySet())
+//			{
+//				try
+//				{
+//				doc_len=Double.parseDouble(IndexWriter.docCatList.get(docID)[1]);
+//				}
+//				catch(Exception e)
+//				{
+//					doc_len=0.0;
+//				}
+//			//	doc_len=Math.sqrt(docterms.get(docID));
+//				score=postings.get(docID)/(length * doc_len);
+//				postings.put(docID, score);
+//			}	
+//		}
+//		else
+//		{
+//			for(Integer docID:postings.keySet())
+//			{
+//				score=postings.get(docID);
+//				postings.put(docID, score);
+//			}
+//		}
+//		  
+//		    if(postings.size()>0)
+//		    {
+//		    	
+//		    for(Entry<Integer, Double> ent : postings.entrySet())
+//		    {
+//		    	min=final_result.get(ent.getKey());
+//		    	if(min==null)
+//		    		min=0.0;
+//		    	postings.put(ent.getKey(), Math.max(ent.getValue(),min));
+//		    }
+//		    
+//		    final_result.putAll(postings);
+//		    finalp=IndexReader.entriesComparator(final_result);
+//		    }
 		
-		if(recur_flag==0)
+		
+		Entry<Integer, Double> doc;
+		if(recur_flag==0 && finalp.size()<10)
+		{
+			recur_flag=1;
+			defOp="OR";
+			op="OR";
+			qterms.clear();
+			query(userQuery,model);
+			recur_flag=0;
+			op="AND";
+			defOp="AND";
+		}
+		else
+		{
+		double sc=0.0;   
+		max=Collections.max(postings.values());
+		//max=Math.max(max, Collections.max(final_result.values()));
+		long time=System.currentTimeMillis()-startTime;
+		o_stream.println("Query: "+userQuery);
+		o_stream.println("Query time: "+time + " ms");
+		o_stream.println("\n");
+		String[] snippet_title;
+		for(int i=0;res_count<=res_total && i<finalp.size();i++)
+		{
+			
+			doc = finalp.get(i);
+			snippet_title=getSnippet_title(IndexWriter.docCatList.get(doc.getKey())[0]);
+			sc=(doc.getValue()-0)/(max-0);
+			if(sc==0 || doc.getKey()==0)
+				i++;
+			else
+			{
+			o_stream.println("Result Rank: "+res_count++);
+			o_stream.println("Result title: "+snippet_title[0]);
+            o_stream.println("Result snippet: "+snippet_title[1]);
+			o_stream.println("Result relevance: "+String.format("%.5f",sc));
+			// DELETE BEFORE SUBMIT!
+			o_stream.println("Result docId: "+doc.getKey());
+			o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+			o_stream.println("Result before normalization: "+doc.getValue());
+			
+			o_stream.println("\n");
+			}
+		}
+		}
+//		for(Entry<Integer, Double> res:final_result.entrySet())
+//		{
+//			doc=res;
+//			sc=(doc.getValue()-min)/(max-min);
+//			if(sc!=0 && doc.getKey()!=0)
+//			{
+//				o_stream.println("Result Rank: "+res_count++);
+//				o_stream.println("Result title: "+doc.getKey());
+//				o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+//				o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
+//				o_stream.println("\n");
+//			}
+//		}
+		
+	}
+	
+	
+	/**
+	 * Method to execute queries in E mode
+	 * @param queryFile : The file from which queries are to be read and executed
+	 */
+	public void query(File queryFile) {
+		//TODO: IMPLEMENT THIS METHOD
+//		numQueries=3
+//				Q_1A63C:{hello world}
+//				Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}
+//				Q_4K66L:{long query with several words}
+		
+		FileReader f_in = null;
+		BufferedReader br= null;
+		 List<Map.Entry<Integer, Double>> finalPostings;
+	        ArrayList<String> outputLines= new ArrayList<String>(); 
+	        String outputLine;
+		try {
+			f_in = new FileReader(queryFile);
+			br= new BufferedReader(f_in);
+			String line;
+			int queryNum=0;
+			String queryId;
+			String userQuery;
+			Query query;
+			if((line=br.readLine())!=null){
+				if(line.trim().startsWith("numQueries=")){
+					queryNum=Integer.parseInt(line.substring(line.indexOf("numQueries=")+11));
+				}else{
+					System.out.println("Corrupted Query File.Invalid numQueries statement");
+				}
+			}
+			int i=0;
+			while(i++<queryNum){
+				if((line=br.readLine())!=null){
+					if(line.contains(":")){
+						queryId=line.substring(0,line.indexOf(":"));
+						userQuery=line.substring(line.indexOf(":")+2,line.length()-1);
+						postings=null;
+						finalp.clear();
+						final_result.clear();
+						currentmodel=ScoringModel.OKAPI;
+						 finalPostings= queryProcessor(userQuery);
+						 
+
+							Entry<Integer, Double> doc;
+							if(recur_flag==0 && finalPostings.size()<10)
+							{
+								recur_flag=1;
+								defOp="OR";
+								op="OR";
+								qterms.clear();
+								finalPostings=queryProcessor(userQuery);
+								recur_flag=0;
+								op="AND";
+								defOp="AND";
+							}
+							
+	                        if(finalPostings!=null && !finalPostings.isEmpty()){
+	                        	double max=Collections.max(postings.values()),sc=0;
+	                            outputLine=queryId+":{";
+	                            for(Map.Entry<Integer,Double> posting: finalPostings){
+	                            	sc=(posting.getValue()-0)/(max-0);
+	                                outputLine+=IndexWriter.docCatList.get(posting.getKey())[0]+"#"+String.format("%.5f",sc)+", ";
+	                            }
+	                            outputLine=outputLine.substring(0, outputLine.length()-2)+"}";
+	                            outputLines.add(outputLine);
+	                        
+					}else{
+						System.out.println("Error at line "+i+" in QueryString");
+						break;
+					}
+				}else{
+					System.out.println("Query "+i+" missing in file");
+					break;
+				}
+			}
+		}
+			if(outputLines!=null && !outputLines.isEmpty() ){
+                o_stream.println("numResults="+outputLines.size());
+                for(String temp: outputLines){
+                    o_stream.println(temp);
+                }
+            }else{
+                
+                o_stream.println("numResults=0");
+            }
+	
+        }catch(IOException ioe){
+            
+        }
+ 
+    }
+ 
+    
+    public List<Map.Entry<Integer, Double>> queryProcessor(String userQuery){
+    	ScoringModel model=currentmodel;
+    	if(recur_flag==0)
 			startTime=System.currentTimeMillis();
-		Query q=QueryParser.parse(userQuery, defOp);
+    	Query q=QueryParser.parse(userQuery, defOp);
 		String fq=q.toString();
 		String[] k=fq.split(" ");
 		if(postings==null)
@@ -482,206 +724,7 @@ public class SearchRunner {
 		    final_result.putAll(postings);
 		    finalp=IndexReader.entriesComparator(final_result);
 		    }
-		
-		
-		Entry<Integer, Double> doc;
-		if(recur_flag==0 && finalp.size()<10)
-		{
-			recur_flag=1;
-			defOp="OR";
-			op="OR";
-			qterms.clear();
-			query(userQuery,model);
-			recur_flag=0;
-			op="AND";
-			defOp="AND";
-		}
-		else
-		{
-		double sc=0.0;   
-		max=Collections.max(postings.values());
-		//max=Math.max(max, Collections.max(final_result.values()));
-		long time=System.currentTimeMillis()-startTime;
-		o_stream.println("Query: "+userQuery+"| "+fq);
-		o_stream.println("Query time: "+time*0.001 + " seconds");
-		o_stream.println("\n");
-		String[] snippet_title;
-		for(int i=0;res_count<=res_total && i<finalp.size();i++)
-		{
-			
-			doc = finalp.get(i);
-			snippet_title=getSnippet_title(IndexWriter.docCatList.get(doc.getKey())[0]);
-			sc=(doc.getValue()-min)/(max-min);
-			if(sc==0 || doc.getKey()==0)
-				i++;
-			else
-			{
-			o_stream.println("Result Rank: "+res_count++);
-			o_stream.println("Result title: "+snippet_title[0]);
-            o_stream.println("Result snippet: "+snippet_title[1]);
-			o_stream.println("Result relevance: "+sc);
-			// DELETE BEFORE SUBMIT!
-			o_stream.println("Result docId: "+doc.getKey());
-			o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-			o_stream.println("Result before normalization: "+doc.getValue());
-			
-			o_stream.println("\n");
-			}
-		}
-		}
-//		for(Entry<Integer, Double> res:final_result.entrySet())
-//		{
-//			doc=res;
-//			sc=(doc.getValue()-min)/(max-min);
-//			if(sc!=0 && doc.getKey()!=0)
-//			{
-//				o_stream.println("Result Rank: "+res_count++);
-//				o_stream.println("Result title: "+doc.getKey());
-//				o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-//				o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
-//				o_stream.println("\n");
-//			}
-//		}
-		
-	}
 	
-	
-	 
-	
-	
-	/**
-	 * Method to execute queries in E mode
-	 * @param queryFile : The file from which queries are to be read and executed
-	 */
-	public void query(File queryFile) {
-		//TODO: IMPLEMENT THIS METHOD
-//		numQueries=3
-//				Q_1A63C:{hello world}
-//				Q_6V87S:{Category:oil AND place:Dubai AND ( price OR cost )}
-//				Q_4K66L:{long query with several words}
-		
-		FileReader f_in = null;
-		BufferedReader br= null;
-		 List<Map.Entry<Integer, Double>> finalPostings;
-	        ArrayList<String> outputLines= new ArrayList<String>(); 
-	        String outputLine;
-		try {
-			f_in = new FileReader(queryFile);
-			br= new BufferedReader(f_in);
-			String line;
-			int queryNum=0;
-			String queryId;
-			String userQuery;
-			Query query;
-			if((line=br.readLine())!=null){
-				if(line.trim().startsWith("numQueries=")){
-					queryNum=Integer.parseInt(line.substring(line.indexOf("numQueries=")+11));
-				}else{
-					System.out.println("Corrupted Query File.Invalid numQueries statement");
-				}
-			}
-			int i=0;
-			while(i++<queryNum){
-				if((line=br.readLine())!=null){
-					if(line.contains(":")){
-						queryId=line.substring(0,line.indexOf(":"));
-						userQuery=line.substring(line.indexOf(":")+2,line.length()-1);
-						query=QueryParser.parse(userQuery, "OR");
-						 finalPostings= queryProcessor(query);
-	                        if(finalPostings!=null && !finalPostings.isEmpty()){
-	                            outputLine=queryId+":{";
-	                            for(Map.Entry<Integer,Double> posting: finalPostings){
-	                                outputLine+=posting.getKey()+"#"+posting.getValue()+", ";
-	                            }
-	                            outputLine=outputLine.substring(0, outputLine.length()-2)+"}";
-	                            outputLines.add(outputLine);
-	                        }
-	                        
-	                        
-					}else{
-						System.out.println("Error at line "+i+" in QueryString");
-						break;
-					}
-				}else{
-					System.out.println("Query "+i+" missing in file");
-					break;
-				}
-			}
-			if(outputLines!=null && !outputLines.isEmpty() ){
-                o_stream.println("numResults="+outputLines.size());
-                for(String temp: outputLines){
-                    o_stream.println(temp);
-                }
-            }else{
-                
-                o_stream.println("numResults=0");
-            }
-            
-        }catch(IOException ioe){
-            
-        }
- 
-    }
- 
-    
-    public List<Map.Entry<Integer, Double>> queryProcessor(Query q){
-//      Query q=QueryParser.parse(userQuery, "OR");
-        String fq=q.toString();
-        String[] k=fq.split(" ");
-        TreeMap<Integer, Double> postings=new TreeMap<Integer,Double>();
-        String tempop="OR";
-        String val;
-        for(iter=0;iter<k.length;iter++)
-        {
-            val=k[iter];
-            if(val.equals("["))
-            {
-                TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
-                val=k[++iter];
-                tempop=op;
-                while(!val.equals("]"))
-                {
-                    temp=processblock(temp, val,  k);
-                    val=k[++iter];
-                }
-                postings=mergePostings(postings,temp,tempop);
-            }
-            else if(!val.equals("{") && !val.equals("}"))
-            {
-                postings=processblock(postings,val,k);
-            }
-        }
-         postings.remove(-1);
-        double length=0,doc_len=0,score=0;
-        for(double d:qterms.values())
-        {
-            length+=d*d;
-        }
-        length=Math.sqrt(length);
-        for(Integer docID:postings.keySet())
-        {
-            String[] str2=IndexWriter.docCatList.get(docID);
-            try
-            {
-                doc_len=Math.sqrt((Double.parseDouble(str2[1])));
-            }
-            catch(Exception e)
-            {
-                doc_len=0;
-            }
-            score=postings.get(docID)/(length * doc_len);
-            postings.put(docID, score);
-        }
-        
-         Comparator<Map.Entry<Integer, Double>> byMapValues = new Comparator<Map.Entry<Integer, Double>>() {
-                @Override
-                public int compare(Map.Entry<Integer, Double> left, Map.Entry<Integer, Double> right) {
-                    return right.getValue().compareTo(left.getValue());
-                }
-            };
-            List<Map.Entry<Integer, Double>> finalp = new ArrayList<Map.Entry<Integer, Double>>();
-            finalp.addAll(postings.entrySet());
-            Collections.sort(finalp, byMapValues);
             return finalp;
     }
     
