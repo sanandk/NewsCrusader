@@ -87,8 +87,6 @@ public class IndexWriter {
 		Double frequency=0.0;
 		//A-C D-G H-K L-P Q-S T-Z
 		
-		if(termValue.contains("leverage"))
-			System.out.println("docid" + FileUtilities.docId +"docname: "+str[0]+" term value: "+termValue);
 		switch(termValue.charAt(0)){
 			case 'a': case 'b': case 'c':
 				if(termIndexAC.containsKey(termValue)){
@@ -130,10 +128,7 @@ public class IndexWriter {
 				termIndexHK.put(termValue,termPosting );
 				break;
 			case 'l': case 'm': case 'n': case 'o': case 'p':
-//				if(termValue.equals("leverag"))
-//					System.out.println("docid" + FileUtilities.docId +"docname: "+str[0]);
-				if(FileUtilities.docId==7676)
-					System.out.println("termValue: " +termValue);
+
 				if(termIndexLP.containsKey(termValue)){
 					termPosting=termIndexLP.get(termValue);
 					frequency=termPosting.get(FileUtilities.docId);
@@ -206,13 +201,11 @@ public class IndexWriter {
 			return;
 		try {
 			str[0]=fid[0];
-			if(str[0].equals("0007847"))
-				System.out.println("A");
+			
 			IndexWriter.docList.put(fid[0],++FileUtilities.docId);
 			
 			IndexWriter.docCatList.put(FileUtilities.docId,str);
 
-			
 			if(cont!=null || tit!=null){	
 				
 					t_stream=t.consume(cont[0]);
@@ -261,6 +254,7 @@ public class IndexWriter {
 				}
 			}
 			}
+			String s;
             if(place!=null && place[0].length()>1){
 				t_stream=t.consume(place[0]);
 
@@ -270,7 +264,7 @@ public class IndexWriter {
 					
 				}
 				
-				String s;
+				
 				ArrayList<Integer> ll;
 				while(t_stream.hasNext())
 				{
@@ -291,7 +285,7 @@ public class IndexWriter {
 				CatIndex.put(cat[0], ll);
 			
 				}
-			
+			ArrayList<Integer> ll;
 			if(author!=null && author[0].length()>1){
 				String a[] = author[0].split(" and ");
 				StringBuilder sb=new StringBuilder();
@@ -304,7 +298,15 @@ public class IndexWriter {
 					}
 					
 					while(t_stream.hasNext())
-						sb.append(t_stream.next()).toString();
+					{
+						s=t_stream.next().toString();
+						sb.append(s);
+						ll=AuthorIndex.get(s);
+						if(ll==null)
+							ll=new ArrayList<Integer>();
+						ll.add(FileUtilities.docId);
+						AuthorIndex.put(s, ll);
+					}
 					
 					if(authororg!=null &&  authororg[0].length()>1)
 					{
@@ -318,13 +320,19 @@ public class IndexWriter {
 						{
 							if(i==0)
 								sb.append('(');
-							sb.append(t_stream.next()).toString();
+							s=t_stream.next().toString();
+							sb.append(s);
+							ll=AuthorIndex.get(s);
+							if(ll==null)
+								ll=new ArrayList<Integer>();
+							ll.add(FileUtilities.docId);
+							AuthorIndex.put(s, ll);
 						}
 						sb.append(')');
 					}
 					
-					String s=sb.toString();
-					ArrayList<Integer> ll=AuthorIndex.get(s);
+					s=sb.toString();
+					ll=AuthorIndex.get(s);
 					if(ll==null)
 						ll=new ArrayList<Integer>();
 					ll.add(FileUtilities.docId);

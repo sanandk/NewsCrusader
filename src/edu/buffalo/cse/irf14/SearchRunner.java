@@ -40,18 +40,18 @@ public class SearchRunner {
 	
 	public static void main(String args[])
 	{
-//		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
+		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
 	//	r.query(new File("D:\\output\\q.txt"));
-//		r.query("laser", ScoringModel.OKAPI);
+		r.query("a*obe OR l*ser", ScoringModel.OKAPI);
 	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
 			//r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
 			//r.getQueryTerms();
 		//		r.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
-		SearchRunner r=new SearchRunner("D:\\UB\\Project\\IR\\project dataset\\news_training\\index","D:\\UB\\Project\\IR\\project dataset\\corpus_dataset",'Q',System.out);
-		r.q=QueryParser.parse("he*lo worl?","AND");
+	//	SearchRunner r=new SearchRunner("D:\\UB\\Project\\IR\\project dataset\\news_training\\index","D:\\UB\\Project\\IR\\project dataset\\corpus_dataset",'Q',System.out);
+	//	r.q=QueryParser.parse("he*lo worl? AND test OR Category:coffee","AND");
 //		r.query(new File("D:\\UB\\Project\\IR\\project dataset\\QueryFile.txt"));
-		r.getWCQueryTerms();
-		System.out.println(r.wcQueryTerms.size());
+	//	r.getWCQueryTerms();
+	//	System.out.println(r.wcQueryTerms);
 	}
 	TreeMap <Integer, Double> final_result;
 	final double k1=1.2,k3=2,b=0.75;
@@ -105,17 +105,7 @@ public class SearchRunner {
 			IndexWriter.CatIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexCat);
 		
 			IndexWriter.PlaceIndex=(TreeMap<String, ArrayList<Integer>>) FileUtilities.readIndexFile(FileUtilities.indexPlace);
-			/*
-				for(Entry<String, HashMap<Integer, Double>> id:IndexWriter.termIndexLP.entrySet())
-				{
-					if(id.getKey().startsWith("leverage"))
-					{
-					System.out.print("\n"+id.getKey()+":");
-					for(Integer a:id.getValue().keySet())
-						System.out.print(" "+a+",");
-					}
-				}
-				*/
+			
 	}
 	
 	public TreeMap<Integer, Double> getPostings(String term, IndexType type, String op) 
@@ -403,88 +393,9 @@ public class SearchRunner {
 		//TODO: IMPLEMENT THIS METHOD
 		 Double max=0.0;
 		currentmodel=model;
+		
 		queryProcessor(userQuery);
-//		if(recur_flag==0)
-//			startTime=System.currentTimeMillis();
-//		Query q=QueryParser.parse(userQuery, defOp);
-//		String fq=q.toString();
-//		String[] k=fq.split(" ");
-//		if(postings==null)
-//		postings=new TreeMap<Integer,Double>();
-//		String tempop=defOp;
-//		String val;
-//		for(iter=0;iter<k.length;iter++)
-//		{
-//			val=k[iter];
-//			if(val.equals("["))
-//			{
-//				TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
-//				val=k[++iter];
-//				tempop=op;
-//				while(!val.equals("]"))
-//				{
-//					temp=processblock(temp, val,  k);
-//					val=k[++iter];
-//				}
-//				postings=mergePostings(postings,temp,tempop);
-//			}
-//			else if(!val.equals("{") && !val.equals("}"))
-//			{
-//				postings=processblock(postings,val,k);
-//			}
-//			else if(val.equals("AND") || val.equals("OR"))
-//				tempop=val;
-//		}
-//		 postings.remove(-1);
-//		double doc_len=0,score=0;
-//	
-//	
-//		if(model==ScoringModel.TFIDF)
-//		{
-//			double length=0;
-//			for(double d:qterms.values())
-//				length+=d*d;
-//			length=Math.sqrt(length);
-//			for(Integer docID:postings.keySet())
-//			{
-//				try
-//				{
-//				doc_len=Double.parseDouble(IndexWriter.docCatList.get(docID)[1]);
-//				}
-//				catch(Exception e)
-//				{
-//					doc_len=0.0;
-//				}
-//			//	doc_len=Math.sqrt(docterms.get(docID));
-//				score=postings.get(docID)/(length * doc_len);
-//				postings.put(docID, score);
-//			}	
-//		}
-//		else
-//		{
-//			for(Integer docID:postings.keySet())
-//			{
-//				score=postings.get(docID);
-//				postings.put(docID, score);
-//			}
-//		}
-//		  
-//		    if(postings.size()>0)
-//		    {
-//		    	
-//		    for(Entry<Integer, Double> ent : postings.entrySet())
-//		    {
-//		    	min=final_result.get(ent.getKey());
-//		    	if(min==null)
-//		    		min=0.0;
-//		    	postings.put(ent.getKey(), Math.max(ent.getValue(),min));
-//		    }
-//		    
-//		    final_result.putAll(postings);
-//		    finalp=IndexReader.entriesComparator(final_result);
-//		    }
-		
-		
+
 		Entry<Integer, Double> doc;
 		if(recur_flag==0 && finalp.size()<10)
 		{
@@ -499,9 +410,14 @@ public class SearchRunner {
 		}
 		else
 		{
-		double sc=0.0;   
+		double sc=0.0;
+		if(postings.size()<1)
+		{
+			o_stream.println("No Results Found!");
+			return;
+		}
 		max=Collections.max(postings.values());
-		//max=Math.max(max, Collections.max(final_result.values()));
+	
 		long time=System.currentTimeMillis()-startTime;
 		o_stream.println("Query: "+userQuery);
 		o_stream.println("Query time: "+time + " ms");
@@ -522,28 +438,15 @@ public class SearchRunner {
             o_stream.println("Result snippet: "+snippet_title[1]);
 			o_stream.println("Result relevance: "+String.format("%.5f",sc));
 			// DELETE BEFORE SUBMIT!
-			o_stream.println("Result docId: "+doc.getKey());
-			o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-			o_stream.println("Result before normalization: "+doc.getValue());
+		//	o_stream.println("Result docId: "+doc.getKey());
+		//	o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
+		//	o_stream.println("Result before normalization: "+doc.getValue());
 			
 			o_stream.println("\n");
 			}
 		}
 		}
-//		for(Entry<Integer, Double> res:final_result.entrySet())
-//		{
-//			doc=res;
-//			sc=(doc.getValue()-min)/(max-min);
-//			if(sc!=0 && doc.getKey()!=0)
-//			{
-//				o_stream.println("Result Rank: "+res_count++);
-//				o_stream.println("Result title: "+doc.getKey());
-//				o_stream.println("Result snippet: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-//				o_stream.println("Result relevance: "+sc+"|"+doc.getValue());
-//				o_stream.println("\n");
-//			}
-//		}
-		
+
 	}
 	
 	
@@ -644,6 +547,8 @@ public class SearchRunner {
     	if(recur_flag==0)
 			startTime=System.currentTimeMillis();
     	q=QueryParser.parse(userQuery, defOp);
+    	if(userQuery.contains("*") || userQuery.contains("?"))
+    		processWCQueryTerms();
 		String fq=q.toString();
 		String[] k=fq.split(" ");
 		if(postings==null)
@@ -653,6 +558,43 @@ public class SearchRunner {
 		for(iter=0;iter<k.length;iter++)
 		{
 			val=k[iter];
+			if(val.contains("*") || val.contains("?"))
+			{
+				String oldval=val;
+				String[] vsp=val.split(":");
+				StringBuilder sb=new StringBuilder();
+				List<String> lst= null;
+				if(wcQueryTerms!=null)
+					lst = wcQueryTerms.get(val);
+				System.out.println(wcQueryTerms+","+val);
+				if(lst!=null)
+				{
+					
+				for(int i=0;i<lst.size();i++)
+				{
+					val=lst.get(i);
+					if(!val.contains(" "))
+					{
+						sb.append(vsp[0]);
+						sb.append(":");
+					}
+					sb.append(val);
+					if(i==0)
+						val=sb.toString();
+					if(i<lst.size()-1)
+						sb.append(" OR ");
+				}
+					fq=fq.replace(oldval, sb.toString());
+					fq=fq.replace("{ ", "");
+					fq=fq.replace(" }", "");
+					//System.out.println("ov:"+oldval+" sb:"+sb.toString()+" Mfq:"+fq);
+					q=QueryParser.parse(fq, "OR");
+					fq=q.toString();
+					k=fq.split(" ");
+					//System.out.println("finq:"+fq);
+				}
+					
+			}
 			if(val.equals("["))
 			{
 				TreeMap<Integer, Double> temp=new TreeMap<Integer,Double>();
@@ -805,7 +747,7 @@ public class SearchRunner {
 	 */
 	public static boolean wildcardSupported() {
 		//TODO: CHANGE THIS TO TRUE ONLY IF WILDCARD BONUS ATTEMPTED
-		return false;
+		return true;
 	}
 	
 	/**
@@ -819,7 +761,7 @@ public class SearchRunner {
 	}
 	
 	HashMap<String, List<String>> wcQueryTerms;
-	public void getWCQueryTerms() {
+	public void processWCQueryTerms() {
 		//TODO:IMPLEMENT THIS METHOD IFF WILDCARD BONUS ATTEMPTED
 		//wcIndexes
 		wcQueryTerms=new HashMap<String, List<String>>();
@@ -1141,6 +1083,7 @@ public class SearchRunner {
 						}
 					}
 				}
+				wcTerm=wcTerm.trim();
 				if(!wcTermList.isEmpty()){
 					wcQueryTerms.put(wcTerm, wcTermList);
 				}else{
