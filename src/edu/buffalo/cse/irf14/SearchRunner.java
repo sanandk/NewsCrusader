@@ -38,11 +38,12 @@ import edu.buffalo.cse.irf14.query.QueryParser;
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
 	
+	// REMOVE BEFORE SUBMIT
 	public static void main(String args[])
 	{
 		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
 	//	r.query(new File("D:\\output\\q.txt"));
-		r.query("a*obe OR l*ser", ScoringModel.OKAPI);
+		r.query("Place:tokyo NOT bank", ScoringModel.TFIDF);
 	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
 			//r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
 			//r.getQueryTerms();
