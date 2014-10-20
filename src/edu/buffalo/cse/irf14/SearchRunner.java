@@ -1,8 +1,12 @@
 package edu.buffalo.cse.irf14;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -38,22 +42,7 @@ import edu.buffalo.cse.irf14.query.QueryParser;
 public class SearchRunner {
 	public enum ScoringModel {TFIDF, OKAPI};
 	
-	// REMOVE BEFORE SUBMIT
-	public static void main(String args[])
-	{
-		SearchRunner r=new SearchRunner("D:\\output","D:\\Projects\\news_training\\flattened",'Q',System.out);
-	//	r.query(new File("D:\\output\\q.txt"));
-		r.query("Place:tokyo NOT bank", ScoringModel.TFIDF);
-	//	r.query("Category:coffee beans", ScoringModel.OKAPI);
-			//r.query("hostile bids mergers takeovers acquisitions", ScoringModel.OKAPI);
-			//r.getQueryTerms();
-		//		r.query("trade deficit foreign exchange trade surplus balance of trade", ScoringModel.OKAPI);
-	//	SearchRunner r=new SearchRunner("D:\\UB\\Project\\IR\\project dataset\\news_training\\index","D:\\UB\\Project\\IR\\project dataset\\corpus_dataset",'Q',System.out);
-	//	r.q=QueryParser.parse("he*lo worl? AND test OR Category:coffee","AND");
-//		r.query(new File("D:\\UB\\Project\\IR\\project dataset\\QueryFile.txt"));
-	//	r.getWCQueryTerms();
-	//	System.out.println(r.wcQueryTerms);
-	}
+	
 	TreeMap <Integer, Double> final_result;
 	final double k1=1.2,k3=2,b=0.75;
 	PrintStream o_stream;
@@ -81,6 +70,7 @@ public class SearchRunner {
 		 final_result=new TreeMap<Integer, Double>();
 		 finalp= new ArrayList<Map.Entry<Integer, Double>>();
 	}
+	
 	HashMap<String, Double> qterms=new HashMap<String, Double>();
 	//HashMap<Integer, Double> docterms=new HashMap<Integer, Double>();
 	String ori_term="";
@@ -438,14 +428,11 @@ public class SearchRunner {
 			o_stream.println("Result title: "+snippet_title[0]);
             o_stream.println("Result snippet: "+snippet_title[1]);
 			o_stream.println("Result relevance: "+String.format("%.5f",sc));
-			// DELETE BEFORE SUBMIT!
-		//	o_stream.println("Result docId: "+doc.getKey());
-		//	o_stream.println("Result fileName: "+IndexWriter.docCatList.get(doc.getKey())[0]);
-		//	o_stream.println("Result before normalization: "+doc.getValue());
 			
 			o_stream.println("\n");
 			}
 		}
+		res_count=1;
 		}
 
 	}
@@ -509,10 +496,14 @@ public class SearchRunner {
 	                        if(finalPostings!=null && !finalPostings.isEmpty()){
 	                        	double max=Collections.max(postings.values()),sc=0;
 	                            outputLine=queryId+":{";
+	                            res_count=1;
 	                            for(Map.Entry<Integer,Double> posting: finalPostings){
+	                            	if(res_count++>res_total)
+	                            		break;
 	                            	sc=(posting.getValue()-0)/(max-0);
 	                                outputLine+=IndexWriter.docCatList.get(posting.getKey())[0]+"#"+String.format("%.5f",sc)+", ";
 	                            }
+	                            res_count=1;
 	                            outputLine=outputLine.substring(0, outputLine.length()-2)+"}";
 	                            outputLines.add(outputLine);
 	                        
